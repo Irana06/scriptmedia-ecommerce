@@ -64,6 +64,26 @@ return [
             ]) : [],
         ],
 
+        'central' => [
+            'driver' => 'mysql',
+            'host' => env('CENTRAL_DB_HOST', '127.0.0.1'),
+            'port' => env('CENTRAL_DB_PORT', '3306'),
+            'database' => env('CENTRAL_DB_DATABASE'),
+            'username' => env('CENTRAL_DB_USERNAME'),
+            'password' => env('CENTRAL_DB_PASSWORD', ''),
+            'unix_socket' => env('CENTRAL_DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                Mysql::ATTR_SSL_CA => env('CENTRAL_MYSQL_ATTR_SSL_CA'),
+                PDO::ATTR_TIMEOUT => 2,
+            ]) : [],
+        ],
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),

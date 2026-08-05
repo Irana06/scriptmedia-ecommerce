@@ -1,5 +1,11 @@
 @php($editing = isset($product))
 
+@if (! $editing && ! $canAddProduct)
+    <div class="mb-6 rounded-xl border border-orange/30 bg-orange/10 p-4 text-sm text-navy">Batas paket tercapai ({{ $productLimit }} produk). Form tetap ditampilkan untuk referensi, tetapi produk baru tidak dapat disimpan.</div>
+@endif
+
+@error('limit')<div class="mb-6 rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-700">{{ $message }}</div>@enderror
+
 <div class="grid gap-6 lg:grid-cols-[1fr_20rem]">
     <x-ui.card><div class="grid gap-5 sm:grid-cols-2">
         <label class="grid gap-2 text-sm font-semibold text-navy sm:col-span-2">Nama produk<input name="name" value="{{ old('name', $product->name ?? '') }}" required class="rounded-xl border border-line px-4 py-3 font-normal"></label>
@@ -10,5 +16,5 @@
     </div></x-ui.card>
     <div class="space-y-6"><x-ui.card><h2 class="text-lg text-navy">Publikasi</h2><label class="mt-4 flex gap-3 text-sm text-ink-soft"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $product->is_active ?? true))>Aktif di storefront</label><label class="mt-3 flex gap-3 text-sm text-ink-soft"><input type="checkbox" name="is_featured" value="1" @checked(old('is_featured', $product->is_featured ?? false))>Produk unggulan</label></x-ui.card>
         <x-ui.card><h2 class="text-lg text-navy">Gambar produk</h2>@if ($editing && $product->getFirstMediaUrl('product-images'))<img src="{{ $product->getFirstMediaUrl('product-images', 'thumb') }}" alt="" class="mt-4 aspect-video w-full rounded-xl object-cover">@endif<input type="file" name="image" accept="image/*" class="mt-4 block w-full text-sm text-ink-soft"><p class="mt-2 text-xs text-ink-soft">JPG/PNG/WebP, maks. 4 MB.</p></x-ui.card>
-        <x-ui.button type="submit" class="w-full">{{ $editing ? 'Simpan perubahan' : 'Buat produk' }}</x-ui.button></div>
+        <x-ui.button type="submit" class="w-full disabled:cursor-not-allowed disabled:opacity-50" :disabled="! $editing && ! $canAddProduct">{{ $editing ? 'Simpan perubahan' : 'Buat produk' }}</x-ui.button></div>
 </div>

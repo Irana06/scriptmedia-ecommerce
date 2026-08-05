@@ -50,6 +50,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'permiss
     Route::put('store-settings', [AdminStoreSettingController::class, 'update'])
         ->middleware('permission:manage store settings')
         ->name('store-settings.update');
+    Route::patch('payment-gateways/{paymentGateway}', [AdminStoreSettingController::class, 'updateGateway'])
+        ->middleware('permission:manage store settings')
+        ->name('payment-gateways.update');
     Route::get('reports', AdminReportController::class)
         ->middleware('permission:view reports')
         ->name('reports.index');

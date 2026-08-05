@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\StoreLimitService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,6 +13,8 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
+    public function __construct(private readonly StoreLimitService $storeLimits) {}
+
     public function index(Request $request): View
     {
         $search = $request->string('search')->toString();
@@ -22,18 +25,31 @@ class ProductController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('admin.products.index', compact('products', 'search'));
+        return view('admin.products.index', [
+            'products' => $products,
+            'search' => $search,
+            'canAddProduct' => $this->storeLimits->canAddProduct(),
+            'productLimit' => $this->storeLimits->productLimit(),
+        ]);
     }
 
     public function create(): View
     {
         return view('admin.products.create', [
             'categories' => Category::query()->where('is_active', true)->orderBy('name')->get(),
+            'canAddProduct' => $this->storeLimits->canAddProduct(),
+            'productLimit' => $this->storeLimits->productLimit(),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
+        if (! $this->storeLimits->canAddProduct()) {
+            return back()
+                ->withInput()
+                ->withErrors(['limit' => $this->productLimitMessage()]);
+        }
+
         $validated = $this->validateProduct($request);
         $product = Product::query()->create([
             ...$validated,
@@ -111,5 +127,12 @@ class ProductController extends Controller
         }
 
         return $slug;
+    }
+
+    private function productLimitMessage(): string
+    {
+        $limit = $this->storeLimits->productLimit();
+
+        return "Batas paket tercapai ({$limit} produk). Hapus produk atau tingkatkan paket untuk menambah produk baru.";
     }
 }
