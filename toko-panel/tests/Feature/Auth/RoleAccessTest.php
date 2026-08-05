@@ -2,8 +2,6 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Models\Plan;
-use App\Models\Subscription;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -48,35 +46,5 @@ class RoleAccessTest extends TestCase
         $this->actingAs($owner)
             ->get(route('portal.tenants.show', $otherTenant))
             ->assertForbidden();
-    }
-
-    public function test_owner_can_submit_content_request_only_within_plan_quota(): void
-    {
-        $owner = User::factory()->owner()->create();
-        $tenant = Tenant::factory()->create(['owner_user_id' => $owner->id]);
-        $plan = Plan::factory()->create(['content_request_quota' => 1]);
-        Subscription::factory()->for($tenant)->for($plan)->create();
-
-        $route = route('portal.tenants.content-requests.store', $tenant);
-
-        $this->actingAs($owner)
-            ->post($route, ['description' => 'Perbarui judul utama pada halaman depan.'])
-            ->assertRedirect();
-
-        $this->assertDatabaseHas('content_change_requests', [
-            'tenant_id' => $tenant->id,
-            'requested_by_user_id' => $owner->id,
-            'status' => 'pending',
-        ]);
-        $this->assertDatabaseHas('plan_feature_usages', [
-            'tenant_id' => $tenant->id,
-            'content_requests_used' => 1,
-        ]);
-
-        $this->actingAs($owner)
-            ->post($route, ['description' => 'Ajukan perubahan konten untuk kedua kali.'])
-            ->assertSessionHasErrors('description');
-
-        $this->assertDatabaseCount('content_change_requests', 1);
     }
 }

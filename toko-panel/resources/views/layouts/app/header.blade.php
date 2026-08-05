@@ -22,6 +22,7 @@
                         <a href="{{ route('admin.plans.index') }}" class="rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.plans.*') ? 'bg-white/15' : '' }}" wire:navigate>Plan</a>
                         <a href="{{ route('admin.tenants.index') }}" class="rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.tenants.*') ? 'bg-white/15' : '' }}" wire:navigate>Tenant</a>
                         <a href="{{ route('admin.billing.index') }}" class="rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.billing.*') ? 'bg-white/15' : '' }}" wire:navigate>Billing</a>
+                        <a href="{{ route('admin.content-requests.index') }}" class="rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.content-requests.*') ? 'bg-white/15' : '' }}" wire:navigate>Tiket Konten</a>
                     @elserole('owner')
                         <a href="{{ route('portal.dashboard') }}" class="rounded-full bg-white/12 px-4 py-2 text-sm text-white transition hover:bg-white/20" wire:navigate>Portal Tenant</a>
                     @endrole

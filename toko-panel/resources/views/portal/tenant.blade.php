@@ -59,25 +59,10 @@
                 @endif
             </x-ui.card>
 
-            <x-ui.card>
-                <x-ui.badge variant="orange">Request konten</x-ui.badge>
-                <h2 class="mt-4 text-xl text-navy">Ajukan perubahan</h2>
-                <form method="POST" action="{{ route('portal.tenants.content-requests.store', $tenant) }}" class="mt-5 space-y-4">
-                    @csrf
-                    <flux:textarea
-                        name="description"
-                        label="Deskripsi perubahan"
-                        :value="old('description')"
-                        placeholder="Jelaskan konten yang perlu diubah..."
-                        rows="4"
-                        required
-                    />
-                    <x-ui.button type="submit" class="w-full">Kirim request</x-ui.button>
-                </form>
-            </x-ui.card>
+            <livewire:portal.manage-content-requests :tenant-id="$tenant->id" />
         </div>
 
-        <div class="grid gap-5 xl:grid-cols-2">
+        <div>
             <x-ui.card :padding="false" class="overflow-hidden">
                 <div class="border-b border-line px-6 py-5">
                     <h2 class="text-xl text-navy">Histori invoice</h2>
@@ -105,23 +90,6 @@
                             @endforelse
                         </tbody>
                     </table>
-                </div>
-            </x-ui.card>
-
-            <x-ui.card>
-                <h2 class="text-xl text-navy">Request terbaru</h2>
-                <div class="mt-5 space-y-4">
-                    @forelse ($tenant->contentChangeRequests as $contentRequest)
-                        <article class="rounded-xl border border-line p-4">
-                            <div class="flex items-center justify-between gap-3">
-                                <time class="text-xs text-ink-soft">{{ $contentRequest->created_at->format('d M Y') }}</time>
-                                <x-ui.badge>{{ str($contentRequest->status)->replace('_', ' ')->title() }}</x-ui.badge>
-                            </div>
-                            <p class="mt-3 text-sm leading-6 text-ink">{{ $contentRequest->description }}</p>
-                        </article>
-                    @empty
-                        <p class="text-sm text-ink-soft">Belum ada request perubahan konten.</p>
-                    @endforelse
                 </div>
             </x-ui.card>
         </div>
