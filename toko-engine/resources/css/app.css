@@ -90,6 +90,22 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
+.auth-form [data-flux-label] {
+    @apply text-sm font-semibold text-navy;
+}
+
+.auth-form input[data-flux-control] {
+    @apply rounded-xl border-line bg-offwhite px-4 py-3 text-navy shadow-none placeholder:text-ink-soft/50;
+}
+
+.auth-form input[data-flux-control]:focus {
+    @apply border-tosca bg-white ring-2 ring-tosca/20 ring-offset-0;
+}
+
+.auth-form [data-flux-checkbox] {
+    @apply border-line;
+}
+
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */

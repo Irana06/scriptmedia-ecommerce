@@ -1,61 +1,58 @@
-<x-layouts::auth :title="__('Log in')">
-    <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
+<x-layouts::auth :title="__('Masuk')">
+    <div class="auth-form mx-auto w-full max-w-md">
+        <div>
+            <span class="text-xs font-semibold tracking-[0.16em] text-tosca uppercase">Selamat datang kembali</span>
+            <h2 class="mt-3 text-3xl font-semibold tracking-[-0.035em] text-navy sm:text-4xl">Masuk ke dashboard toko</h2>
+            <p class="mt-3 max-w-sm text-sm leading-6 text-ink-soft">Gunakan akun pengelola untuk mengatur produk, pesanan, dan operasional tokomu.</p>
+        </div>
 
-        <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+        <x-auth-session-status class="mt-6 rounded-xl border border-tosca/20 bg-tosca-tint p-4 text-sm text-navy" :status="session('status')" />
 
-        <x-passkey-verify />
-
-        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
+        <form method="POST" action="{{ route('login.store') }}" class="mt-8 flex flex-col gap-5">
             @csrf
 
-            <!-- Email Address -->
             <flux:input
                 name="email"
-                :label="__('Email address')"
+                label="Alamat email"
                 :value="old('email')"
                 type="email"
                 required
                 autofocus
                 autocomplete="email"
-                placeholder="email@example.com"
+                placeholder="nama@tokomu.com"
             />
 
-            <!-- Password -->
             <div class="relative">
                 <flux:input
                     name="password"
-                    :label="__('Password')"
+                    label="Kata sandi"
                     type="password"
                     required
                     autocomplete="current-password"
-                    :placeholder="__('Password')"
+                    placeholder="Masukkan kata sandi"
                     viewable
                 />
 
                 @if (Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
-                        {{ __('Forgot your password?') }}
+                    <flux:link class="absolute top-0 text-sm font-semibold text-tosca hover:text-navy end-0" :href="route('password.request')" wire:navigate>
+                        Lupa kata sandi?
                     </flux:link>
                 @endif
             </div>
 
-            <!-- Remember Me -->
-            <flux:checkbox name="remember" :label="__('Remember me')" :checked="old('remember')" />
-
-            <div class="flex items-center justify-end">
-                <flux:button variant="primary" type="submit" class="w-full" data-test="login-button">
-                    {{ __('Log in') }}
-                </flux:button>
+            <div class="flex items-center justify-between gap-4">
+                <flux:checkbox name="remember" label="Ingat saya" :checked="old('remember')" />
+                <span class="inline-flex items-center gap-2 text-xs text-ink-soft"><span class="size-1.5 rounded-full bg-tosca"></span>Akses aman</span>
             </div>
+
+            <button type="submit" class="mt-1 inline-flex w-full items-center justify-center gap-2 rounded-full bg-orange px-5 py-3.5 text-sm font-semibold text-navy shadow-[0_10px_24px_rgba(244,163,0,0.24)] transition hover:-translate-y-0.5 hover:bg-orange-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange" data-test="login-button">
+                Masuk ke dashboard
+                <span aria-hidden="true">&rarr;</span>
+            </button>
         </form>
 
-        @if (Route::has('register'))
-            <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
-                <span>{{ __('Don\'t have an account?') }}</span>
-                <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
-            </div>
-        @endif
+        <!-- <x-passkey-verify /> -->
+
+        <p class="mt-7 text-center text-xs leading-5 text-ink-soft/75">Dengan masuk, kamu menyetujui kebijakan keamanan dan penggunaan sistem Toko Engine.</p>
     </div>
 </x-layouts::auth>
