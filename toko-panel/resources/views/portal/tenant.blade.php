@@ -17,6 +17,16 @@
             </div>
         @endif
 
+        @if ($tenant->store_status === 'grace_period')
+            <div class="rounded-card border border-orange/40 bg-orange/10 px-5 py-4 text-sm text-navy">
+                Pembayaran tenant ini melewati jatuh tempo. Toko masih aktif selama masa tenggang; segera selesaikan pembayaran agar layanan tidak disuspend.
+            </div>
+        @elseif ($tenant->store_status === 'suspended')
+            <div class="rounded-card border border-red-300 bg-red-50 px-5 py-4 text-sm text-red-900">
+                Toko sedang disuspend karena invoice belum dibayar. Hubungi tim ScriptMedia setelah pembayaran dilakukan.
+            </div>
+        @endif
+
         @php($plan = $tenant->currentSubscription?->plan)
 
         <div class="grid gap-5 lg:grid-cols-3">

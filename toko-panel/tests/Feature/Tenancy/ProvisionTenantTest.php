@@ -114,7 +114,8 @@ class ProvisionTenantTest extends TestCase
                 ->assertOk()
                 ->assertJson([
                     'tenant_id' => $tenant->id,
-                    'status' => 'active',
+                    'provisioning_status' => 'active',
+                    'store_status' => 'active',
                 ]);
 
             $this->assertSame('active', $tenant->fresh()->provisioning_status);
