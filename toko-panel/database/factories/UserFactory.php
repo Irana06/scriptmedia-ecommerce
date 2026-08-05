@@ -2,10 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 /**
  * @extends Factory<User>
@@ -56,5 +58,19 @@ class UserFactory extends Factory
             'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code-1'])),
             'two_factor_confirmed_at' => now(),
         ]);
+    }
+
+    public function admin(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            $user->assignRole(Role::findOrCreate(UserRole::Admin->value, 'web'));
+        });
+    }
+
+    public function owner(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            $user->assignRole(Role::findOrCreate(UserRole::Owner->value, 'web'));
+        });
     }
 }
