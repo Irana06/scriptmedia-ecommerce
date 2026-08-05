@@ -9,7 +9,21 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Questrial', ui-sans-serif, system-ui, sans-serif;
+
+    --color-navy: #0b2545;
+    --color-navy-mid: #14406e;
+    --color-tosca: #2ca6a4;
+    --color-tosca-tint: #e3f4f3;
+    --color-orange: #f4a300;
+    --color-orange-light: #ffb347;
+    --color-offwhite: #f4fafa;
+    --color-ink: #0b2545;
+    --color-ink-soft: #3c5878;
+    --color-line: rgb(11 37 69 / 14%);
+
+    --radius-card: 1.125rem;
+    --shadow-card: 0 12px 35px rgb(11 37 69 / 8%);
 
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
@@ -23,8 +37,8 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    --color-accent: var(--color-neutral-800);
-    --color-accent-content: var(--color-neutral-800);
+    --color-accent: var(--color-tosca);
+    --color-accent-content: var(--color-navy);
     --color-accent-foreground: var(--color-white);
 }
 
@@ -44,6 +58,21 @@
     ::backdrop,
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
+    }
+
+    body {
+        @apply bg-offwhite font-sans text-ink antialiased;
+    }
+
+    h1,
+    h2,
+    h3 {
+        font-weight: 600;
+    }
+
+    h1,
+    h2 {
+        letter-spacing: -0.025em;
     }
 }
 

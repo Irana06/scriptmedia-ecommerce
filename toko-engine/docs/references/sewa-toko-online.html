@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sewa Toko Online — ScriptMedia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2545;
+    --navy-mid:#14406E;
+    --tosca:#2CA6A4;
+    --orange:#F4A300;
+    --orange-light:#FFB347;
+    --offwhite:#F4FAFA;
+    --tosca-tint:#E3F4F3;
+    --ink:#0B2545;
+    --ink-soft:#3C5878;
+    --line: rgba(11,37,69,0.14);
+    --radius: 18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--offwhite);
+    color:var(--ink);
+    font-family:'Questrial', sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{
+    font-family:'Questrial', sans-serif;
+    font-weight:600;
+    margin:0;
+    color:var(--navy);
+  }
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+
+  .wrap{max-width:1180px; margin:0 auto; padding:0 28px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:
+      radial-gradient(1100px 480px at 15% -10%, rgba(244,163,0,0.18), transparent 60%),
+      linear-gradient(180deg, var(--navy) 0%, var(--navy-mid) 100%);
+    color:var(--offwhite);
+    padding:88px 0 120px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero .wrap{position:relative; z-index:2;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--orange-light); font-weight:700;
+    border:1px solid rgba(255,179,71,0.4);
+    padding:7px 14px; border-radius:999px;
+    background:rgba(255,255,255,0.03);
+  }
+  .hero h1{
+    color:#fff;
+    font-size:clamp(34px, 5vw, 54px);
+    line-height:1.08;
+    margin:22px 0 18px;
+    max-width:760px;
+    letter-spacing:-0.01em;
+  }
+  .hero h1 em{color:var(--orange-light); font-style:normal;}
+  .hero p.lede{
+    max-width:560px;
+    color:rgba(244,250,250,0.82);
+    font-size:17px;
+    margin-bottom:0;
+  }
+
+  /* promo strip — key selling points */
+  .promo-strip{
+    margin-top:52px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+  .promo-chip{
+    display:flex; align-items:center; gap:10px;
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,179,71,0.35);
+    border-radius:999px;
+    padding:11px 18px 11px 12px;
+  }
+  .promo-chip .chip-icon{
+    width:30px; height:30px; border-radius:50%;
+    background:var(--orange); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .promo-chip span.label{font-size:13.5px; font-weight:700; color:#fff; letter-spacing:.01em;}
+
+  /* ---------- SECTION HEADERS ---------- */
+  .section{padding:76px 0;}
+  .section-head{max-width:640px; margin:0 auto 48px; text-align:center;}
+  .section-head .eyebrow{
+    color:var(--navy-mid); border-color:var(--line); background:transparent;
+  }
+  .section-head h2{font-size:clamp(26px,3.4vw,36px); margin:16px 0 14px;}
+  .section-head p{color:var(--ink-soft); font-size:15.5px;}
+
+  /* ---------- PLAN ICON BADGES ---------- */
+  .plan-icon-badge{
+    width:54px; height:54px; border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:18px;
+  }
+  .plan-icon-badge.starter{background:linear-gradient(145deg, #4FC3C0, #1C8C8A);}
+  .plan-icon-badge.standard{background:linear-gradient(145deg, var(--orange-light), var(--orange));}
+  .plan-icon-badge.pro{background:linear-gradient(145deg, var(--navy-mid), var(--navy)); box-shadow:0 8px 20px -8px rgba(11,37,69,0.55);}
+
+  /* ---------- BILLING TOGGLE ---------- */
+  .billing-toggle{
+    display:flex; justify-content:center; align-items:center;
+    gap:4px; margin:0 auto 40px; width:fit-content;
+    background:#fff; border:1px solid var(--line); border-radius:999px;
+    padding:5px;
+  }
+  .billing-toggle button{
+    border:none; background:none; cursor:pointer;
+    font-family:'Questrial', sans-serif; font-size:13.5px; font-weight:700;
+    color:var(--ink-soft); padding:9px 18px; border-radius:999px;
+    display:flex; align-items:center; gap:8px;
+    transition:background .2s ease, color .2s ease;
+  }
+  .billing-toggle button.active{background:var(--navy); color:#fff;}
+  .save-badge{
+    font-size:11px; font-weight:800; letter-spacing:.02em;
+    background:var(--orange); color:var(--navy);
+    padding:2px 8px; border-radius:999px;
+  }
+  .billing-toggle button.active .save-badge{background:var(--orange-light);}
+  .price-total.price-annual{display:none;}
+  .save-note{
+    font-size:12.5px; color:var(--navy-mid); font-weight:700;
+    margin-top:2px;
+  }
+
+  /* ---------- PRICING CARDS ---------- */
+  .pricing-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:24px;
+    align-items:stretch;
+  }
+  .plan-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:32px 26px 26px;
+    display:flex; flex-direction:column;
+    position:relative;
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .plan-card:hover{ transform:translateY(-4px); box-shadow:0 20px 40px -20px rgba(11,37,69,0.25); }
+  .plan-card.featured{
+    background:linear-gradient(180deg, #fff 0%, var(--tosca-tint) 100%);
+    border-color:var(--orange);
+    box-shadow:0 24px 50px -22px rgba(244,163,0,0.45);
+  }
+  .badge-featured{
+    position:absolute; top:-13px; left:50%; transform:translateX(-50%);
+    background:var(--orange); color:var(--navy);
+    font-size:11.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+    padding:6px 16px; border-radius:999px;
+  }
+  .plan-name{font-size:22px; margin-bottom:4px;}
+  .plan-stage{font-size:13px; color:var(--tosca); font-weight:600; margin-bottom:20px;}
+
+  .price-breakdown{
+    border-top:1px dashed var(--line);
+    border-bottom:1px dashed var(--line);
+    padding:18px 0;
+    margin-bottom:18px;
+  }
+  .price-row{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:14.5px; color:var(--ink-soft);
+    padding:5px 0;
+  }
+  .price-row .amt{font-weight:700; color:var(--ink);}
+  .price-total{
+    display:flex; justify-content:space-between; align-items:baseline;
+    margin-bottom:4px;
+  }
+  .price-total .big{
+    font-family:'Questrial', sans-serif; font-size:32px; font-weight:600; color:var(--navy);
+  }
+  .price-total .per{font-size:13px; color:var(--ink-soft);}
+  .activation-note{
+    font-size:12.5px; color:var(--ink-soft);
+    background:var(--offwhite);
+    border-radius:10px; padding:8px 12px; margin-bottom:22px;
+    display:flex; gap:6px; align-items:flex-start;
+  }
+  .activation-note b{color:var(--ink);}
+
+  .feature-list{list-style:none; margin:0 0 22px; padding:0; flex:1;}
+  .feature-list li{
+    display:flex; gap:9px; align-items:flex-start;
+    font-size:14px; color:var(--ink-soft); padding:6px 0;
+  }
+  .feature-list li svg{flex-shrink:0; margin-top:2px;}
+
+  .cta-btn{
+    display:block; text-align:center;
+    padding:13px 20px; border-radius:11px;
+    background:var(--navy); color:#fff;
+    font-weight:700; font-size:14.5px;
+    text-decoration:none;
+    transition:background .2s ease;
+  }
+  .cta-btn:hover{background:var(--navy-mid);}
+  .plan-card.featured .cta-btn{background:var(--orange); color:var(--navy);}
+  .plan-card.featured .cta-btn:hover{background:var(--orange-light);}
+
+  .details-toggle{
+    text-align:center; margin-top:14px;
+  }
+  .details-toggle button{
+    background:none; border:none; cursor:pointer;
+    font-family:'Questrial', sans-serif; font-size:13px; font-weight:700;
+    color:var(--navy-mid);
+    display:inline-flex; align-items:center; gap:5px;
+    padding:6px 4px;
+  }
+  .details-toggle svg{transition:transform .25s ease;}
+  .details-toggle.open svg{transform:rotate(180deg);}
+
+  .care-detail{
+    max-height:0; overflow:hidden;
+    transition:max-height .35s ease;
+  }
+  .care-detail.open{max-height:900px;}
+  .care-detail-inner{padding-top:16px;}
+  .care-detail h5{
+    font-size:12.5px; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--tosca); font-weight:700; margin:14px 0 8px;
+  }
+  .care-detail h5:first-child{margin-top:0;}
+  .care-detail ul{list-style:none; margin:0; padding:0;}
+  .care-detail li{
+    font-size:13.5px; color:var(--ink-soft);
+    padding:5px 0 5px 18px; position:relative;
+  }
+  .care-detail li::before{
+    content:'';
+    position:absolute; left:0; top:12px;
+    width:5px; height:5px; border-radius:50%;
+    background:var(--orange);
+  }
+
+  /* ---------- FAQ ---------- */
+  .faq-list{max-width:760px; margin:0 auto;}
+  .faq-item{
+    border-bottom:1px solid var(--line);
+  }
+  .faq-q{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:20px 4px; cursor:pointer;
+    font-family:'Questrial', sans-serif; font-size:17px; color:var(--navy); font-weight:500;
+  }
+  .faq-q svg{transition:transform .25s ease; flex-shrink:0;}
+  .faq-item.open .faq-q svg{transform:rotate(45deg);}
+  .faq-a{
+    max-height:0; overflow:hidden; transition:max-height .35s ease;
+  }
+  .faq-item.open .faq-a{max-height:300px;}
+  .faq-a p{padding:0 4px 20px; color:var(--ink-soft); font-size:14.5px; max-width:640px;}
+
+  /* ---------- ACTIVATION STRIP ---------- */
+  .activation-strip{
+    background:var(--tosca-tint);
+    border-radius:var(--radius);
+    padding:36px 32px;
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    gap:36px;
+    align-items:center;
+  }
+  .activation-strip h3{font-size:21px; margin-bottom:10px;}
+  .activation-strip p{color:var(--ink-soft); font-size:14.5px; margin-bottom:0;}
+  .activation-list{list-style:none; margin:0; padding:0;}
+  .activation-list li{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 0; border-bottom:1px dashed var(--line);
+    font-size:14.5px;
+  }
+  .activation-list li:last-child{border-bottom:none;}
+  .activation-list .tier-tag{font-weight:700; color:var(--ink);}
+  .activation-list .tier-price{font-family:'Questrial', sans-serif; font-weight:600; color:var(--navy); font-size:17px;}
+
+  /* ---------- FOOTER CTA ---------- */
+  .footer-cta{
+    background:var(--navy); color:var(--offwhite);
+    padding:64px 0; text-align:center;
+  }
+  .footer-cta h2{color:#fff; font-size:clamp(24px,3vw,32px); margin-bottom:14px;}
+  .footer-cta p{color:rgba(244,250,250,0.75); max-width:480px; margin:0 auto 28px; font-size:15px;}
+  .footer-cta .cta-btn{
+    display:inline-block; background:var(--orange); color:var(--navy); padding:15px 34px;
+  }
+  .footer-cta .cta-btn:hover{background:var(--orange-light);}
+  .footer-note{margin-top:20px; font-size:12.5px; color:rgba(244,250,250,0.45);}
+
+  @media (max-width: 860px){
+    .pricing-grid{grid-template-columns:1fr;}
+    .activation-strip{grid-template-columns:1fr;}
+    .promo-strip{gap:10px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">🔥 Promo Toko Online · ScriptMedia</span>
+    <h1>Punya toko online <em>profesional</em> mulai Rp300rb/bulan — tanpa ribet, tanpa biaya aktivasi.</h1>
+    <p class="lede">Lupakan biaya develop puluhan juta. Sewa toko online siap jualan hari ini juga — lengkap dengan payment gateway, backup rutin, dan tim support yang selalu siap bantu. Bayar bulanan santai, atau langsung setahun dan <b>hemat 2 bulan gratis</b>.</p>
+
+    <div class="promo-strip">
+      <div class="promo-chip">
+        <span class="chip-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#0B2545" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="label">Tanpa biaya aktivasi</span>
+      </div>
+      <div class="promo-chip">
+        <span class="chip-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" fill="#0B2545"/></svg></span>
+        <span class="label">Aktif dalam 24 jam</span>
+      </div>
+      <div class="promo-chip">
+        <span class="chip-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" fill="#0B2545"/></svg></span>
+        <span class="label">Support responsif tiap hari</span>
+      </div>
+      <div class="promo-chip">
+        <span class="chip-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3" stroke="#0B2545" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="label">Upgrade paket kapan saja</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="section" id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Pilih Paket</span>
+      <h2>Harga pasti, fasilitas jelas — tinggal pilih yang paling pas</h2>
+      <p>Tanpa biaya aktivasi, tanpa kejutan di tagihan. Harga yang tertera adalah harga final yang Anda bayar — Sewa Platform Rp150rb sudah termasuk di semua paket; yang membedakan adalah Web Care Plan — makin lengkap fiturnya, makin sat-set operasional tokomu. Klik "Apa saja yang termasuk?" untuk rincian lengkap.</p>
+    </div>
+
+    <div class="billing-toggle">
+      <button type="button" class="active" data-billing="monthly" onclick="setBilling('monthly')">Bulanan</button>
+      <button type="button" data-billing="annual" onclick="setBilling('annual')">Tahunan <span class="save-badge">Hemat 2 bulan</span></button>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- STARTER -->
+      <div class="plan-card" data-plan="starter">
+        <div class="plan-icon-badge starter"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" fill="#fff"/></svg></div>
+        <div class="plan-name">Starter</div>
+        <div class="plan-stage">Mulai jualan online secepat kilat</div>
+
+        <div class="price-breakdown">
+          <div class="price-row"><span>Sewa Platform</span><span class="amt">Rp150.000</span></div>
+          <div class="price-row"><span>Web Care Plan</span><span class="amt">Rp150.000</span></div>
+        </div>
+
+        <div class="price-total price-monthly">
+          <span class="big">Rp300rb</span>
+          <span class="per">/ bulan</span>
+        </div>
+        <div class="price-total price-annual">
+          <span class="big">Rp3.000.000</span>
+          <span class="per">/ tahun</span>
+          <div class="save-note">Hemat Rp600rb — setara 2 bulan gratis</div>
+        </div>
+        <div class="activation-note"><span>⚡</span><span><b>Tanpa biaya aktivasi.</b> Langsung aktif setelah pembayaran bulan pertama.</span></div>
+
+        <ul class="feature-list">
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#2CA6A4"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Template siap pakai, hingga 50 produk</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#2CA6A4"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>1 payment gateway otomatis (QRIS otomatis)</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#2CA6A4"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Backup mingguan & update keamanan dasar</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#2CA6A4"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>1x request ubah konten kecil / bulan</li>
+        </ul>
+
+        <a href="#" class="cta-btn">Mulai Sekarang</a>
+
+        <div class="details-toggle"><button type="button" onclick="toggleCare('starter')">Apa saja yang termasuk? <svg id="chev-starter" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="#14406E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+        <div class="care-detail" id="care-starter">
+          <div class="care-detail-inner">
+            <h5>Sewa Platform mencakup</h5>
+            <ul>
+              <li>1 pilihan desain template toko</li>
+              <li>Kapasitas hingga 50 produk</li>
+              <li>1 payment gateway otomatis (QRIS otomatis)</li>
+            </ul>
+            <h5>Web Care Plan mencakup</h5>
+            <ul>
+              <li>Domain hosting ScriptMedia (namatoko.scriptmedia.id) & SSL certificate aktif otomatis</li>
+              <li>Backup data otomatis setiap minggu</li>
+              <li>Update keamanan CMS & plugin dasar</li>
+              <li>Monitoring uptime toko 24 jam</li>
+              <li>Dukungan teknis via WhatsApp, respon 1x24 jam (hari kerja)</li>
+              <li>1x permintaan ubah teks/gambar kecil per bulan</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- STANDARD -->
+      <div class="plan-card featured" data-plan="standard">
+        <span class="badge-featured">🔥 Paling Laris</span>
+        <div class="plan-icon-badge standard"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.9 6.6L22 9.3l-5 4.9 1.2 7-6.2-3.5-6.2 3.5 1.2-7-5-4.9 7.1-.7L12 2z" fill="#0B2545"/></svg></div>
+        <div class="plan-name">Standard</div>
+        <div class="plan-stage">Paling banyak dipilih pemilik toko yang serius jualan</div>
+
+        <div class="price-breakdown">
+          <div class="price-row"><span>Sewa Platform</span><span class="amt">Rp150.000</span></div>
+          <div class="price-row"><span>Web Care Plan</span><span class="amt">Rp350.000</span></div>
+        </div>
+
+        <div class="price-total price-monthly">
+          <span class="big">Rp500rb</span>
+          <span class="per">/ bulan</span>
+        </div>
+        <div class="price-total price-annual">
+          <span class="big">Rp5.000.000</span>
+          <span class="per">/ tahun</span>
+          <div class="save-note">Hemat Rp1.000.000 — setara 2 bulan gratis</div>
+        </div>
+        <div class="activation-note"><span>⭐</span><span><b>Tanpa biaya aktivasi.</b> Langsung aktif setelah pembayaran bulan pertama.</span></div>
+
+        <ul class="feature-list">
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#F4A300"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Hingga 150 produk, dukung custom domain</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#F4A300"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>2 payment gateway otomatis (QRIS + transfer bank)</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#F4A300"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Dukungan respon maks. 12 jam, laporan bulanan</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#F4A300"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>3x request ubah konten / bulan</li>
+        </ul>
+
+        <a href="#" class="cta-btn">Gas, Pilih Standard</a>
+
+        <div class="details-toggle"><button type="button" onclick="toggleCare('standard')">Apa saja yang termasuk? <svg id="chev-standard" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="#14406E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+        <div class="care-detail" id="care-standard">
+          <div class="care-detail-inner">
+            <h5>Sewa Platform mencakup</h5>
+            <ul>
+              <li>Semua fitur Starter, kapasitas naik ke 150 produk</li>
+              <li>2 payment gateway otomatis (QRIS otomatis + transfer bank otomatis)</li>
+              <li>Kapasitas penyimpanan gambar produk lebih besar</li>
+            </ul>
+            <h5>Web Care Plan mencakup</h5>
+            <ul>
+              <li>Domain hosting ScriptMedia, dukung custom domain (.com/.co.id milik sendiri)</li>
+              <li>Backup data otomatis setiap minggu + restore atas permintaan</li>
+              <li>Monitoring keamanan & uptime toko</li>
+              <li>Dukungan teknis prioritas, respon maks. 12 jam</li>
+              <li>3x permintaan ubah konten per bulan</li>
+              <li>Laporan bulanan (traffic & aktivitas toko)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRO -->
+      <div class="plan-card" data-plan="pro">
+        <div class="plan-icon-badge pro"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M3 8l4 3 5-6 5 6 4-3-2 11H5L3 8z" fill="#FFB347"/><circle cx="3" cy="7" r="1.6" fill="#FFB347"/><circle cx="21" cy="7" r="1.6" fill="#FFB347"/><circle cx="12" cy="4.5" r="1.6" fill="#FFB347"/></svg></div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-stage">Semua fitur lengkap, tanpa batas — buat toko yang siap scale up</div>
+
+        <div class="price-breakdown">
+          <div class="price-row"><span>Sewa Platform</span><span class="amt">Rp150.000</span></div>
+          <div class="price-row"><span>Web Care Plan</span><span class="amt">Rp550.000</span></div>
+        </div>
+
+        <div class="price-total price-monthly">
+          <span class="big">Rp700rb</span>
+          <span class="per">/ bulan</span>
+        </div>
+        <div class="price-total price-annual">
+          <span class="big">Rp7.000.000</span>
+          <span class="per">/ tahun</span>
+          <div class="save-note">Hemat Rp1.400.000 — setara 2 bulan gratis</div>
+        </div>
+        <div class="activation-note"><span>👑</span><span><b>Tanpa biaya aktivasi.</b> Langsung aktif setelah pembayaran bulan pertama.</span></div>
+
+        <ul class="feature-list">
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#0B2545"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Produk unlimited, multi payment gateway (kartu & e-wallet)</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#0B2545"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Integrasi ongkir otomatis real-time & kustomisasi desain penuh</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#0B2545"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Dukungan respon tercepat, termasuk akhir pekan + konsultasi bulanan</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#0B2545"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>5x request ubah konten / bulan</li>
+        </ul>
+
+        <a href="#" class="cta-btn">Upgrade ke Pro</a>
+
+        <div class="details-toggle"><button type="button" onclick="toggleCare('pro')">Apa saja yang termasuk? <svg id="chev-pro" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="#14406E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+        <div class="care-detail" id="care-pro">
+          <div class="care-detail-inner">
+            <h5>Sewa Platform mencakup</h5>
+            <ul>
+              <li>Semua fitur Standard, kapasitas produk unlimited</li>
+              <li>Multi payment gateway otomatis (QRIS, transfer bank, kartu kredit, e-wallet)</li>
+              <li>Integrasi ongkir otomatis real-time (JNE/JNT/SiCepat, dll.)</li>
+            </ul>
+            <h5>Web Care Plan mencakup</h5>
+            <ul>
+              <li>Domain hosting ScriptMedia + kustomisasi desain penuh (warna, layout, banner)</li>
+              <li>Backup data otomatis setiap minggu, retensi 14 hari</li>
+              <li>Dukungan teknis prioritas, respon maks. 6 jam termasuk akhir pekan</li>
+              <li>5x permintaan ubah konten per bulan</li>
+              <li>Laporan bulanan detail (traffic, uptime, aktivitas toko)</li>
+              <li>Konsultasi bulanan 30 menit dengan tim kami</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <p style="text-align:center; font-size:13.5px; color:var(--ink-soft); margin-top:28px; max-width:620px; margin-left:auto; margin-right:auto;">
+      Fitur premium seperti <b>integrasi ongkir otomatis real-time</b>, <b>multi payment gateway kartu kredit/e-wallet</b>, dan <b>kustomisasi desain penuh</b> sudah termasuk di paket Pro. Butuh salah satu fitur ini di paket Starter/Standard? Bisa ditambahkan sebagai <b>add-on berbayar terpisah</b> — tanya tim kami untuk detail harganya.
+    </p>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Pertanyaan Umum</span>
+      <h2>Sebelum bertanya, cek dulu di sini</h2>
+    </div>
+
+    <div class="faq-list">
+      <div class="faq-item open">
+        <div class="faq-q" onclick="toggleFaq(this)">Kenapa Sewa Platform sama tapi Web Care Plan beda-beda? <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#0B2545" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="faq-a"><p>Sewa Platform (Rp150rb) sama di ketiga paket karena itu biaya dasar infrastruktur teknis toko (mesin toko & payment gateway) yang tidak berubah. Domain hosting, backup, dan layanan dukungan masuk ke Web Care Plan — porsi yang menyesuaikan tiap tier. Makin tinggi paket, makin besar Web Care Plan-nya, karena layanan yang diberikan memang lebih intensif (respon lebih cepat, fitur lebih lengkap, request lebih banyak).</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Apakah bisa upgrade paket di tengah jalan? <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#0B2545" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="faq-a"><p>Bisa, kapan saja tanpa biaya aktivasi tambahan — Anda cukup membayar selisih Web Care Plan ke paket yang lebih tinggi, efektif mulai periode tagihan berikutnya.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Apa bedanya bayar bulanan dan bayar tahunan (prepay)? <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#0B2545" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="faq-a"><p>Kalau dibayar tahunan sekaligus, Anda hanya membayar setara 10 bulan untuk masa aktif 12 bulan — hemat 2 bulan (sekitar 17%) dibanding bayar bulanan rutin. Fasilitas yang didapat sama persis, hanya cara pembayarannya yang berbeda. Cocok kalau Anda sudah yakin akan pakai layanan ini minimal setahun.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Kalau berhenti sewa, apa yang terjadi dengan toko saya? <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#0B2545" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="faq-a"><p>Data produk dan pesanan bisa diekspor sebelum masa sewa berakhir. Toko akan dinonaktifkan setelah periode terakhir selesai, dan kami sediakan waktu tenggang untuk migrasi data.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Apa maksud "request ubah konten"? <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#0B2545" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="faq-a"><p>Permintaan kecil seperti ganti teks, foto produk, banner, atau harga yang dikerjakan oleh tim kami — bukan Anda edit sendiri. Jumlah permintaan per bulan mengikuti batas tiap paket; kebutuhan tambahan di luar batas bisa dikerjakan dengan biaya terpisah.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Domain sendiri sudah ada, apakah tetap harus pakai subdomain ScriptMedia? <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#0B2545" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="faq-a"><p>Tidak. Domain hosting sudah termasuk dalam Web Care Plan — Paket Starter memakai subdomain ScriptMedia gratis (namatoko.scriptmedia.id), sementara custom domain (.com/.co.id) sudah didukung mulai paket Standard. Domain sendiri tetap bisa dihubungkan ke paket Starter dengan penyesuaian kecil.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER CTA ============ -->
+<section class="footer-cta">
+  <div class="wrap">
+    <h2>Toko online kamu bisa online hari ini juga.</h2>
+    <p>Chat tim kami sekarang, ceritakan kebutuhan bisnismu — kami bantu pilihkan paket yang paling pas, tanpa dipaksa upgrade.</p>
+    <a href="#" class="cta-btn">💬 Chat via WhatsApp Sekarang</a>
+    <p class="footer-note">Ganti tautan CTA (#) dengan nomor WhatsApp/kontak resmi sebelum digunakan.</p>
+  </div>
+</section>
+
+<script>
+  function toggleCare(plan){
+    const el = document.getElementById('care-' + plan);
+    const btn = el.previousElementSibling.querySelector('button');
+    el.classList.toggle('open');
+    btn.classList.toggle('open');
+  }
+  function toggleFaq(el){
+    const item = el.parentElement;
+    item.classList.toggle('open');
+  }
+  function setBilling(mode){
+    document.querySelectorAll('.billing-toggle button').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.billing === mode);
+    });
+    document.querySelectorAll('.price-monthly').forEach(function(el){
+      el.style.display = mode === 'monthly' ? 'flex' : 'none';
+    });
+    document.querySelectorAll('.price-annual').forEach(function(el){
+      el.style.display = mode === 'annual' ? 'block' : 'none';
+    });
+  }
+</script>
+
+</body>
+</html>
