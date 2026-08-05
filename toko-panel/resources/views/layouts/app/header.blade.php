@@ -17,13 +17,13 @@
                 </a>
 
                 <nav class="ml-6 hidden items-center gap-1 md:flex" aria-label="{{ __('Primary navigation') }}">
-                    <a
-                        href="{{ route('dashboard') }}"
-                        class="rounded-full bg-white/12 px-4 py-2 text-sm text-white transition hover:bg-white/20"
-                        wire:navigate
-                    >
-                        {{ __('Dashboard') }}
-                    </a>
+                    @role('admin')
+                        <a href="{{ route('admin.dashboard') }}" class="rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.dashboard') ? 'bg-white/15' : '' }}" wire:navigate>Dashboard</a>
+                        <a href="{{ route('admin.plans.index') }}" class="rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.plans.*') ? 'bg-white/15' : '' }}" wire:navigate>Plan</a>
+                        <a href="{{ route('admin.tenants.index') }}" class="rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.tenants.*') ? 'bg-white/15' : '' }}" wire:navigate>Tenant</a>
+                    @elserole('owner')
+                        <a href="{{ route('portal.dashboard') }}" class="rounded-full bg-white/12 px-4 py-2 text-sm text-white transition hover:bg-white/20" wire:navigate>Portal Tenant</a>
+                    @endrole
                 </nav>
 
                 <div class="ml-auto">

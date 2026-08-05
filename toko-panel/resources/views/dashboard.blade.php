@@ -12,10 +12,8 @@
                 </p>
                 <p class="mt-3 text-sm text-white/60">{{ number_format($metrics['pending_requests']) }} request sedang menunggu tindak lanjut.</p>
                 <div class="mt-8 flex flex-wrap gap-3">
-                    <x-ui.button :href="route('profile.edit')" wire:navigate>Pengaturan akun</x-ui.button>
-                    <x-ui.button href="#ringkasan" variant="navy" class="ring-1 ring-white/30 hover:ring-white/50">
-                        Lihat ringkasan
-                    </x-ui.button>
+                    <x-ui.button :href="route('admin.tenants.index')" wire:navigate>Kelola tenant</x-ui.button>
+                    <x-ui.button :href="route('admin.plans.index')" variant="navy" class="ring-1 ring-white/30 hover:ring-white/50" wire:navigate>Atur plan</x-ui.button>
                 </div>
             </div>
         </section>
@@ -38,8 +36,8 @@
                         <x-ui.badge>Tenant</x-ui.badge>
                     </div>
                     <h3 class="mt-6 text-xl text-navy">Manajemen tenant</h3>
-                    <p class="mt-2 text-3xl text-navy">{{ number_format($metrics['tenants']) }}</p>
-                    <p class="mt-1 leading-6 text-ink-soft">Tenant tersimpan pada database central.</p>
+                    <p class="mt-2 text-3xl text-navy">{{ number_format($metrics['active_tenants']) }}</p>
+                    <p class="mt-1 leading-6 text-ink-soft">Tenant aktif dari {{ number_format($metrics['tenants']) }} tenant.</p>
                 </x-ui.card>
 
                 <x-ui.card>
@@ -52,8 +50,8 @@
                         <x-ui.badge variant="orange">Billing</x-ui.badge>
                     </div>
                     <h3 class="mt-6 text-xl text-navy">Subscription & invoice</h3>
-                    <p class="mt-2 text-3xl text-navy">{{ number_format($metrics['unpaid_invoices']) }}</p>
-                    <p class="mt-1 leading-6 text-ink-soft">Invoice unpaid atau overdue.</p>
+                    <p class="mt-2 text-3xl text-navy">Rp{{ number_format($metrics['mrr'], 0, ',', '.') }}</p>
+                    <p class="mt-1 leading-6 text-ink-soft">Estimasi MRR dari Web Care subscription aktif.</p>
                 </x-ui.card>
 
                 <x-ui.card>
@@ -69,6 +67,15 @@
                     <p class="mt-2 text-3xl text-navy">{{ number_format($metrics['active_plans']) }}</p>
                     <p class="mt-1 leading-6 text-ink-soft">Plan aktif yang tersedia untuk tenant.</p>
                 </x-ui.card>
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                @foreach ($metrics['tenant_statuses'] as $status => $total)
+                    <div class="rounded-card border border-line bg-white px-5 py-4">
+                        <p class="text-xs tracking-[0.16em] text-ink-soft uppercase">{{ str($status)->replace('_', ' ') }}</p>
+                        <p class="mt-2 text-2xl text-navy">{{ number_format($total) }}</p>
+                    </div>
+                @endforeach
             </div>
         </section>
     </div>
