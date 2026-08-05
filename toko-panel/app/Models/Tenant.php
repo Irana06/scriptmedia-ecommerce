@@ -65,4 +65,12 @@ class Tenant extends Model
     {
         return $this->hasMany(PlanFeatureUsage::class);
     }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return ['owner_user_id' => 'integer'];
+    }
 }

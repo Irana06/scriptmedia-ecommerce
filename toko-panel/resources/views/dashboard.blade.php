@@ -10,6 +10,7 @@
                 <p class="mt-5 max-w-2xl text-base leading-7 text-white/75 sm:text-lg">
                     Pantau tenant, subscription, billing, dan request konten melalui alur kerja yang konsisten untuk tim ScriptMedia.
                 </p>
+                <p class="mt-3 text-sm text-white/60">{{ number_format($metrics['pending_requests']) }} request sedang menunggu tindak lanjut.</p>
                 <div class="mt-8 flex flex-wrap gap-3">
                     <x-ui.button :href="route('profile.edit')" wire:navigate>Pengaturan akun</x-ui.button>
                     <x-ui.button href="#ringkasan" variant="navy" class="ring-1 ring-white/30 hover:ring-white/50">
@@ -37,7 +38,8 @@
                         <x-ui.badge>Tenant</x-ui.badge>
                     </div>
                     <h3 class="mt-6 text-xl text-navy">Manajemen tenant</h3>
-                    <p class="mt-2 leading-6 text-ink-soft">Kelola identitas klien dan status provisioning dari data central.</p>
+                    <p class="mt-2 text-3xl text-navy">{{ number_format($metrics['tenants']) }}</p>
+                    <p class="mt-1 leading-6 text-ink-soft">Tenant tersimpan pada database central.</p>
                 </x-ui.card>
 
                 <x-ui.card>
@@ -50,7 +52,8 @@
                         <x-ui.badge variant="orange">Billing</x-ui.badge>
                     </div>
                     <h3 class="mt-6 text-xl text-navy">Subscription & invoice</h3>
-                    <p class="mt-2 leading-6 text-ink-soft">Satukan siklus plan, subscription, dan invoice dalam alur yang mudah diaudit.</p>
+                    <p class="mt-2 text-3xl text-navy">{{ number_format($metrics['unpaid_invoices']) }}</p>
+                    <p class="mt-1 leading-6 text-ink-soft">Invoice unpaid atau overdue.</p>
                 </x-ui.card>
 
                 <x-ui.card>
@@ -63,7 +66,8 @@
                         <x-ui.badge variant="navy">Support</x-ui.badge>
                     </div>
                     <h3 class="mt-6 text-xl text-navy">Request konten</h3>
-                    <p class="mt-2 leading-6 text-ink-soft">Tindak lanjuti tiket perubahan konten berdasarkan benefit plan yang tersimpan.</p>
+                    <p class="mt-2 text-3xl text-navy">{{ number_format($metrics['active_plans']) }}</p>
+                    <p class="mt-1 leading-6 text-ink-soft">Plan aktif yang tersedia untuk tenant.</p>
                 </x-ui.card>
             </div>
         </section>
