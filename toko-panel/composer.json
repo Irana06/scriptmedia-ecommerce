@@ -17,7 +17,9 @@
         "livewire/blaze": "^1.0",
         "livewire/flux": "^2.13.1",
         "livewire/livewire": "^4.1",
-        "spatie/laravel-permission": "^8.3"
+        "spatie/laravel-permission": "^8.3",
+        "stancl/jobpipeline": "^2.0@RC",
+        "stancl/tenancy": "dev-master"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",
@@ -67,7 +69,7 @@
             "@test"
         ],
         "types:check": [
-            "phpstan analyse"
+            "phpstan analyse --memory-limit=512M"
         ],
         "test": [
             "@php artisan config:clear --ansi",

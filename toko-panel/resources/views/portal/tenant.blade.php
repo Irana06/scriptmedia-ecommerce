@@ -4,7 +4,7 @@
             <div>
                 <a href="{{ route('portal.dashboard') }}" class="text-sm text-tosca hover:text-navy" wire:navigate>← Kembali ke portal</a>
                 <h1 class="mt-3 text-3xl text-navy sm:text-4xl">{{ $tenant->name }}</h1>
-                <p class="mt-2 text-ink-soft">{{ $tenant->custom_domain ?? $tenant->subdomain.'.example.test' }}</p>
+                <p class="mt-2 text-ink-soft">{{ $tenant->custom_domain ?? $tenant->subdomain.'.'.config('tenancy.base_domain') }}</p>
             </div>
             <x-ui.badge :variant="$tenant->store_status === 'active' ? 'tosca' : 'orange'">
                 {{ str($tenant->store_status)->replace('_', ' ')->title() }}

@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Jobs\ProvisionTenantJob;
 use App\Livewire\Admin\Tenants\ManageTenants;
 use App\Models\Plan;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -23,8 +25,9 @@ class TenantManagementTest extends TestCase
         $this->actingAs($owner)->get(route('admin.tenants.index'))->assertForbidden();
     }
 
-    public function test_admin_can_create_manual_tenant_with_pending_provisioning(): void
+    public function test_admin_can_create_tenant_and_queue_provisioning(): void
     {
+        Queue::fake();
         $admin = User::factory()->admin()->create();
         $owner = User::factory()->owner()->create();
         $plan = Plan::factory()->create();
@@ -50,6 +53,31 @@ class TenantManagementTest extends TestCase
             'billing_cycle' => 'annual',
             'status' => 'active',
         ]);
+        Queue::assertPushed(
+            ProvisionTenantJob::class,
+            fn (ProvisionTenantJob $job): bool => $job->tenantId === $tenant->id,
+        );
+    }
+
+    public function test_custom_domain_requires_a_plan_that_supports_it(): void
+    {
+        Queue::fake();
+        $admin = User::factory()->admin()->create();
+        $owner = User::factory()->owner()->create();
+        $plan = Plan::factory()->create(['custom_domain_allowed' => false]);
+
+        Livewire::actingAs($admin)
+            ->test(ManageTenants::class)
+            ->set('name', 'Toko Custom')
+            ->set('subdomain', 'toko-custom')
+            ->set('customDomain', 'toko-custom.id')
+            ->set('ownerUserId', (string) $owner->id)
+            ->set('planId', (string) $plan->id)
+            ->call('createTenant')
+            ->assertHasErrors(['customDomain']);
+
+        $this->assertDatabaseMissing('tenants', ['subdomain' => 'toko-custom']);
+        Queue::assertNothingPushed();
     }
 
     public function test_admin_can_suspend_and_reactivate_tenant(): void

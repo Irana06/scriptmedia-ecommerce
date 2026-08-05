@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Tenants;
 
 use App\Enums\UserRole;
+use App\Jobs\ProvisionTenantJob;
 use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\Tenant;
@@ -21,6 +22,8 @@ class ManageTenants extends Component
 
     public string $subdomain = '';
 
+    public string $customDomain = '';
+
     public string $ownerUserId = '';
 
     public string $planId = '';
@@ -32,6 +35,7 @@ class ManageTenants extends Component
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:150'],
             'subdomain' => ['required', 'string', 'min:3', 'max:63', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', 'unique:tenants,subdomain'],
+            'customDomain' => ['nullable', 'string', 'max:253', 'regex:/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/', 'unique:tenants,custom_domain'],
             'ownerUserId' => ['required', 'integer', 'exists:users,id'],
             'planId' => ['required', 'integer', 'exists:plans,id'],
             'billingCycle' => ['required', 'in:monthly,annual'],
@@ -52,16 +56,26 @@ class ManageTenants extends Component
             return;
         }
 
+        $customDomain = filled($validated['customDomain'])
+            ? strtolower((string) $validated['customDomain'])
+            : null;
+
+        if ($customDomain !== null && ! $plan->custom_domain_allowed) {
+            $this->addError('customDomain', 'Plan yang dipilih belum mendukung custom domain.');
+
+            return;
+        }
+
         $periodStart = today();
         $nextBillingDate = $validated['billingCycle'] === 'annual'
             ? $periodStart->addYear()
             : $periodStart->addMonth();
 
-        DB::transaction(function () use ($validated, $owner, $plan, $periodStart, $nextBillingDate): void {
+        $tenant = DB::transaction(function () use ($validated, $customDomain, $owner, $plan, $periodStart, $nextBillingDate): Tenant {
             $tenant = Tenant::create([
                 'name' => $validated['name'],
                 'subdomain' => $validated['subdomain'],
-                'custom_domain' => null,
+                'custom_domain' => $customDomain,
                 'owner_user_id' => $owner->id,
                 'database_name' => 'tenant_'.Str::of((string) $validated['subdomain'])->replace('-', '_'),
                 'provisioning_status' => 'pending',
@@ -78,11 +92,15 @@ class ManageTenants extends Component
                 'next_billing_date' => $nextBillingDate,
                 'pending_plan_id' => null,
             ]);
+
+            return $tenant;
         });
 
-        $this->reset(['name', 'subdomain', 'ownerUserId', 'planId']);
+        ProvisionTenantJob::dispatch($tenant->id)->afterCommit();
+
+        $this->reset(['name', 'subdomain', 'customDomain', 'ownerUserId', 'planId']);
         $this->billingCycle = 'monthly';
-        Flux::toast(variant: 'success', text: 'Tenant manual berhasil dibuat dengan status pending.');
+        Flux::toast(variant: 'success', text: 'Tenant dibuat. Provisioning database sedang diproses.');
     }
 
     public function toggleStoreStatus(int $tenantId): void

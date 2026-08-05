@@ -9,6 +9,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Stancl\Tenancy\Contracts\Tenant as TenantContract;
+use Stancl\Tenancy\Database\Concerns\CentralConnection;
+use Stancl\Tenancy\Database\Concerns\HasDatabase;
+use Stancl\Tenancy\Database\Concerns\HasDomains;
+use Stancl\Tenancy\Database\Concerns\InitializationHelpers;
+use Stancl\Tenancy\Database\Concerns\InvalidatesResolverCache;
+use Stancl\Tenancy\Database\Concerns\TenantRun;
+use Stancl\Tenancy\Database\Contracts\TenantWithDatabase;
 
 #[Fillable([
     'name',
@@ -19,10 +27,42 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'provisioning_status',
     'store_status',
 ])]
-class Tenant extends Model
+class Tenant extends Model implements TenantContract, TenantWithDatabase
 {
+    use CentralConnection;
+    use HasDatabase;
+    use HasDomains;
+
     /** @use HasFactory<TenantFactory> */
     use HasFactory;
+
+    use InitializationHelpers;
+    use InvalidatesResolverCache;
+    use TenantRun;
+
+    public function getTenantKeyName(): string
+    {
+        return $this->getKeyName();
+    }
+
+    public function getTenantKey(): int|string
+    {
+        return $this->getKey();
+    }
+
+    public function getInternal(string $key): mixed
+    {
+        return $key === 'db_name'
+            ? $this->database_name
+            : $this->getAttribute('tenancy_'.$key);
+    }
+
+    public function setInternal(string $key, mixed $value): static
+    {
+        $this->setAttribute($key === 'db_name' ? 'database_name' : 'tenancy_'.$key, $value);
+
+        return $this;
+    }
 
     /** @return BelongsTo<User, $this> */
     public function owner(): BelongsTo
