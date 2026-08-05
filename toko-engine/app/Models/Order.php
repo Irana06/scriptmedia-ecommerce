@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+#[Fillable([
+    'number', 'customer_name', 'customer_email', 'customer_phone', 'shipping_address',
+    'notes', 'subtotal', 'total', 'status', 'payment_status', 'payment_gateway_code', 'placed_at',
+])]
+class Order extends Model
+{
+    public const STATUSES = ['pending', 'processing', 'shipped', 'completed', 'cancelled'];
+
+    public const PAYMENT_STATUSES = ['pending', 'paid', 'failed'];
+
+    protected function casts(): array
+    {
+        return [
+            'subtotal' => 'decimal:2',
+            'total' => 'decimal:2',
+            'placed_at' => 'datetime',
+        ];
+    }
+
+    /** @return HasMany<OrderItem, $this> */
+    public function items(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+}

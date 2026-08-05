@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\StoreSetting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -9,14 +12,39 @@ class StorefrontTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_storefront_example_is_publicly_accessible(): void
+    public function test_storefront_lists_featured_products_and_filters_catalog_by_category(): void
     {
-        $response = $this->get(route('home'));
+        StoreSetting::query()->create(['store_name' => 'Toko Senja']);
+        $home = Category::query()->create(['name' => 'Rumah', 'slug' => 'rumah', 'is_active' => true]);
+        $fashion = Category::query()->create(['name' => 'Fashion', 'slug' => 'fashion', 'is_active' => true]);
+        Product::query()->create([
+            'category_id' => $home->id,
+            'name' => 'Teko Tanah Sore',
+            'slug' => 'teko-tanah-sore',
+            'price' => 189000,
+            'stock' => 10,
+            'is_featured' => true,
+            'is_active' => true,
+        ]);
+        Product::query()->create([
+            'category_id' => $fashion->id,
+            'name' => 'Tas Kanvas',
+            'slug' => 'tas-kanvas',
+            'price' => 245000,
+            'stock' => 5,
+            'is_featured' => false,
+            'is_active' => true,
+        ]);
 
-        $response
+        $this->get(route('home'))
             ->assertOk()
             ->assertSee('Toko Senja')
-            ->assertSee('Produk unggulan')
-            ->assertSee('Teko Tanah Sore');
+            ->assertSee('Teko Tanah Sore')
+            ->assertDontSee('Tas Kanvas');
+
+        $this->get(route('products.index', ['category' => 'fashion']))
+            ->assertOk()
+            ->assertSee('Tas Kanvas')
+            ->assertDontSee('Teko Tanah Sore');
     }
 }

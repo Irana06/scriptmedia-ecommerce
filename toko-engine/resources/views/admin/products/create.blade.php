@@ -1,0 +1,1 @@
+<x-layouts::app title="Tambah produk"><div class="mb-8"><a href="{{ route('admin.products.index') }}" class="text-sm font-semibold text-tosca">&larr; Kembali</a><h1 class="mt-3 text-3xl text-navy">Tambah produk</h1></div><form method="POST" action="{{ route('admin.products.store') }}" enctype="multipart/form-data">@csrf @include('admin.products.form')</form></x-layouts::app>
