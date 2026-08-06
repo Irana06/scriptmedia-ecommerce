@@ -16,5 +16,5 @@
     </div></x-ui.card>
     <div class="space-y-6"><x-ui.card><h2 class="text-lg text-navy">Publikasi</h2><label class="mt-4 flex gap-3 text-sm text-ink-soft"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $product->is_active ?? true))>Aktif di storefront</label><label class="mt-3 flex gap-3 text-sm text-ink-soft"><input type="checkbox" name="is_featured" value="1" @checked(old('is_featured', $product->is_featured ?? false))>Produk unggulan</label></x-ui.card>
         <x-ui.card><h2 class="text-lg text-navy">Gambar produk</h2>@if ($editing && $product->getFirstMediaUrl('product-images'))<img src="{{ $product->getFirstMediaUrl('product-images', 'thumb') }}" alt="" class="mt-4 aspect-video w-full rounded-xl object-cover">@endif<input type="file" name="image" accept="image/*" class="mt-4 block w-full text-sm text-ink-soft"><p class="mt-2 text-xs text-ink-soft">JPG/PNG/WebP, maks. 4 MB.</p></x-ui.card>
-        <x-ui.button type="submit" class="w-full disabled:cursor-not-allowed disabled:opacity-50" :disabled="! $editing && ! $canAddProduct">{{ $editing ? 'Simpan perubahan' : 'Buat produk' }}</x-ui.button></div>
+        <x-ui.loading-button loading-label="Menyimpan..." class="w-full" :disabled="! $editing && ! $canAddProduct">{{ $editing ? 'Simpan perubahan' : 'Buat produk' }}</x-ui.loading-button></div>
 </div>

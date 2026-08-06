@@ -12,7 +12,13 @@
         </div>
 
         @if ($products->isEmpty())
-            <x-ui.card class="mt-10 text-center"><p class="text-ink-soft">Belum ada produk dalam kategori ini.</p></x-ui.card>
+            <x-ui.empty-state
+                class="mt-10"
+                title="{{ $categorySlug === '' ? 'Katalog sedang disiapkan' : 'Belum ada produk di kategori ini' }}"
+                description="{{ $categorySlug === '' ? 'Koleksi produk akan segera tersedia. Kunjungi kembali etalase ini nanti.' : 'Coba jelajahi kategori lain untuk menemukan produk yang kamu cari.' }}"
+                :action-href="$categorySlug === '' ? route('home') : route('products.index')"
+                :action-label="$categorySlug === '' ? 'Kembali ke beranda' : 'Lihat semua produk'"
+            />
         @else
             <div class="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">@foreach ($products as $product)<x-storefront.product-card :product="$product" />@endforeach</div>
             <div class="mt-10">{{ $products->links() }}</div>

@@ -28,7 +28,7 @@
                 @if ($storeSetting->getFirstMediaUrl('banner'))<img src="{{ $storeSetting->getFirstMediaUrl('banner') }}" alt="" class="mt-4 aspect-video w-full rounded-xl object-cover">@endif
                 <input type="file" name="banner" accept="image/*" class="mt-4 block w-full text-sm text-ink-soft">
             </x-ui.card>
-            <x-ui.button type="submit" class="w-full">Simpan pengaturan</x-ui.button>
+            <x-ui.loading-button loading-label="Menyimpan..." class="w-full">Simpan pengaturan</x-ui.loading-button>
         </div>
     </form>
 
@@ -58,11 +58,11 @@
                         @csrf
                         @method('PATCH')
                         <input type="hidden" name="is_active" value="{{ $gateway->is_active ? 0 : 1 }}">
-                        <x-ui.button type="submit" variant="navy">{{ $gateway->is_active ? 'Nonaktifkan' : 'Aktifkan' }}</x-ui.button>
+                        <x-ui.loading-button loading-label="Memperbarui..." variant="navy">{{ $gateway->is_active ? 'Nonaktifkan' : 'Aktifkan' }}</x-ui.loading-button>
                     </form>
                 </x-ui.card>
             @empty
-                <x-ui.card><p class="text-sm text-ink-soft">Belum ada payment gateway yang dikonfigurasi.</p></x-ui.card>
+                <x-ui.empty-state class="md:col-span-2" icon="payment" title="Belum ada payment gateway" description="Tambahkan konfigurasi gateway agar pelanggan dapat memilih metode pembayaran saat checkout." />
             @endforelse
         </div>
     </section>

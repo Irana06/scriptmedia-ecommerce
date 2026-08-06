@@ -13,7 +13,11 @@
         </div>
 
         <x-ui.card><div class="flex items-center justify-between gap-4"><div><h2 class="text-2xl text-navy">Order terbaru</h2><p class="mt-1 text-sm text-ink-soft">Lima order terakhir yang masuk.</p></div>@can('manage orders')<x-ui.button :href="route('admin.orders.index')" variant="navy">Semua order</x-ui.button>@endcan</div>
-            <div class="mt-6 overflow-x-auto"><table class="w-full min-w-[36rem] text-left text-sm"><thead class="border-b border-line text-xs tracking-wide text-ink-soft uppercase"><tr><th class="pb-3">Nomor</th><th class="pb-3">Pelanggan</th><th class="pb-3">Total</th><th class="pb-3">Status</th></tr></thead><tbody class="divide-y divide-line">@forelse ($recentOrders as $order)<tr><td class="py-4 font-semibold text-navy">{{ $order->number }}</td><td class="py-4 text-ink-soft">{{ $order->customer_name }}</td><td class="py-4">Rp{{ number_format((float) $order->total, 0, ',', '.') }}</td><td class="py-4"><x-ui.badge variant="{{ $order->status === 'pending' ? 'orange' : 'tosca' }}">{{ ucfirst($order->status) }}</x-ui.badge></td></tr>@empty<tr><td colspan="4" class="py-8 text-center text-ink-soft">Belum ada order.</td></tr>@endforelse</tbody></table></div>
+            @if ($recentOrders->isEmpty())
+                <x-ui.empty-state class="mt-6" compact icon="order" title="Belum ada order masuk" description="Order baru dari storefront akan langsung muncul pada ringkasan ini." />
+            @else
+                <div class="mt-6 overflow-x-auto"><table class="w-full min-w-[36rem] text-left text-sm"><thead class="border-b border-line text-xs tracking-wide text-ink-soft uppercase"><tr><th class="pb-3">Nomor</th><th class="pb-3">Pelanggan</th><th class="pb-3">Total</th><th class="pb-3">Status</th></tr></thead><tbody class="divide-y divide-line">@foreach ($recentOrders as $order)<tr><td class="py-4 font-semibold text-navy">{{ $order->number }}</td><td class="py-4 text-ink-soft">{{ $order->customer_name }}</td><td class="py-4">Rp{{ number_format((float) $order->total, 0, ',', '.') }}</td><td class="py-4"><x-ui.badge variant="{{ $order->status === 'pending' ? 'orange' : 'tosca' }}">{{ ucfirst($order->status) }}</x-ui.badge></td></tr>@endforeach</tbody></table></div>
+            @endif
         </x-ui.card>
     </div>
 </x-layouts::app>

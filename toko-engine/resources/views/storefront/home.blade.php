@@ -12,7 +12,7 @@
     <section class="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-24">
         <x-ui.section-header eyebrow="Produk unggulan" title="Pilihan sederhana, kualitas istimewa" description="Produk pilihan yang siap menemani keseharianmu." />
         @if ($featuredProducts->isEmpty())
-            <x-ui.card class="mt-10 text-center"><p class="text-ink-soft">Belum ada produk unggulan. Jalankan seeder atau tambahkan produk dari admin.</p></x-ui.card>
+            <x-ui.empty-state class="mt-10" title="Koleksi pilihan sedang disiapkan" description="Produk unggulan terbaru akan segera hadir. Sementara itu, jelajahi seluruh katalog toko." action-label="Lihat semua produk" :action-href="route('products.index')" />
         @else
             <div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">@foreach ($featuredProducts as $product)<x-storefront.product-card :product="$product" />@endforeach</div>
         @endif

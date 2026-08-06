@@ -19,7 +19,7 @@
                     <form method="POST" action="{{ route('cart.store', $product) }}" class="mt-6 flex flex-wrap items-end gap-3">
                         @csrf
                         <label class="grid gap-2 text-sm font-semibold text-navy">Jumlah<input type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}" class="w-24 rounded-xl border border-line bg-white px-4 py-3"></label>
-                        <x-ui.button type="submit">Tambah ke keranjang</x-ui.button>
+                        <x-ui.loading-button loading-label="Menambahkan...">Tambah ke keranjang</x-ui.loading-button>
                     </form>
                 @endif
             </div>
