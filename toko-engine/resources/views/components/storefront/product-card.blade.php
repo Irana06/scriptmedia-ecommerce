@@ -17,7 +17,7 @@
         <div class="mt-6 flex items-center justify-between gap-3">
             <span class="font-semibold text-navy">Rp{{ number_format((float) $product->price, 0, ',', '.') }}</span>
             @if ($product->stock > 0)
-                <form method="POST" action="{{ route('cart.store', $product) }}">@csrf<input type="hidden" name="quantity" value="1"><x-ui.button type="submit" variant="navy" class="px-4 py-2.5">+ Cart</x-ui.button></form>
+                <form method="POST" action="{{ route('cart.store', $product) }}">@csrf<input type="hidden" name="quantity" value="1"><x-ui.button type="submit" variant="navy" class="px-4 py-2.5 cursor-pointer">+ Cart</x-ui.button></form>
             @endif
         </div>
     </div>

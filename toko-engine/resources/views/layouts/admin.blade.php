@@ -36,7 +36,7 @@
                     <p class="text-xs tracking-[0.15em] text-orange-light uppercase">{{ auth()->user()->getRoleNames()->first() ?? 'Admin' }}</p>
                     <p class="mt-2 truncate font-semibold">{{ auth()->user()->name }}</p>
                     <p class="mt-1 truncate text-xs text-white/55">{{ auth()->user()->email }}</p>
-                    <form method="POST" action="{{ route('logout') }}" class="mt-4">@csrf<button type="submit" class="text-xs font-semibold text-white/70 hover:text-orange-light">Keluar &rarr;</button></form>
+                    <form method="POST" action="{{ route('logout') }}" class="mt-4">@csrf<button type="submit" class="text-xs font-semibold text-white/70 hover:text-orange-light cursor-pointer">Keluar &rarr;</button></form>
                 </div>
             </aside>
 

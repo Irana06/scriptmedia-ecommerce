@@ -51,7 +51,7 @@
             </div>
 
             <div class="flex justify-end">
-                <x-ui.button type="submit" wire:loading.attr="disabled" :disabled="$owners->isEmpty() || $plans->isEmpty()">
+                <x-ui.button type="submit" wire:loading.attr="disabled" :disabled="$owners->isEmpty() || $plans->isEmpty()" class="cursor-pointer">
                     <span wire:loading.remove wire:target="createTenant">Simpan &amp; provision tenant</span>
                     <span wire:loading wire:target="createTenant">Menyimpan tenant...</span>
                 </x-ui.button>
@@ -109,7 +109,7 @@
                                     type="button"
                                     wire:click="toggleStoreStatus({{ $tenant->id }})"
                                     wire:confirm="Ubah status toko tenant ini?"
-                                    class="rounded-full border border-line px-4 py-2 text-xs font-semibold text-navy transition hover:border-tosca hover:bg-tosca-tint"
+                                    class="rounded-full border border-line px-4 py-2 text-xs font-semibold text-navy transition hover:border-tosca hover:bg-tosca-tint cursor-pointer"
                                 >
                                     {{ $tenant->store_status === 'active' ? 'Suspend' : 'Aktifkan' }}
                                 </button>

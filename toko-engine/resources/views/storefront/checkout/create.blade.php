@@ -41,7 +41,7 @@
                     @endforeach
                 </div>
                 <div class="mt-5 flex justify-between border-t border-line pt-5"><span>Total</span><span class="text-lg font-semibold text-navy">Rp{{ number_format($subtotal, 0, ',', '.') }}</span></div>
-                <div class="mt-6"><x-ui.loading-button loading-label="Mencatat order..." class="w-full" :disabled="$gateways->isEmpty()">Buat order</x-ui.loading-button></div>
+                <div class="mt-6"><x-ui.loading-button loading-label="Mencatat order..." class="w-full cursor-pointer" :disabled="$gateways->isEmpty()">Buat order</x-ui.loading-button></div>
             </x-ui.card>
         </form>
     </section>

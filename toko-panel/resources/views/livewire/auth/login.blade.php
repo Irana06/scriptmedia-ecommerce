@@ -45,7 +45,7 @@
             <flux:checkbox name="remember" label="Ingat saya" :checked="old('remember')" />
 
             <div class="flex items-center justify-end">
-                <x-ui.button type="submit" class="w-full" data-test="login-button">
+                <x-ui.button type="submit" class="w-full cursor-pointer" data-test="login-button">
                     Masuk
                 </x-ui.button>
             </div>
