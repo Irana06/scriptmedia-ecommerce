@@ -1,4 +1,5 @@
 <div class="space-y-8">
+    <x-ui.loading-indicator label="Memperbarui data billing..." />
     <x-ui.section-header
         eyebrow="Keuangan tenant"
         title="Billing & Pembayaran"
@@ -78,7 +79,14 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="px-6 py-10 text-center text-ink-soft">Belum ada invoice.</td></tr>
+                        <tr>
+                            <td colspan="7">
+                                <x-ui.empty-state
+                                    title="Belum ada invoice"
+                                    description="Invoice recurring akan tampil setelah jadwal billing subscription diproses."
+                                />
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
@@ -112,7 +120,14 @@
                             <td class="px-6 py-4"><x-ui.badge variant="tosca">{{ str($payment->status)->title() }}</x-ui.badge></td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="px-6 py-10 text-center text-ink-soft">Belum ada pembayaran.</td></tr>
+                        <tr>
+                            <td colspan="6">
+                                <x-ui.empty-state
+                                    title="Belum ada pembayaran"
+                                    description="Pembayaran yang berhasil atau ditandai manual akan tercatat di sini."
+                                />
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>

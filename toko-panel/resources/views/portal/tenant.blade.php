@@ -86,7 +86,14 @@
                                     <td class="px-6 py-4"><x-ui.badge variant="navy">{{ str($invoice->status)->title() }}</x-ui.badge></td>
                                 </tr>
                             @empty
-                                <tr><td colspan="4" class="px-6 py-8 text-center text-ink-soft">Belum ada invoice.</td></tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <x-ui.empty-state
+                                            title="Belum ada invoice"
+                                            description="Invoice tenant akan tampil setelah jadwal billing berikutnya diproses."
+                                        />
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>

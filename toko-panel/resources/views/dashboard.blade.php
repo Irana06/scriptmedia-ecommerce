@@ -64,8 +64,8 @@
                         <x-ui.badge variant="navy">Support</x-ui.badge>
                     </div>
                     <h3 class="mt-6 text-xl text-navy">Request konten</h3>
-                    <p class="mt-2 text-3xl text-navy">{{ number_format($metrics['active_plans']) }}</p>
-                    <p class="mt-1 leading-6 text-ink-soft">Plan aktif yang tersedia untuk tenant.</p>
+                    <p class="mt-2 text-3xl text-navy">{{ number_format($metrics['pending_requests']) }}</p>
+                    <p class="mt-1 leading-6 text-ink-soft">Tiket pending atau sedang dikerjakan.</p>
                 </x-ui.card>
             </div>
 

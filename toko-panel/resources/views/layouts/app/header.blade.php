@@ -32,6 +32,18 @@
                     <x-desktop-user-menu />
                 </div>
             </div>
+
+            <nav class="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-5 pb-3 md:hidden" aria-label="{{ __('Mobile navigation') }}">
+                @role('admin')
+                    <a href="{{ route('admin.dashboard') }}" class="shrink-0 rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.dashboard') ? 'bg-white/15' : '' }}" wire:navigate>Dashboard</a>
+                    <a href="{{ route('admin.plans.index') }}" class="shrink-0 rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.plans.*') ? 'bg-white/15' : '' }}" wire:navigate>Plan</a>
+                    <a href="{{ route('admin.tenants.index') }}" class="shrink-0 rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.tenants.*') ? 'bg-white/15' : '' }}" wire:navigate>Tenant</a>
+                    <a href="{{ route('admin.billing.index') }}" class="shrink-0 rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.billing.*') ? 'bg-white/15' : '' }}" wire:navigate>Billing</a>
+                    <a href="{{ route('admin.content-requests.index') }}" class="shrink-0 rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.content-requests.*') ? 'bg-white/15' : '' }}" wire:navigate>Tiket Konten</a>
+                @elserole('owner')
+                    <a href="{{ route('portal.dashboard') }}" class="shrink-0 rounded-full bg-white/12 px-4 py-2 text-sm text-white transition hover:bg-white/20" wire:navigate>Portal Tenant</a>
+                @endrole
+            </nav>
         </header>
 
         <main class="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 sm:py-14">

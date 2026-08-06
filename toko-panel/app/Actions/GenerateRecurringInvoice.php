@@ -24,7 +24,7 @@ class GenerateRecurringInvoice
                 return null;
             }
 
-            $periodStart = $lockedSubscription->current_period_end->addDay();
+            $periodStart = $lockedSubscription->current_period_end->copy()->addDay();
 
             if (Invoice::query()
                 ->where('subscription_id', $lockedSubscription->getKey())
@@ -40,8 +40,8 @@ class GenerateRecurringInvoice
             }
 
             $periodEnd = $lockedSubscription->billing_cycle === 'annual'
-                ? $periodStart->addYear()->subDay()
-                : $periodStart->addMonth()->subDay();
+                ? $periodStart->copy()->addYear()->subDay()
+                : $periodStart->copy()->addMonth()->subDay();
             $carePrice = $lockedSubscription->billing_cycle === 'annual'
                 ? (float) $plan->price_care_annual
                 : (float) $plan->price_care_monthly;
@@ -77,7 +77,7 @@ class GenerateRecurringInvoice
                 'pending_plan_id' => null,
                 'current_period_start' => $periodStart,
                 'current_period_end' => $periodEnd,
-                'next_billing_date' => $periodEnd->addDay(),
+                'next_billing_date' => $periodEnd->copy()->addDay(),
             ]);
 
             return $invoice;
@@ -102,7 +102,7 @@ class GenerateRecurringInvoice
         }
 
         $today = today();
-        $latestDate = $today->addDays((int) config('billing.invoice_lead_days', 3));
+        $latestDate = $today->copy()->addDays((int) config('billing.invoice_lead_days', 3));
 
         return ! $subscription->current_period_end->isBefore($today)
             && ! $subscription->current_period_end->isAfter($latestDate);

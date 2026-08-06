@@ -68,8 +68,8 @@ class ManageTenants extends Component
 
         $periodStart = today();
         $nextBillingDate = $validated['billingCycle'] === 'annual'
-            ? $periodStart->addYear()
-            : $periodStart->addMonth();
+            ? $periodStart->copy()->addYear()
+            : $periodStart->copy()->addMonth();
 
         $tenant = DB::transaction(function () use ($validated, $customDomain, $owner, $plan, $periodStart, $nextBillingDate): Tenant {
             $tenant = Tenant::create([
@@ -88,7 +88,7 @@ class ManageTenants extends Component
                 'billing_cycle' => $validated['billingCycle'],
                 'status' => 'active',
                 'current_period_start' => $periodStart,
-                'current_period_end' => $nextBillingDate->subDay(),
+                'current_period_end' => $nextBillingDate->copy()->subDay(),
                 'next_billing_date' => $nextBillingDate,
                 'pending_plan_id' => null,
             ]);

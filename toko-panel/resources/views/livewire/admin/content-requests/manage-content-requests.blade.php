@@ -1,4 +1,5 @@
 <div class="space-y-8">
+    <x-ui.loading-indicator label="Memperbarui tiket konten..." />
     <x-ui.section-header
         eyebrow="Dukungan konten"
         title="Tiket Perubahan Konten"
@@ -69,7 +70,14 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="px-6 py-10 text-center text-ink-soft">Tidak ada tiket untuk filter ini.</td></tr>
+                        <tr>
+                            <td colspan="5">
+                                <x-ui.empty-state
+                                    title="Tidak ada tiket"
+                                    description="Belum ada request konten yang cocok dengan filter tenant dan status ini."
+                                />
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>

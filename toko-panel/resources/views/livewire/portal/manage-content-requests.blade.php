@@ -1,4 +1,5 @@
 <x-ui.card>
+    <x-ui.loading-indicator label="Mengirim request konten..." target="submit" />
     <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
         <div>
             <x-ui.badge variant="orange">Request konten</x-ui.badge>
@@ -63,7 +64,11 @@
                     <p class="mt-3 text-sm leading-6 text-ink">{{ $contentRequest->description }}</p>
                 </article>
             @empty
-                <p class="text-sm text-ink-soft">Belum ada request perubahan konten.</p>
+                <x-ui.empty-state
+                    class="py-4"
+                    title="Belum ada request"
+                    description="Request perubahan konten yang Anda kirim akan tampil di sini."
+                />
             @endforelse
         </div>
     </div>

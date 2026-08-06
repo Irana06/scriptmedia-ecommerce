@@ -7,7 +7,7 @@
         />
 
         <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            @foreach ($tenants as $tenant)
+            @forelse ($tenants as $tenant)
                 <x-ui.card class="flex h-full flex-col">
                     <div class="flex items-start justify-between gap-4">
                         <div>
@@ -34,7 +34,14 @@
                         Buka detail tenant
                     </x-ui.button>
                 </x-ui.card>
-            @endforeach
+            @empty
+                <x-ui.card class="md:col-span-2 xl:col-span-3">
+                    <x-ui.empty-state
+                        title="Belum ada toko"
+                        description="Tenant yang Anda miliki akan tampil di sini setelah dibuat oleh administrator."
+                    />
+                </x-ui.card>
+            @endforelse
         </div>
     </div>
 </x-layouts::app>

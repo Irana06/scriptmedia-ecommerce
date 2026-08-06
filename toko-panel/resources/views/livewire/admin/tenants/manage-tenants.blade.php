@@ -1,4 +1,5 @@
 <div class="space-y-8">
+    <x-ui.loading-indicator label="Memperbarui data tenant..." />
     <x-ui.section-header
         eyebrow="Operasional tenant"
         title="Manajemen Tenant"
@@ -17,6 +18,12 @@
         @if ($owners->isEmpty())
             <div class="mt-5 rounded-xl border border-orange/30 bg-orange/10 px-4 py-3 text-sm text-navy">
                 Belum ada user dengan role owner. Buat atau seed owner sebelum menambahkan tenant.
+            </div>
+        @endif
+
+        @if ($plans->isEmpty())
+            <div class="mt-5 rounded-xl border border-orange/30 bg-orange/10 px-4 py-3 text-sm text-navy">
+                Belum ada plan aktif. Aktifkan atau tambahkan plan sebelum membuat tenant.
             </div>
         @endif
 
@@ -45,7 +52,8 @@
 
             <div class="flex justify-end">
                 <x-ui.button type="submit" wire:loading.attr="disabled" :disabled="$owners->isEmpty() || $plans->isEmpty()">
-                    Simpan &amp; provision tenant
+                    <span wire:loading.remove wire:target="createTenant">Simpan &amp; provision tenant</span>
+                    <span wire:loading wire:target="createTenant">Menyimpan tenant...</span>
                 </x-ui.button>
             </div>
         </form>
@@ -108,7 +116,14 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="px-6 py-10 text-center text-ink-soft">Belum ada tenant.</td></tr>
+                        <tr>
+                            <td colspan="7">
+                                <x-ui.empty-state
+                                    title="Belum ada tenant"
+                                    description="Isi formulir di atas untuk membuat tenant dan menjalankan provisioning otomatis."
+                                />
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>

@@ -1,4 +1,5 @@
 <div class="space-y-8">
+    <x-ui.loading-indicator label="Menyimpan konfigurasi plan..." />
     <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
             <p class="text-xs font-semibold tracking-[0.22em] text-tosca uppercase">Konfigurasi paket</p>
@@ -62,7 +63,10 @@
 
                 <div class="flex flex-wrap justify-end gap-3">
                     <x-ui.button type="button" variant="navy" wire:click="resetPlanForm">Batal</x-ui.button>
-                    <x-ui.button type="submit">Simpan plan</x-ui.button>
+                    <x-ui.button type="submit" wire:loading.attr="disabled" wire:target="savePlan">
+                        <span wire:loading.remove wire:target="savePlan">Simpan plan</span>
+                        <span wire:loading wire:target="savePlan">Menyimpan...</span>
+                    </x-ui.button>
                 </div>
             </form>
         </x-ui.card>
@@ -105,7 +109,16 @@
                 </div>
             </x-ui.card>
         @empty
-            <x-ui.card class="xl:col-span-3"><p class="text-center text-ink-soft">Belum ada plan.</p></x-ui.card>
+            <x-ui.card class="xl:col-span-3">
+                <x-ui.empty-state
+                    title="Belum ada plan"
+                    description="Tambahkan plan pertama untuk mulai membuat tenant dan subscription."
+                >
+                    <x-slot:action>
+                        <x-ui.button wire:click="createPlan">Tambah plan</x-ui.button>
+                    </x-slot:action>
+                </x-ui.empty-state>
+            </x-ui.card>
         @endforelse
     </div>
 </div>
