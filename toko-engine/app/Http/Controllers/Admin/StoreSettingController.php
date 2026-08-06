@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\PaymentGateway;
 use App\Models\StoreSetting;
+use App\Services\MidtransService;
 use App\Services\StoreLimitService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -12,7 +13,10 @@ use Illuminate\Http\Request;
 
 class StoreSettingController extends Controller
 {
-    public function __construct(private readonly StoreLimitService $storeLimits) {}
+    public function __construct(
+        private readonly StoreLimitService $storeLimits,
+        private readonly MidtransService $midtrans,
+    ) {}
 
     public function edit(): View
     {
@@ -56,6 +60,12 @@ class StoreSettingController extends Controller
             'is_active' => ['required', 'boolean'],
         ]);
         $shouldActivate = (bool) $validated['is_active'];
+
+        if ($shouldActivate && $paymentGateway->code === MidtransService::GATEWAY_CODE && ! $this->midtrans->isConfigured()) {
+            return back()->withErrors([
+                'gateway_limit' => 'Kredensial Midtrans belum lengkap di environment toko.',
+            ]);
+        }
 
         if ($shouldActivate && ! $paymentGateway->is_active && ! $this->storeLimits->canUseGateway()) {
             $limit = $this->storeLimits->gatewayLimit();

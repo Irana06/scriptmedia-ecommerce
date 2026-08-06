@@ -1,8 +1,36 @@
 <x-layouts::app :title="$order->number">
-    <a href="{{ route('admin.orders.index') }}" class="text-sm font-semibold text-tosca">&larr; Kembali</a><div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><x-ui.badge variant="orange">{{ $order->number }}</x-ui.badge><h1 class="mt-3 text-3xl text-navy">Detail order</h1><p class="mt-2 text-ink-soft">Dibuat {{ $order->placed_at->format('d M Y H:i') }}</p></div><div class="text-2xl font-semibold text-navy">Rp{{ number_format((float) $order->total, 0, ',', '.') }}</div></div>
+    <a href="{{ route('admin.orders.index') }}" class="text-sm font-semibold text-tosca">&larr; Kembali</a>
+    <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div><x-ui.badge variant="orange">{{ $order->number }}</x-ui.badge><h1 class="mt-3 text-3xl text-navy">Detail order</h1><p class="mt-2 text-ink-soft">Dibuat {{ $order->placed_at->format('d M Y H:i') }}</p></div>
+        <div class="text-2xl font-semibold text-navy">Rp{{ number_format((float) $order->total, 0, ',', '.') }}</div>
+    </div>
+
     <div class="mt-8 grid gap-6 lg:grid-cols-[1fr_22rem]">
-        <div class="space-y-6"><x-ui.card><h2 class="text-xl text-navy">Item order</h2><div class="mt-5 divide-y divide-line">@foreach ($order->items as $item)<div class="flex justify-between gap-4 py-4"><div><p class="font-semibold text-navy">{{ $item->product_name }}</p><p class="mt-1 text-sm text-ink-soft">{{ $item->quantity }} × Rp{{ number_format((float) $item->unit_price, 0, ',', '.') }}</p></div><p class="font-semibold text-navy">Rp{{ number_format((float) $item->line_total, 0, ',', '.') }}</p></div>@endforeach</div></x-ui.card>
-            <x-ui.card><h2 class="text-xl text-navy">Data pelanggan</h2><dl class="mt-5 grid gap-4 text-sm sm:grid-cols-2"><div><dt class="text-ink-soft">Nama</dt><dd class="mt-1 font-semibold text-navy">{{ $order->customer_name }}</dd></div><div><dt class="text-ink-soft">Email</dt><dd class="mt-1 text-navy">{{ $order->customer_email }}</dd></div><div><dt class="text-ink-soft">Telepon</dt><dd class="mt-1 text-navy">{{ $order->customer_phone }}</dd></div><div class="sm:col-span-2"><dt class="text-ink-soft">Alamat</dt><dd class="mt-1 whitespace-pre-line text-navy">{{ $order->shipping_address }}</dd></div>@if ($order->notes)<div class="sm:col-span-2"><dt class="text-ink-soft">Catatan</dt><dd class="mt-1 text-navy">{{ $order->notes }}</dd></div>@endif</dl></x-ui.card></div>
-        <x-ui.card class="h-fit"><h2 class="text-xl text-navy">Perbarui status</h2><form method="POST" action="{{ route('admin.orders.update', $order) }}" class="mt-5 space-y-5">@csrf @method('PATCH')<label class="grid gap-2 text-sm font-semibold text-navy">Status order<select name="status" class="rounded-xl border border-line px-4 py-3 font-normal">@foreach (\App\Models\Order::STATUSES as $status)<option value="{{ $status }}" @selected($order->status === $status)>{{ ucfirst($status) }}</option>@endforeach</select></label><label class="grid gap-2 text-sm font-semibold text-navy">Status pembayaran<select name="payment_status" class="rounded-xl border border-line px-4 py-3 font-normal">@foreach (\App\Models\Order::PAYMENT_STATUSES as $paymentStatus)<option value="{{ $paymentStatus }}" @selected($order->payment_status === $paymentStatus)>{{ ucfirst($paymentStatus) }}</option>@endforeach</select></label><x-ui.loading-button loading-label="Menyimpan..." class="w-full cursor-pointer">Simpan status</x-ui.loading-button></form></x-ui.card>
+        <div class="space-y-6">
+            <x-ui.card>
+                <h2 class="text-xl text-navy">Item order</h2>
+                <div class="mt-5 divide-y divide-line">@foreach ($order->items as $item)<div class="flex justify-between gap-4 py-4"><div><p class="font-semibold text-navy">{{ $item->product_name }}</p><p class="mt-1 text-sm text-ink-soft">{{ $item->quantity }} &times; Rp{{ number_format((float) $item->unit_price, 0, ',', '.') }}</p></div><p class="font-semibold text-navy">Rp{{ number_format((float) $item->line_total, 0, ',', '.') }}</p></div>@endforeach</div>
+            </x-ui.card>
+
+            <x-ui.card>
+                <h2 class="text-xl text-navy">Detail pembayaran</h2>
+                <dl class="mt-5 grid gap-4 text-sm sm:grid-cols-2">
+                    <div><dt class="text-ink-soft">Gateway</dt><dd class="mt-1 font-semibold text-navy">{{ $order->payment_gateway_code }}</dd></div>
+                    <div><dt class="text-ink-soft">Status</dt><dd class="mt-1"><x-ui.badge variant="{{ $order->payment_status === 'paid' ? 'tosca' : ($order->payment_status === 'pending' ? 'orange' : 'navy') }}">{{ ucfirst($order->payment_status) }}</x-ui.badge></dd></div>
+                    @if ($order->payment_reference)<div class="sm:col-span-2"><dt class="text-ink-soft">Referensi provider</dt><dd class="mt-1 break-all font-mono text-xs text-navy">{{ $order->payment_reference }}</dd></div>@endif
+                    @if ($order->paid_at)<div><dt class="text-ink-soft">Dibayar</dt><dd class="mt-1 text-navy">{{ $order->paid_at->format('d M Y H:i') }}</dd></div>@endif
+                </dl>
+            </x-ui.card>
+
+            <x-ui.card>
+                <h2 class="text-xl text-navy">Data pelanggan</h2>
+                <dl class="mt-5 grid gap-4 text-sm sm:grid-cols-2"><div><dt class="text-ink-soft">Nama</dt><dd class="mt-1 font-semibold text-navy">{{ $order->customer_name }}</dd></div><div><dt class="text-ink-soft">Email</dt><dd class="mt-1 text-navy">{{ $order->customer_email }}</dd></div><div><dt class="text-ink-soft">Telepon</dt><dd class="mt-1 text-navy">{{ $order->customer_phone }}</dd></div><div class="sm:col-span-2"><dt class="text-ink-soft">Alamat</dt><dd class="mt-1 whitespace-pre-line text-navy">{{ $order->shipping_address }}</dd></div>@if ($order->notes)<div class="sm:col-span-2"><dt class="text-ink-soft">Catatan</dt><dd class="mt-1 text-navy">{{ $order->notes }}</dd></div>@endif</dl>
+            </x-ui.card>
+        </div>
+
+        <x-ui.card class="h-fit">
+            <h2 class="text-xl text-navy">Perbarui status</h2>
+            <form method="POST" action="{{ route('admin.orders.update', $order) }}" class="mt-5 space-y-5">@csrf @method('PATCH')<label class="grid gap-2 text-sm font-semibold text-navy">Status order<select name="status" class="rounded-xl border border-line px-4 py-3 font-normal">@foreach (\App\Models\Order::STATUSES as $status)<option value="{{ $status }}" @selected($order->status === $status)>{{ ucfirst($status) }}</option>@endforeach</select></label><label class="grid gap-2 text-sm font-semibold text-navy">Status pembayaran<select name="payment_status" class="rounded-xl border border-line px-4 py-3 font-normal">@foreach (\App\Models\Order::PAYMENT_STATUSES as $paymentStatus)<option value="{{ $paymentStatus }}" @selected($order->payment_status === $paymentStatus)>{{ ucfirst($paymentStatus) }}</option>@endforeach</select></label><x-ui.loading-button loading-label="Menyimpan..." class="w-full cursor-pointer">Simpan status</x-ui.loading-button></form>
+        </x-ui.card>
     </div>
 </x-layouts::app>

@@ -118,6 +118,15 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ],
         );
+        PaymentGateway::query()->updateOrCreate(
+            ['code' => 'midtrans'],
+            [
+                'name' => 'Midtrans',
+                'instructions' => 'Bayar aman melalui kartu, virtual account, QRIS, GoPay, dan metode lain yang aktif di Midtrans Snap.',
+                'config' => ['provider' => 'midtrans', 'environment' => 'sandbox'],
+                'is_active' => false,
+            ],
+        );
 
         StoreSetting::query()->firstOrCreate(
             [],

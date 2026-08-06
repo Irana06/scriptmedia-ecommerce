@@ -5,10 +5,12 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\StoreSettingController as AdminStoreSettingController;
+use App\Http\Controllers\Payments\MidtransNotificationController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\ProductController;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -25,6 +27,13 @@ Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.st
 Route::get('orders/{order}/success', [CheckoutController::class, 'success'])
     ->middleware('signed')
     ->name('checkout.success');
+Route::post('orders/{order}/payments/midtrans/retry', [CheckoutController::class, 'retryMidtrans'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('checkout.midtrans.retry');
+Route::post('payments/midtrans/notification', MidtransNotificationController::class)
+    ->withoutMiddleware(ValidateCsrfToken::class)
+    ->middleware('throttle:60,1')
+    ->name('payments.midtrans.notification');
 
 Route::get('dashboard', AdminDashboardController::class)
     ->middleware(['auth', 'verified', 'permission:access admin'])
