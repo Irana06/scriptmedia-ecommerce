@@ -10,7 +10,7 @@ use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\ProductController;
-use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -31,7 +31,7 @@ Route::post('orders/{order}/payments/midtrans/retry', [CheckoutController::class
     ->middleware(['signed', 'throttle:10,1'])
     ->name('checkout.midtrans.retry');
 Route::post('payments/midtrans/notification', MidtransNotificationController::class)
-    ->withoutMiddleware(ValidateCsrfToken::class)
+    ->withoutMiddleware(PreventRequestForgery::class)
     ->middleware('throttle:60,1')
     ->name('payments.midtrans.notification');
 

@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\PaymentGateway;
 use App\Models\Product;
 use App\Services\MidtransService;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
@@ -15,6 +16,14 @@ use Tests\TestCase;
 class MidtransPaymentTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_notification_route_is_excluded_from_request_forgery_protection(): void
+    {
+        $route = app('router')->getRoutes()->getByName('payments.midtrans.notification');
+
+        $this->assertNotNull($route);
+        $this->assertContains(PreventRequestForgery::class, $route->excludedMiddleware());
+    }
 
     public function test_checkout_creates_a_sandbox_snap_transaction(): void
     {
