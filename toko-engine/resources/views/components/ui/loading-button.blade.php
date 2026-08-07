@@ -10,7 +10,7 @@
     :disabled="$disabled"
     :data-blocked="$disabled ? 'true' : null"
     x-data="{ loading: false }"
-    x-on:click="if ($el.dataset.blocked !== 'true' && $el.form?.checkValidity()) loading = true"
+    x-init="$el.form?.addEventListener('submit', () => loading = true)"
     x-bind:disabled="loading || $el.dataset.blocked === 'true'"
     {{ $attributes->class('disabled:cursor-not-allowed disabled:opacity-55') }}
 >

@@ -8,6 +8,7 @@ use App\Models\PaymentGateway;
 use App\Models\Product;
 use App\Services\CartService;
 use App\Services\MidtransService;
+use App\Services\StoreLimitService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ use Throwable;
 
 class CheckoutController extends Controller
 {
-    public function create(CartService $cart): View|RedirectResponse
+    public function create(CartService $cart, StoreLimitService $storeLimits): View|RedirectResponse
     {
         if ($cart->items()->isEmpty()) {
             return redirect()->route('cart.index')->withErrors(['cart' => 'Keranjang masih kosong.']);
@@ -31,6 +32,7 @@ class CheckoutController extends Controller
             'items' => $cart->items(),
             'subtotal' => $cart->subtotal(),
             'gateways' => $gateways,
+            'midtransPaymentDescription' => $storeLimits->paymentMethodDescription(),
         ]);
     }
 

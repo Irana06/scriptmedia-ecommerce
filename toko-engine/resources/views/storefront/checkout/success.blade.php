@@ -19,7 +19,7 @@
                     @if ($order->payment_status === 'paid')
                         <p class="mt-5 text-sm font-semibold text-tosca">Pembayaran telah terverifikasi.</p>
                     @elseif ($order->payment_checkout_token && $midtransClientKey && $midtransSnapJsUrl)
-                        <button id="midtrans-pay-button" type="button" class="mt-5 inline-flex w-full items-center justify-center rounded-full bg-orange px-5 py-3 text-sm font-semibold text-navy transition hover:bg-orange-light">Bayar sekarang dengan Midtrans</button>
+                        <button id="midtrans-pay-button" type="button" class="mt-5 inline-flex w-full items-center justify-center rounded-full bg-orange px-5 py-3 text-sm font-semibold text-navy transition hover:bg-orange-light cursor-pointer">Bayar sekarang dengan Midtrans</button>
                         <p id="midtrans-message" class="mt-3 text-xs leading-5 text-ink-soft">Popup pembayaran aman akan dibuka oleh Midtrans Snap.</p>
                     @elseif ($midtransRetryUrl)
                         <form method="POST" action="{{ $midtransRetryUrl }}" class="mt-5">@csrf<x-ui.loading-button loading-label="Menghubungi Midtrans..." class="w-full">Coba siapkan pembayaran</x-ui.loading-button></form>

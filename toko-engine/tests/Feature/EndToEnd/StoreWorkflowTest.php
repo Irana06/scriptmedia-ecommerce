@@ -132,6 +132,7 @@ class StoreWorkflowTest extends TestCase
 
         Schema::connection('central')->create('plans', function (Blueprint $table): void {
             $table->id();
+            $table->string('slug');
             $table->unsignedInteger('max_products')->nullable();
             $table->unsignedInteger('max_payment_gateways')->nullable();
         });
@@ -149,6 +150,7 @@ class StoreWorkflowTest extends TestCase
 
         DB::connection('central')->table('plans')->insert([
             'id' => 1,
+            'slug' => 'starter',
             'max_products' => $maxProducts,
             'max_payment_gateways' => 1,
         ]);

@@ -24,7 +24,7 @@
                         @forelse ($gateways as $gateway)
                             <label class="flex cursor-pointer gap-3 rounded-xl border border-line p-4 transition hover:border-tosca/50 hover:bg-tosca-tint/40">
                                 <input type="radio" name="payment_gateway_code" value="{{ $gateway->code }}" @checked(old('payment_gateway_code', $gateways->first()?->code) === $gateway->code)>
-                                <span><span class="block font-semibold text-navy">{{ $gateway->name }}</span><span class="mt-1 block text-sm leading-6 text-ink-soft">{{ $gateway->instructions }}</span></span>
+                                <span><span class="block font-semibold text-navy">{{ $gateway->name }}</span><span class="mt-1 block text-sm leading-6 text-ink-soft">{{ $gateway->code === \App\Services\MidtransService::GATEWAY_CODE ? $midtransPaymentDescription : $gateway->instructions }}</span></span>
                             </label>
                         @empty
                             <x-ui.empty-state compact icon="payment" title="Metode pembayaran belum tersedia" description="Pengelola toko belum mengaktifkan payment gateway. Silakan coba kembali nanti." />

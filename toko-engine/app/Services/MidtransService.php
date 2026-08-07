@@ -13,6 +13,8 @@ class MidtransService
 {
     public const GATEWAY_CODE = 'midtrans';
 
+    public function __construct(private readonly StoreLimitService $storeLimits) {}
+
     public function isConfigured(): bool
     {
         return filled(config('services.midtrans.client_key'))
@@ -26,43 +28,50 @@ class MidtransService
         }
 
         $order->loadMissing('items');
+        $payload = [
+            'transaction_details' => [
+                'order_id' => $order->number,
+                'gross_amount' => (int) round((float) $order->total),
+            ],
+            'item_details' => $order->items->map(fn ($item): array => [
+                'id' => (string) ($item->product_id ?? $item->id),
+                'price' => (int) round((float) $item->unit_price),
+                'quantity' => $item->quantity,
+                'name' => Str::limit($item->product_name, 50, ''),
+            ])->all(),
+            'customer_details' => [
+                'first_name' => $order->customer_name,
+                'email' => $order->customer_email,
+                'phone' => $order->customer_phone,
+                'shipping_address' => [
+                    'first_name' => $order->customer_name,
+                    'email' => $order->customer_email,
+                    'phone' => $order->customer_phone,
+                    'address' => $order->shipping_address,
+                ],
+            ],
+            'credit_card' => ['secure' => true],
+            'callbacks' => [
+                'finish' => URL::temporarySignedRoute(
+                    'checkout.success',
+                    now()->addDay(),
+                    ['order' => $order],
+                ),
+            ],
+            'expiry' => ['duration' => 24, 'unit' => 'hours'],
+        ];
+        $enabledPayments = $this->storeLimits->midtransPaymentMethods();
+
+        if ($enabledPayments !== null) {
+            $payload['enabled_payments'] = $enabledPayments;
+        }
+
         $response = Http::acceptJson()
             ->asJson()
             ->withBasicAuth((string) config('services.midtrans.server_key'), '')
             ->connectTimeout(5)
             ->timeout(15)
-            ->post((string) config('services.midtrans.snap_url'), [
-                'transaction_details' => [
-                    'order_id' => $order->number,
-                    'gross_amount' => (int) round((float) $order->total),
-                ],
-                'item_details' => $order->items->map(fn ($item): array => [
-                    'id' => (string) ($item->product_id ?? $item->id),
-                    'price' => (int) round((float) $item->unit_price),
-                    'quantity' => $item->quantity,
-                    'name' => Str::limit($item->product_name, 50, ''),
-                ])->all(),
-                'customer_details' => [
-                    'first_name' => $order->customer_name,
-                    'email' => $order->customer_email,
-                    'phone' => $order->customer_phone,
-                    'shipping_address' => [
-                        'first_name' => $order->customer_name,
-                        'email' => $order->customer_email,
-                        'phone' => $order->customer_phone,
-                        'address' => $order->shipping_address,
-                    ],
-                ],
-                'credit_card' => ['secure' => true],
-                'callbacks' => [
-                    'finish' => URL::temporarySignedRoute(
-                        'checkout.success',
-                        now()->addDay(),
-                        ['order' => $order],
-                    ),
-                ],
-                'expiry' => ['duration' => 24, 'unit' => 'hours'],
-            ]);
+            ->post((string) config('services.midtrans.snap_url'), $payload);
 
         $response->throw();
         $token = $response->json('token');

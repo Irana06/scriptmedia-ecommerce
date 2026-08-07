@@ -10,7 +10,7 @@ use Throwable;
 
 class StoreLimitService
 {
-    /** @var array{max_products: int|null, max_payment_gateways: int|null}|null */
+    /** @var array{plan_slug: string|null, max_products: int|null, max_payment_gateways: int|null}|null */
     private ?array $limits = null;
 
     public function canAddProduct(): bool
@@ -37,7 +37,39 @@ class StoreLimitService
         return $this->resolveLimits()['max_payment_gateways'];
     }
 
-    /** @return array{max_products: int|null, max_payment_gateways: int|null} */
+    public function planSlug(): ?string
+    {
+        return $this->resolveLimits()['plan_slug'];
+    }
+
+    /** @return list<string>|null Null means every active Midtrans payment method is allowed. */
+    public function midtransPaymentMethods(): ?array
+    {
+        $planSlug = $this->planSlug();
+
+        if (! in_array($planSlug, ['starter', 'standard'], true)) {
+            return null;
+        }
+
+        $methods = config("store-limits.midtrans_payment_methods.{$planSlug}");
+
+        if (! is_array($methods)) {
+            return null;
+        }
+
+        return array_values(array_filter($methods, fn (mixed $method): bool => is_string($method) && $method !== ''));
+    }
+
+    public function paymentMethodDescription(): string
+    {
+        return match ($this->planSlug()) {
+            'starter' => 'Pembayaran QRIS melalui Midtrans.',
+            'standard' => 'Pembayaran QRIS dan bank transfer/virtual account melalui Midtrans.',
+            default => 'Semua metode pembayaran yang aktif di Midtrans Snap.',
+        };
+    }
+
+    /** @return array{plan_slug: string|null, max_products: int|null, max_payment_gateways: int|null} */
     private function resolveLimits(): array
     {
         if ($this->limits !== null) {
@@ -65,7 +97,7 @@ class StoreLimitService
                 ->whereIn('tenants.store_status', ['active', 'grace_period'])
                 ->whereIn('subscriptions.status', ['active', 'grace_period'])
                 ->latest('subscriptions.id')
-                ->select(['plans.max_products', 'plans.max_payment_gateways'])
+                ->select(['plans.slug', 'plans.max_products', 'plans.max_payment_gateways'])
                 ->first();
 
             if ($plan === null) {
@@ -73,6 +105,7 @@ class StoreLimitService
             }
 
             return $this->limits = [
+                'plan_slug' => $this->normalizePlanSlug($plan->slug),
                 'max_products' => $this->normalizeLimit($plan->max_products),
                 'max_payment_gateways' => $this->normalizeLimit($plan->max_payment_gateways),
             ];
@@ -83,13 +116,19 @@ class StoreLimitService
         }
     }
 
-    /** @return array{max_products: int|null, max_payment_gateways: int|null} */
+    /** @return array{plan_slug: string|null, max_products: int|null, max_payment_gateways: int|null} */
     private function fallbackLimits(): array
     {
         return [
+            'plan_slug' => $this->normalizePlanSlug(config('store-limits.fallback.plan_slug')),
             'max_products' => $this->normalizeLimit(config('store-limits.fallback.max_products')),
             'max_payment_gateways' => $this->normalizeLimit(config('store-limits.fallback.max_payment_gateways')),
         ];
+    }
+
+    private function normalizePlanSlug(mixed $value): ?string
+    {
+        return is_string($value) && $value !== '' ? strtolower($value) : null;
     }
 
     private function normalizeLimit(mixed $value): ?int

@@ -70,8 +70,41 @@ class MidtransPaymentTest extends TestCase
             return $request->url() === 'https://app.sandbox.midtrans.com/snap/v1/transactions'
                 && $request['transaction_details']['order_id'] === $order->number
                 && $request['transaction_details']['gross_amount'] === 250000
+                && $request['enabled_payments'] === ['other_qris']
                 && $request['credit_card']['secure'] === true;
         });
+    }
+
+    public function test_standard_plan_enables_qris_and_virtual_accounts(): void
+    {
+        $this->configureMidtrans();
+        config()->set('store-limits.fallback.plan_slug', 'standard');
+        Http::fake([
+            'https://app.sandbox.midtrans.com/snap/v1/transactions' => Http::response([
+                'token' => 'standard-snap-token',
+                'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/standard-snap-token',
+            ], 201),
+        ]);
+
+        app(MidtransService::class)->createSnapTransaction($this->midtransOrder());
+
+        Http::assertSent(fn (Request $request): bool => $request['enabled_payments'] === config('store-limits.midtrans_payment_methods.standard'));
+    }
+
+    public function test_pro_plan_leaves_all_active_midtrans_methods_available(): void
+    {
+        $this->configureMidtrans();
+        config()->set('store-limits.fallback.plan_slug', 'pro');
+        Http::fake([
+            'https://app.sandbox.midtrans.com/snap/v1/transactions' => Http::response([
+                'token' => 'pro-snap-token',
+                'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/pro-snap-token',
+            ], 201),
+        ]);
+
+        app(MidtransService::class)->createSnapTransaction($this->midtransOrder());
+
+        Http::assertSent(fn (Request $request): bool => ! array_key_exists('enabled_payments', $request->data()));
     }
 
     public function test_valid_notification_is_idempotent_and_cannot_downgrade_a_paid_order(): void
@@ -110,6 +143,8 @@ class MidtransPaymentTest extends TestCase
 
     private function configureMidtrans(): void
     {
+        config()->set('database.connections.central.database', null);
+        config()->set('store-limits.fallback.plan_slug', 'starter');
         config()->set('services.midtrans', [
             'merchant_id' => 'merchant-test',
             'client_key' => 'client-test',

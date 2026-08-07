@@ -48,6 +48,7 @@ class StoreLimitTest extends TestCase
     public function test_central_plan_blocks_products_and_gateway_activation_at_the_limit(): void
     {
         $this->configureCentralPlan(maxProducts: 2, maxGateways: 1);
+        $this->assertSame('starter', app(StoreLimitService::class)->planSlug());
         $owner = $this->ownerWithPermissions();
         $category = Category::query()->create([
             'name' => 'Rumah',
@@ -101,6 +102,7 @@ class StoreLimitTest extends TestCase
 
         Schema::connection('central')->create('plans', function (Blueprint $table): void {
             $table->id();
+            $table->string('slug');
             $table->unsignedInteger('max_products')->nullable();
             $table->unsignedInteger('max_payment_gateways')->nullable();
         });
@@ -118,6 +120,7 @@ class StoreLimitTest extends TestCase
 
         DB::connection('central')->table('plans')->insert([
             'id' => 1,
+            'slug' => 'starter',
             'max_products' => $maxProducts,
             'max_payment_gateways' => $maxGateways,
         ]);
