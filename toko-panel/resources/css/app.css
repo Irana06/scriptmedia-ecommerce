@@ -141,6 +141,115 @@ select:focus[data-flux-control] {
     --color-zinc-600: #334155;
 }
 
+.bpmn-canvas svg {
+    display: block;
+    min-width: 76rem;
+    width: 100%;
+}
+
+.bpmn-pool {
+    fill: white;
+    stroke: rgb(11 37 69 / 25%);
+    stroke-width: 2;
+}
+
+.bpmn-lane {
+    fill: white;
+}
+
+.bpmn-lane-alt {
+    fill: #f4fafa;
+}
+
+.bpmn-divider {
+    fill: none;
+    stroke: rgb(11 37 69 / 18%);
+    stroke-width: 2;
+}
+
+.bpmn-lane-title {
+    fill: #0b2545;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+.bpmn-lane-subtitle {
+    fill: #3c5878;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: normal;
+}
+
+.bpmn-flows path {
+    fill: none;
+    marker-end: url('#bpmn-arrow');
+    stroke: #0b2545;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3;
+}
+
+.bpmn-flows .bpmn-return-flow {
+    marker-end: url('#bpmn-arrow-muted');
+    stroke: #2ca6a4;
+    stroke-dasharray: 8 7;
+}
+
+.bpmn-start {
+    fill: white;
+    stroke: #2ca6a4;
+    stroke-width: 5;
+}
+
+.bpmn-task rect {
+    fill: white;
+    rx: 13px;
+    stroke: #0b2545;
+    stroke-width: 2;
+}
+
+.bpmn-task text,
+.bpmn-end-label {
+    fill: #0b2545;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.bpmn-task-muted rect {
+    fill: #e3f4f3;
+    stroke: #2ca6a4;
+}
+
+.bpmn-task-success rect {
+    fill: #fff4d8;
+    stroke: #f4a300;
+}
+
+.bpmn-gateway rect {
+    fill: #fff4d8;
+    stroke: #f4a300;
+    stroke-width: 3;
+}
+
+.bpmn-gateway path {
+    fill: none;
+    stroke: #0b2545;
+    stroke-width: 3;
+}
+
+.bpmn-label {
+    fill: #3c5878;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.bpmn-end {
+    fill: #0b2545;
+    stroke: #0b2545;
+    stroke-width: 4;
+}
+
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
@@ -157,5 +266,9 @@ select:focus[data-flux-control] {
 
     main section {
         break-inside: avoid;
+    }
+
+    .bpmn-canvas svg {
+        min-width: 0;
     }
 }

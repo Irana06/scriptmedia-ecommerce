@@ -45,6 +45,86 @@
         <section id="alur" class="border-y border-line bg-white py-16 sm:py-20">
             <div class="mx-auto max-w-7xl px-5 sm:px-8">
                 <div class="max-w-3xl"><p class="text-xs font-semibold tracking-[0.22em] text-tosca uppercase">Alur bisnis</p><h2 class="mt-3 text-3xl sm:text-4xl">Apa yang terjadi setelah calon klien memilih layanan?</h2><p class="mt-4 leading-7 text-ink-soft">Toko Panel menjadi tempat pendaftaran, pembayaran, dan pemantauan. Toko Engine adalah website toko beserta area administrasinya.</p></div>
+
+                <div class="mt-10 overflow-hidden rounded-card border border-line bg-offwhite shadow-card">
+                    <div class="flex flex-col gap-4 border-b border-line bg-white px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+                        <div><p class="text-xs font-semibold tracking-[0.18em] text-tosca uppercase">Peta proses bergaya BPMN</p><h3 class="mt-1 text-xl">Siklus aktivasi toko baru</h3></div>
+                        <div class="flex flex-wrap gap-x-5 gap-y-2 text-xs text-ink-soft">
+                            <span class="inline-flex items-center gap-2"><span class="size-3 rounded-full border-2 border-tosca bg-white"></span>Mulai</span>
+                            <span class="inline-flex items-center gap-2"><span class="h-3 w-5 rounded border border-navy bg-white"></span>Aktivitas</span>
+                            <span class="inline-flex items-center gap-2"><span class="size-3 rotate-45 border border-orange bg-orange/20"></span>Keputusan</span>
+                            <span class="inline-flex items-center gap-2"><span class="size-3 rounded-full border-2 border-navy bg-navy"></span>Selesai</span>
+                        </div>
+                    </div>
+
+                    <div class="bpmn-canvas overflow-x-auto" role="img" aria-label="Diagram alur aktivasi toko dari pendaftaran klien, pembayaran, verifikasi admin, provisioning Toko Engine, sampai toko aktif.">
+                        <svg viewBox="0 0 1940 680" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <defs>
+                                <marker id="bpmn-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#0B2545"/></marker>
+                                <marker id="bpmn-arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2CA6A4"/></marker>
+                            </defs>
+
+                            <rect class="bpmn-pool" x="1" y="1" width="1938" height="678" rx="16"/>
+                            <path class="bpmn-lane bpmn-lane-alt" d="M1 16A15 15 0 0 1 16 1H1939V170H1Z"/>
+                            <rect class="bpmn-lane" x="1" y="170" width="1938" height="170"/>
+                            <rect class="bpmn-lane bpmn-lane-alt" x="1" y="340" width="1938" height="170"/>
+                            <path class="bpmn-lane" d="M1 510H1939V664A15 15 0 0 1 1924 679H16A15 15 0 0 1 1 664Z"/>
+                            <path class="bpmn-divider" d="M180 1V679M1 170H1939M1 340H1939M1 510H1939"/>
+
+                            <g class="bpmn-lane-title">
+                                <text x="90" y="78" text-anchor="middle"><tspan x="90">CALON KLIEN</tspan><tspan class="bpmn-lane-subtitle" x="90" dy="22">Pemilik bisnis</tspan></text>
+                                <text x="90" y="248" text-anchor="middle"><tspan x="90">TOKO PANEL</tspan><tspan class="bpmn-lane-subtitle" x="90" dy="22">Sistem pusat</tspan></text>
+                                <text x="90" y="418" text-anchor="middle"><tspan x="90">ADMIN</tspan><tspan class="bpmn-lane-subtitle" x="90" dy="22">Tim ScriptMedia</tspan></text>
+                                <text x="90" y="588" text-anchor="middle"><tspan x="90">TOKO ENGINE</tspan><tspan class="bpmn-lane-subtitle" x="90" dy="22">Website klien</tspan></text>
+                            </g>
+
+                            <g class="bpmn-flows">
+                                <path d="M242 85H280"/>
+                                <path d="M430 85H470"/>
+                                <path d="M620 85H660"/>
+                                <path d="M810 85H845Q870 85 870 110V207"/>
+                                <path d="M1020 255H1060"/>
+                                <path d="M1210 255H1240"/>
+                                <path d="M1325 255H1360"/>
+                                <path d="M1510 255H1540"/>
+                                <path d="M1282 213V130H1360"/>
+                                <path class="bpmn-return-flow" d="M1435 117V180Q1435 205 1410 205H1307Q1282 205 1282 213"/>
+                                <path d="M1690 255H1730Q1755 255 1755 280V377"/>
+                                <path d="M1605 425H1560"/>
+                                <path d="M1410 425H1370"/>
+                                <path d="M1220 425H1180Q1155 425 1155 450V547"/>
+                                <path d="M1230 595H1270"/>
+                                <path d="M1420 595H1460"/>
+                                <path d="M1610 595H1668"/>
+                            </g>
+
+                            <g class="bpmn-label"><text x="1338" y="202">Belum</text><text x="1338" y="246">Lunas</text></g>
+
+                            <circle class="bpmn-start" cx="220" cy="85" r="21"/>
+                            <g class="bpmn-task"><rect x="280" y="53" width="150" height="64"/><text x="355" y="80" text-anchor="middle"><tspan x="355">Daftar akun</tspan><tspan x="355" dy="18">Toko Panel</tspan></text></g>
+                            <g class="bpmn-task"><rect x="470" y="53" width="150" height="64"/><text x="545" y="89" text-anchor="middle">Pilih paket</text></g>
+                            <g class="bpmn-task"><rect x="660" y="53" width="150" height="64"/><text x="735" y="80" text-anchor="middle"><tspan x="735">Isi kebutuhan</tspan><tspan x="735" dy="18">dan data toko</tspan></text></g>
+                            <g class="bpmn-task bpmn-task-muted"><rect x="1360" y="53" width="150" height="64"/><text x="1435" y="80" text-anchor="middle"><tspan x="1435">Cek status</tspan><tspan x="1435" dy="18">atau bayar ulang</tspan></text></g>
+
+                            <g class="bpmn-task"><rect x="870" y="223" width="150" height="64"/><text x="945" y="250" text-anchor="middle"><tspan x="945">Buat order</tspan><tspan x="945" dy="18">sewa</tspan></text></g>
+                            <g class="bpmn-task"><rect x="1060" y="223" width="150" height="64"/><text x="1135" y="250" text-anchor="middle"><tspan x="1135">Buat tagihan</tspan><tspan x="1135" dy="18">Midtrans</tspan></text></g>
+                            <g class="bpmn-gateway" transform="translate(1282 255) rotate(45)"><rect x="-30" y="-30" width="60" height="60" rx="3"/><path d="M-11 0H11M0-11V11"/></g>
+                            <g class="bpmn-task bpmn-task-success"><rect x="1360" y="223" width="150" height="64"/><text x="1435" y="250" text-anchor="middle"><tspan x="1435">Pembayaran</tspan><tspan x="1435" dy="18">terverifikasi</tspan></text></g>
+                            <g class="bpmn-task"><rect x="1540" y="223" width="150" height="64"/><text x="1615" y="250" text-anchor="middle"><tspan x="1615">Masuk antrean</tspan><tspan x="1615" dy="18">pengerjaan</tspan></text></g>
+
+                            <g class="bpmn-task"><rect x="1605" y="393" width="150" height="64"/><text x="1680" y="420" text-anchor="middle"><tspan x="1680">Review data</tspan><tspan x="1680" dy="18">dan kebutuhan</tspan></text></g>
+                            <g class="bpmn-task"><rect x="1410" y="393" width="150" height="64"/><text x="1485" y="420" text-anchor="middle"><tspan x="1485">Tentukan domain</tspan><tspan x="1485" dy="18">sesuai paket</tspan></text></g>
+                            <g class="bpmn-task"><rect x="1220" y="393" width="150" height="64"/><text x="1295" y="420" text-anchor="middle"><tspan x="1295">Konfirmasi</tspan><tspan x="1295" dy="18">provisioning</tspan></text></g>
+
+                            <g class="bpmn-task"><rect x="1080" y="563" width="150" height="64"/><text x="1155" y="590" text-anchor="middle"><tspan x="1155">Buat database</tspan><tspan x="1155" dy="18">tenant terpisah</tspan></text></g>
+                            <g class="bpmn-task"><rect x="1270" y="563" width="150" height="64"/><text x="1345" y="590" text-anchor="middle"><tspan x="1345">Siapkan toko,</tspan><tspan x="1345" dy="18">domain & fitur</tspan></text></g>
+                            <g class="bpmn-task"><rect x="1460" y="563" width="150" height="64"/><text x="1535" y="590" text-anchor="middle"><tspan x="1535">Buat akun &</tspan><tspan x="1535" dy="18">kredensial owner</tspan></text></g>
+                            <circle class="bpmn-end" cx="1695" cy="595" r="25"/><text class="bpmn-end-label" x="1740" y="589"><tspan x="1740">Toko aktif</tspan><tspan x="1740" dy="19">& siap digunakan</tspan></text>
+                        </svg>
+                    </div>
+                    <div class="border-t border-line bg-white px-5 py-4 text-sm leading-6 text-ink-soft sm:px-7"><strong class="text-navy">Catatan:</strong> ketika pembayaran belum selesai, order tetap tersimpan dan klien dapat kembali melalui Toko Panel. Tim baru memulai provisioning setelah status pembayaran terverifikasi.</div>
+                </div>
+
                 <div class="relative mt-12 grid gap-5 lg:grid-cols-6">
                     @foreach ([
                         ['01', 'Daftar akun', 'Klien membuat akun Toko Panel menggunakan email aktif.'],
