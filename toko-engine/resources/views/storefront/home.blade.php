@@ -4,7 +4,7 @@
     @if ($demoStore)
         <section class="relative overflow-hidden bg-linear-to-br from-navy via-navy-mid to-navy py-20 text-white sm:py-28">
             @if (isset($demoStore['hero_banner']))
-                <div class="absolute inset-0 bg-cover bg-center opacity-35" style="background-image: url('{{ asset($demoStore['hero_banner']) }}')"></div>
+                <div class="absolute inset-0 bg-cover bg-center opacity-70" style="background-image: url('{{ asset($demoStore['hero_banner']) }}')"></div>
                 <div class="absolute inset-0 bg-linear-to-r from-navy via-navy/85 to-navy/55"></div>
             @endif
             <div class="absolute -top-28 left-[8%] size-80 rounded-full opacity-20 blur-3xl" style="background: {{ $demoStore['accent'] }}"></div>
