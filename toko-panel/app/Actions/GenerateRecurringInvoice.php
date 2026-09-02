@@ -42,10 +42,10 @@ class GenerateRecurringInvoice
             $periodEnd = $lockedSubscription->billing_cycle === 'annual'
                 ? $periodStart->copy()->addYear()->subDay()
                 : $periodStart->copy()->addMonth()->subDay();
-            $carePrice = $lockedSubscription->billing_cycle === 'annual'
-                ? (float) $plan->price_care_annual
-                : (float) $plan->price_care_monthly;
-            $platformPrice = (float) $plan->price_platform;
+            $isAnnual = $lockedSubscription->billing_cycle === 'annual';
+            $billingMultiplier = $isAnnual ? 10 : 1;
+            $carePrice = (float) $plan->price_care_monthly * $billingMultiplier;
+            $platformPrice = (float) $plan->price_platform * $billingMultiplier;
 
             $invoice = Invoice::create([
                 'tenant_id' => $lockedSubscription->tenant_id,

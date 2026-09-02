@@ -16,7 +16,7 @@
                         </x-ui.card>
                     @endforeach
                 </div>
-                <x-ui.card class="h-fit lg:sticky lg:top-24"><h2 class="text-xl text-navy">Ringkasan</h2><div class="mt-5 flex justify-between border-t border-line pt-5 text-sm text-ink-soft"><span>Subtotal</span><span class="font-semibold text-navy">Rp{{ number_format($subtotal, 0, ',', '.') }}</span></div><p class="mt-3 text-xs leading-5 text-ink-soft">Ongkir belum dihitung pada skeleton ini.</p><div class="mt-6"><x-ui.button :href="route('checkout.create')" class="w-full">Lanjut checkout</x-ui.button></div></x-ui.card>
+                <x-ui.card class="h-fit lg:sticky lg:top-24"><h2 class="text-xl text-navy">Ringkasan</h2><div class="mt-5 flex justify-between border-t border-line pt-5 text-sm text-ink-soft"><span>Subtotal</span><span class="font-semibold text-navy">Rp{{ number_format($subtotal, 0, ',', '.') }}</span></div><p class="mt-3 text-xs leading-5 text-ink-soft">Biaya pengiriman akan dikonfirmasi oleh toko sesuai alamat tujuan.</p><div class="mt-6"><x-ui.button :href="route('checkout.create')" class="w-full">Lanjut checkout</x-ui.button></div></x-ui.card>
             </div>
         @endif
     </section>

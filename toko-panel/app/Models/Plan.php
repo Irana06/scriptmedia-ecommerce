@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'slug',
     'price_platform',
     'price_care_monthly',
-    'price_care_annual',
     'max_products',
     'max_payment_gateways',
     'content_request_quota',
@@ -41,6 +40,22 @@ class Plan extends Model
         return $this->hasMany(Subscription::class, 'pending_plan_id');
     }
 
+    /** @return HasMany<RentalOrder, $this> */
+    public function rentalOrders(): HasMany
+    {
+        return $this->hasMany(RentalOrder::class);
+    }
+
+    public function monthlyTotal(): float
+    {
+        return (float) $this->price_platform + (float) $this->price_care_monthly;
+    }
+
+    public function annualTotal(): float
+    {
+        return $this->monthlyTotal() * 10;
+    }
+
     /**
      * @return array<string, string>
      */
@@ -49,7 +64,6 @@ class Plan extends Model
         return [
             'price_platform' => 'decimal:2',
             'price_care_monthly' => 'decimal:2',
-            'price_care_annual' => 'decimal:2',
             'max_products' => 'integer',
             'max_payment_gateways' => 'integer',
             'content_request_quota' => 'integer',

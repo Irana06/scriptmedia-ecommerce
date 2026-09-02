@@ -34,7 +34,6 @@ class PlanManagementTest extends TestCase
             ->set('slug', 'pro')
             ->set('pricePlatform', '3000000')
             ->set('priceCareMonthly', '750000')
-            ->set('priceCareAnnual', '7500000')
             ->set('maxProducts', '')
             ->set('maxPaymentGateways', '')
             ->set('contentRequestQuota', '10')

@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
-use Stancl\Tenancy\Middleware\PreventAccessFromUnwantedDomains;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,13 +16,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->append(PreventAccessFromUnwantedDomains::class);
-
         $middleware->alias([
             'permission' => PermissionMiddleware::class,
             'role' => RoleMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
             'tenant.owner' => EnsureTenantOwnership::class,
+        ]);
+
+        $middleware->preventRequestForgery(except: [
+            'payments/midtrans/rental-notification',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

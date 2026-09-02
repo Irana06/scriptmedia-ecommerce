@@ -51,6 +51,9 @@
                         @can('manage products')<a href="{{ route('admin.products.index') }}">Produk</a>@endcan
                         @can('manage orders')<a href="{{ route('admin.orders.index') }}">Order</a>@endcan
                         @can('view reports')<a href="{{ route('admin.reports.index') }}">Laporan</a>@endcan
+                        @can('manage store settings')<a href="{{ route('admin.store-settings.edit') }}">Pengaturan</a>@endcan
+                        <a href="{{ route('profile.edit') }}">Profil</a>
+                        <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit" class="cursor-pointer font-semibold">Keluar</button></form>
                     </nav>
                 </header>
 

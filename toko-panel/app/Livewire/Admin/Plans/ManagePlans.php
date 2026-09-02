@@ -24,8 +24,6 @@ class ManagePlans extends Component
 
     public string $priceCareMonthly = '0';
 
-    public string $priceCareAnnual = '0';
-
     public string $maxProducts = '';
 
     public string $maxPaymentGateways = '';
@@ -59,7 +57,6 @@ class ManagePlans extends Component
         $this->slug = $plan->slug;
         $this->pricePlatform = (string) $plan->price_platform;
         $this->priceCareMonthly = (string) $plan->price_care_monthly;
-        $this->priceCareAnnual = (string) $plan->price_care_annual;
         $this->maxProducts = $plan->max_products === null ? '' : (string) $plan->max_products;
         $this->maxPaymentGateways = $plan->max_payment_gateways === null ? '' : (string) $plan->max_payment_gateways;
         $this->contentRequestQuota = (string) $plan->content_request_quota;
@@ -80,7 +77,6 @@ class ManagePlans extends Component
             'slug' => ['required', 'alpha_dash:ascii', 'max:100', Rule::unique('plans', 'slug')->ignore($this->editingPlanId)],
             'pricePlatform' => ['required', 'numeric', 'min:0'],
             'priceCareMonthly' => ['required', 'numeric', 'min:0'],
-            'priceCareAnnual' => ['required', 'numeric', 'min:0'],
             'maxProducts' => ['nullable', 'integer', 'min:0'],
             'maxPaymentGateways' => ['nullable', 'integer', 'min:0'],
             'contentRequestQuota' => ['required', 'integer', 'min:0'],
@@ -101,7 +97,6 @@ class ManagePlans extends Component
             'slug' => $validated['slug'],
             'price_platform' => $validated['pricePlatform'],
             'price_care_monthly' => $validated['priceCareMonthly'],
-            'price_care_annual' => $validated['priceCareAnnual'],
             'max_products' => filled($validated['maxProducts']) ? (int) $validated['maxProducts'] : null,
             'max_payment_gateways' => filled($validated['maxPaymentGateways']) ? (int) $validated['maxPaymentGateways'] : null,
             'content_request_quota' => $validated['contentRequestQuota'],
@@ -147,7 +142,6 @@ class ManagePlans extends Component
         $this->name = 'starter';
         $this->pricePlatform = '0';
         $this->priceCareMonthly = '0';
-        $this->priceCareAnnual = '0';
         $this->contentRequestQuota = '0';
         $this->supportSlaHours = '0';
         $this->isActive = true;

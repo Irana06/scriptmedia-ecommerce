@@ -22,7 +22,12 @@ class TenantPortalController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('portal.dashboard', compact('tenants'));
+        $orders = $user->rentalOrders()
+            ->with(['plan', 'tenant'])
+            ->latest()
+            ->get();
+
+        return view('portal.dashboard', compact('tenants', 'orders'));
     }
 
     public function show(Tenant $tenant): View

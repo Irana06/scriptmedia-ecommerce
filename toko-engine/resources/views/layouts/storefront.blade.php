@@ -28,13 +28,13 @@
                 </a>
 
                 <nav class="hidden items-center gap-7 text-sm text-ink-soft md:flex" aria-label="Navigasi utama">
-                    <a href="{{ route('home') }}" class="transition hover:text-navy">Home</a>
+                    <a href="{{ route('home') }}" class="transition hover:text-navy">Beranda</a>
                     <a href="{{ route('products.index') }}" class="transition hover:text-navy">Produk</a>
                     <a href="{{ route('cart.index') }}" class="transition hover:text-navy">Keranjang ({{ $cartCount }})</a>
                 </nav>
 
                 <div class="flex items-center gap-2">
-                    <a href="{{ route('cart.index') }}" class="rounded-full border border-line px-3 py-2 text-xs font-semibold text-navy md:hidden">Cart {{ $cartCount }}</a>
+                    <details class="relative md:hidden"><summary class="cursor-pointer list-none rounded-full border border-line px-3 py-2 text-xs font-semibold text-navy">Menu</summary><nav class="absolute top-12 right-0 grid min-w-44 gap-1 rounded-xl border border-line bg-white p-2 text-sm text-navy shadow-card"><a href="{{ route('home') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Beranda</a><a href="{{ route('products.index') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Produk</a><a href="{{ route('cart.index') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Keranjang ({{ $cartCount }})</a></nav></details>
                     @auth
                         <x-ui.button :href="route('admin.dashboard')" variant="navy" class="px-4 py-2.5">Admin</x-ui.button>
                     @else

@@ -106,6 +106,12 @@ class Tenant extends Model implements TenantContract, TenantWithDatabase
         return $this->hasMany(PlanFeatureUsage::class);
     }
 
+    /** @return HasOne<RentalOrder, $this> */
+    public function rentalOrder(): HasOne
+    {
+        return $this->hasOne(RentalOrder::class);
+    }
+
     /**
      * @return array<string, string>
      */

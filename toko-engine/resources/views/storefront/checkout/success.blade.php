@@ -14,7 +14,7 @@
 
             @if ($gateway?->code === \App\Services\MidtransService::GATEWAY_CODE)
                 <div class="mt-6 rounded-xl border border-tosca/25 bg-tosca-tint/55 p-5 text-left">
-                    <div class="flex items-start justify-between gap-4"><div><p class="font-semibold text-navy">Pembayaran Midtrans</p><p class="mt-2 text-sm leading-6 text-ink-soft">Status pembayaran hanya diperbarui setelah notifikasi aman dari Midtrans diterima.</p></div><x-ui.badge variant="navy">Sandbox</x-ui.badge></div>
+                    <div class="flex items-start justify-between gap-4"><div><p class="font-semibold text-navy">Pembayaran Midtrans</p><p class="mt-2 text-sm leading-6 text-ink-soft">Status pembayaran hanya diperbarui setelah notifikasi aman dari Midtrans diterima.</p></div>@unless (config('services.midtrans.is_production'))<x-ui.badge variant="navy">Sandbox</x-ui.badge>@endunless</div>
 
                     @if ($order->payment_status === 'paid')
                         <p class="mt-5 text-sm font-semibold text-tosca">Pembayaran telah terverifikasi.</p>
@@ -28,6 +28,15 @@
             @elseif ($gateway)
                 <div class="mt-6 rounded-xl border border-orange/30 bg-orange/10 p-5 text-left"><p class="font-semibold text-navy">Instruksi {{ $gateway->name }}</p><p class="mt-2 text-sm leading-6 text-ink-soft">{{ $gateway->instructions }}</p></div>
             @endif
+
+            <div class="mt-6 rounded-xl border border-line bg-white p-5 text-left">
+                <p class="font-semibold text-navy">Simpan link status order</p>
+                <p class="mt-2 text-sm leading-6 text-ink-soft">Link pribadi ini tetap dapat dibuka untuk mengecek pembayaran dan proses pesanan tanpa membuat akun.</p>
+                <div class="mt-4 flex flex-col gap-3 sm:flex-row">
+                    <x-ui.button :href="$trackingUrl" variant="navy">Lihat status order</x-ui.button>
+                    <a href="{{ $whatsappTrackingUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-full border border-tosca px-5 py-3 text-sm font-semibold text-tosca transition hover:bg-tosca-tint">Kirim link ke WhatsApp</a>
+                </div>
+            </div>
 
             <div class="mt-8"><x-ui.button :href="route('products.index')" variant="navy">Lanjut belanja</x-ui.button></div>
         </x-ui.card>

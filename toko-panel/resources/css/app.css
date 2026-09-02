@@ -90,6 +90,57 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
+/* ScriptMedia cards use a light surface even when Flux follows system dark mode. */
+[data-auth-card],
+[data-panel-surface] {
+    color-scheme: light;
+    color: var(--color-navy);
+}
+
+[data-auth-card] [data-flux-heading],
+[data-panel-surface] [data-flux-heading],
+[data-auth-card] [data-flux-label],
+[data-panel-surface] [data-flux-label] {
+    color: var(--color-navy) !important;
+}
+
+[data-auth-card] [data-flux-subheading],
+[data-panel-surface] [data-flux-subheading],
+[data-auth-card] [data-flux-description],
+[data-panel-surface] [data-flux-description] {
+    color: var(--color-ink-soft) !important;
+}
+
+[data-auth-card] input[data-flux-control],
+[data-auth-card] textarea[data-flux-control],
+[data-auth-card] select[data-flux-control],
+[data-panel-surface] input[data-flux-control],
+[data-panel-surface] textarea[data-flux-control],
+[data-panel-surface] select[data-flux-control] {
+    border-color: var(--color-line) !important;
+    background-color: white !important;
+    color: var(--color-navy) !important;
+}
+
+[data-auth-card] input[data-flux-control]::placeholder,
+[data-auth-card] textarea[data-flux-control]::placeholder,
+[data-panel-surface] input[data-flux-control]::placeholder,
+[data-panel-surface] textarea[data-flux-control]::placeholder {
+    color: #6b7f96 !important;
+    opacity: 1;
+}
+
+[data-auth-card] button,
+[data-auth-card] a,
+[data-auth-card] label,
+[data-panel-surface] button,
+[data-panel-surface] a,
+[data-panel-surface] label {
+    --color-zinc-400: #64748b;
+    --color-zinc-500: #475569;
+    --color-zinc-600: #334155;
+}
+
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */

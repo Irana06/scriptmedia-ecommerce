@@ -73,4 +73,10 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->hasMany(ContentChangeRequest::class, 'requested_by_user_id');
     }
+
+    /** @return HasMany<RentalOrder, $this> */
+    public function rentalOrders(): HasMany
+    {
+        return $this->hasMany(RentalOrder::class);
+    }
 }

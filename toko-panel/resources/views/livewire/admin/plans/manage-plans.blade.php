@@ -1,5 +1,5 @@
 <div class="space-y-8">
-    <x-ui.loading-indicator label="Menyimpan konfigurasi plan..." />
+    <x-ui.loading-indicator label="Menyimpan konfigurasi plan..." target="savePlan" />
     <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
             <p class="text-xs font-semibold tracking-[0.22em] text-tosca uppercase">Konfigurasi paket</p>
@@ -14,7 +14,7 @@
     @enderror
 
     @if ($showForm)
-        <x-ui.card>
+        <x-ui.card data-panel-surface>
             <div class="flex items-center justify-between gap-4">
                 <div>
                     <x-ui.badge variant="navy">{{ $editingPlanId ? 'Edit plan' : 'Plan baru' }}</x-ui.badge>
@@ -36,11 +36,11 @@
 
                 <div>
                     <h3 class="text-sm font-semibold text-navy">Harga</h3>
-                    <div class="mt-3 grid gap-5 md:grid-cols-3">
+                    <div class="mt-3 grid gap-5 md:grid-cols-2">
                         <flux:input wire:model="pricePlatform" label="Sewa platform" type="number" min="0" step="0.01" required />
                         <flux:input wire:model="priceCareMonthly" label="Care bulanan" type="number" min="0" step="0.01" required />
-                        <flux:input wire:model="priceCareAnnual" label="Care tahunan" type="number" min="0" step="0.01" required />
                     </div>
+                    <p class="mt-3 text-xs text-ink-soft">Harga tahunan dihitung otomatis: (platform + care bulanan) × 10.</p>
                 </div>
 
                 <div>

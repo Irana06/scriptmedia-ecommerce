@@ -41,13 +41,9 @@ class DatabaseSeeder extends Seeder
         );
         $owner->syncRoles([$ownerRole]);
 
-        $plan = Plan::updateOrCreate(
-            ['name' => 'starter'],
-            [
-                'slug' => 'starter',
-                'price_platform' => 1500000,
-                'price_care_monthly' => 250000,
-                'price_care_annual' => 2500000,
+        $plans = [
+            'starter' => [
+                'price_care_monthly' => 150000,
                 'max_products' => 50,
                 'max_payment_gateways' => 1,
                 'content_request_quota' => 1,
@@ -55,10 +51,45 @@ class DatabaseSeeder extends Seeder
                 'custom_domain_allowed' => false,
                 'allow_realtime_shipping' => false,
                 'allow_full_design_customization' => false,
-                'is_active' => true,
                 'sort_order' => 1,
             ],
-        );
+            'standard' => [
+                'price_care_monthly' => 350000,
+                'max_products' => 150,
+                'max_payment_gateways' => 2,
+                'content_request_quota' => 3,
+                'support_sla_hours' => 12,
+                'custom_domain_allowed' => true,
+                'allow_realtime_shipping' => false,
+                'allow_full_design_customization' => false,
+                'sort_order' => 2,
+            ],
+            'pro' => [
+                'price_care_monthly' => 550000,
+                'max_products' => null,
+                'max_payment_gateways' => null,
+                'content_request_quota' => 5,
+                'support_sla_hours' => 6,
+                'custom_domain_allowed' => true,
+                'allow_realtime_shipping' => true,
+                'allow_full_design_customization' => true,
+                'sort_order' => 3,
+            ],
+        ];
+
+        foreach ($plans as $name => $attributes) {
+            Plan::updateOrCreate(
+                ['name' => $name],
+                [
+                    'slug' => $name,
+                    'price_platform' => 150000,
+                    'is_active' => true,
+                    ...$attributes,
+                ],
+            );
+        }
+
+        $plan = Plan::query()->where('name', 'starter')->sole();
 
         $tenant = Tenant::updateOrCreate(
             ['subdomain' => 'demo'],

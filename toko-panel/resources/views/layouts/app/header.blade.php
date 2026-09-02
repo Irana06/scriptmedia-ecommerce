@@ -19,6 +19,7 @@
                 <nav class="ml-6 hidden items-center gap-1 md:flex" aria-label="{{ __('Primary navigation') }}">
                     @role('admin')
                         <a href="{{ route('admin.dashboard') }}" class="rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.dashboard') ? 'bg-white/15' : '' }}" wire:navigate>Dashboard</a>
+                        <a href="{{ route('admin.rental-orders.index') }}" class="rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.rental-orders.*') ? 'bg-white/15' : '' }}">Order Sewa</a>
                         <a href="{{ route('admin.plans.index') }}" class="rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.plans.*') ? 'bg-white/15' : '' }}" wire:navigate>Plan</a>
                         <a href="{{ route('admin.tenants.index') }}" class="rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.tenants.*') ? 'bg-white/15' : '' }}" wire:navigate>Tenant</a>
                         <a href="{{ route('admin.billing.index') }}" class="rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.billing.*') ? 'bg-white/15' : '' }}" wire:navigate>Billing</a>
@@ -36,6 +37,7 @@
             <nav class="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-5 pb-3 md:hidden" aria-label="{{ __('Mobile navigation') }}">
                 @role('admin')
                     <a href="{{ route('admin.dashboard') }}" class="shrink-0 rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.dashboard') ? 'bg-white/15' : '' }}" wire:navigate>Dashboard</a>
+                    <a href="{{ route('admin.rental-orders.index') }}" class="shrink-0 rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.rental-orders.*') ? 'bg-white/15' : '' }}">Order Sewa</a>
                     <a href="{{ route('admin.plans.index') }}" class="shrink-0 rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.plans.*') ? 'bg-white/15' : '' }}" wire:navigate>Plan</a>
                     <a href="{{ route('admin.tenants.index') }}" class="shrink-0 rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.tenants.*') ? 'bg-white/15' : '' }}" wire:navigate>Tenant</a>
                     <a href="{{ route('admin.billing.index') }}" class="shrink-0 rounded-full px-4 py-2 text-sm text-white transition hover:bg-white/15 {{ request()->routeIs('admin.billing.*') ? 'bg-white/15' : '' }}" wire:navigate>Billing</a>
@@ -46,7 +48,7 @@
             </nav>
         </header>
 
-        <main class="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 sm:py-14">
+        <main data-panel-surface class="mx-auto w-full max-w-7xl px-5 py-10 text-navy sm:px-8 sm:py-14">
             {{ $slot }}
         </main>
 

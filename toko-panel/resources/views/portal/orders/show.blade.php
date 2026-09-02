@@ -1,0 +1,20 @@
+<x-layouts::app :title="$order->number">
+    @php
+        $steps = ['awaiting_payment' => 1, 'paid' => 2, 'provisioning' => 3, 'ready' => 4, 'cancelled' => 0];
+        $currentStep = $steps[$order->status] ?? 0;
+    @endphp
+    <div class="mx-auto max-w-5xl space-y-8">
+        <x-ui.section-header eyebrow="Detail order" :title="$order->number" description="Pantau pembayaran dan proses pembuatan toko dari halaman ini." />
+        <x-ui.card>
+            <div class="grid gap-4 sm:grid-cols-4">
+                @foreach ([['Pembayaran','Selesaikan pembayaran'],['Terverifikasi','Pembayaran diterima'],['Pembuatan toko','Tim menyiapkan toko'],['Toko siap','Kredensial tersedia']] as $index => [$title, $description])
+                    <div class="rounded-xl border p-4 {{ $currentStep >= $index + 1 ? 'border-tosca bg-tosca-tint' : 'border-line bg-offwhite' }}"><span class="text-xs font-semibold text-tosca">LANGKAH {{ $index + 1 }}</span><p class="mt-2 font-semibold">{{ $title }}</p><p class="mt-1 text-xs leading-5 text-ink-soft">{{ $description }}</p></div>
+                @endforeach
+            </div>
+        </x-ui.card>
+        <div class="grid gap-6 lg:grid-cols-[1fr_340px]">
+            <x-ui.card><h2 class="text-2xl">Informasi toko</h2><dl class="mt-6 grid gap-5 text-sm sm:grid-cols-2"><div><dt class="text-ink-soft">Nama bisnis</dt><dd class="mt-1 font-semibold">{{ $order->business_name }}</dd></div><div><dt class="text-ink-soft">Plan</dt><dd class="mt-1 font-semibold">{{ str($order->plan->name)->title() }} · {{ $order->billing_cycle === 'annual' ? 'Tahunan' : 'Bulanan' }}</dd></div><div><dt class="text-ink-soft">Alamat toko</dt><dd class="mt-1 font-semibold">{{ $order->desired_subdomain }}.scriptmedia.id</dd></div><div><dt class="text-ink-soft">Custom domain</dt><dd class="mt-1 font-semibold">{{ $order->custom_domain ?: 'Tidak digunakan' }}</dd></div><div><dt class="text-ink-soft">WhatsApp</dt><dd class="mt-1 font-semibold">{{ $order->whatsapp }}</dd></div><div><dt class="text-ink-soft">Status</dt><dd class="mt-1"><x-ui.badge :variant="$order->status === 'ready' ? 'tosca' : 'orange'">{{ str($order->status)->replace('_', ' ')->title() }}</x-ui.badge></dd></div></dl></x-ui.card>
+            <x-ui.card class="h-fit"><p class="text-sm text-ink-soft">Total pembayaran</p><p class="mt-2 text-3xl">Rp{{ number_format((float) $order->amount, 0, ',', '.') }}</p>@if ($order->status === 'awaiting_payment')<p class="mt-4 text-sm leading-6 text-ink-soft">Setelah pembayaran terverifikasi, tim ScriptMedia akan mulai menyiapkan toko.</p>@if ($order->payment_checkout_url)<x-ui.button :href="$order->payment_checkout_url" class="mt-6 w-full">Bayar dengan Midtrans</x-ui.button>@elseif (app(\App\Services\MidtransRentalService::class)->isConfigured())<form method="POST" action="{{ route('portal.orders.retry', $order) }}" class="mt-6">@csrf<x-ui.button type="submit" class="w-full">Buat ulang pembayaran</x-ui.button></form>@else<div class="mt-6 rounded-xl bg-orange/10 p-4 text-sm leading-6 text-ink-soft">Gateway lokal belum dikonfigurasi. Order sudah tersimpan dan akan bisa dibayar setelah kredensial Midtrans dipasang.</div>@endif @elseif ($order->status === 'ready' && $order->tenant)<div class="mt-6 rounded-xl border border-orange/30 bg-orange/10 p-4"><p class="text-sm font-semibold">Kredensial admin toko</p><dl class="mt-3 space-y-2 text-sm"><div><dt class="text-ink-soft">URL</dt><dd class="font-semibold">https://{{ $order->custom_domain ?: $order->desired_subdomain.'.scriptmedia.id' }}/login</dd></div><div><dt class="text-ink-soft">Email</dt><dd class="font-semibold">{{ $order->engine_login_email }}</dd></div><div><dt class="text-ink-soft">Password sementara</dt><dd class="break-all font-mono font-semibold">{{ $order->engine_temporary_password }}</dd></div></dl><p class="mt-3 text-xs leading-5 text-ink-soft">Password wajib diganti saat pertama masuk. Jangan bagikan kredensial ini kepada orang lain.</p></div><x-ui.button :href="route('portal.tenants.show', $order->tenant)" variant="navy" class="mt-4 w-full">Buka detail toko</x-ui.button>@endif</x-ui.card>
+        </div>
+    </div>
+</x-layouts::app>

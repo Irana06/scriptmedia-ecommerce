@@ -21,6 +21,12 @@ class DashboardRedirectController extends Controller
         }
 
         if ($user->hasRole(UserRole::Owner->value)) {
+            $selectedPlan = $request->session()->pull('selected_plan');
+
+            if (is_string($selectedPlan) && $selectedPlan !== '') {
+                return redirect()->route('onboarding.create', $selectedPlan);
+            }
+
             return redirect()->route('portal.dashboard');
         }
 

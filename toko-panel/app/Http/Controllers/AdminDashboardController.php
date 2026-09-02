@@ -16,7 +16,7 @@ class AdminDashboardController extends Controller
         $mrr = Subscription::query()
             ->join('plans', 'plans.id', '=', 'subscriptions.plan_id')
             ->where('subscriptions.status', 'active')
-            ->selectRaw("COALESCE(SUM(CASE WHEN subscriptions.billing_cycle = 'annual' THEN plans.price_care_annual / 12 ELSE plans.price_care_monthly END), 0) AS mrr")
+            ->selectRaw("COALESCE(SUM(CASE WHEN subscriptions.billing_cycle = 'annual' THEN plans.price_care_monthly * 10 / 12 ELSE plans.price_care_monthly END), 0) AS mrr")
             ->value('mrr');
 
         return view('dashboard', [

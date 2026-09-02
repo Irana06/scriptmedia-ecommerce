@@ -58,6 +58,12 @@ class CheckoutFlowTest extends TestCase
         ]);
         $this->assertSame(8, $product->fresh()->stock);
         $this->assertEmpty(session('storefront_cart'));
+        $this->assertNotNull($order->public_token);
+        $this->get(route('orders.track', $order->public_token))
+            ->assertOk()
+            ->assertSee($order->number)
+            ->assertSee('Simpan lewat WhatsApp');
+        $this->get(route('orders.track', str_repeat('x', 64)))->assertNotFound();
 
         foreach (['access admin', 'manage orders'] as $permissionName) {
             Permission::findOrCreate($permissionName);

@@ -61,12 +61,12 @@ class GenerateRecurringInvoicesTest extends TestCase
         $this->assertDatabaseCount('invoices', 1);
     }
 
-    public function test_annual_subscription_uses_annual_web_care_price(): void
+    public function test_annual_subscription_charges_ten_months_for_a_twelve_month_period(): void
     {
         Notification::fake();
         $plan = Plan::factory()->create([
-            'price_platform' => 3000000,
-            'price_care_annual' => 3600000,
+            'price_platform' => 150000,
+            'price_care_monthly' => 350000,
         ]);
         $subscription = Subscription::factory()->for($plan)->create([
             'billing_cycle' => 'annual',
@@ -76,8 +76,9 @@ class GenerateRecurringInvoicesTest extends TestCase
         $this->artisan('app:generate-invoices')->assertSuccessful();
 
         $invoice = Invoice::query()->sole();
-        $this->assertSame('3600000.00', $invoice->subtotal_care);
-        $this->assertSame('6600000.00', $invoice->total);
+        $this->assertSame('1500000.00', $invoice->subtotal_platform);
+        $this->assertSame('3500000.00', $invoice->subtotal_care);
+        $this->assertSame('5000000.00', $invoice->total);
         $this->assertSame(
             $invoice->billing_period_start->addYear()->subDay()->toDateString(),
             $invoice->billing_period_end->toDateString(),

@@ -27,6 +27,10 @@ Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.st
 Route::get('orders/{order}/success', [CheckoutController::class, 'success'])
     ->middleware('signed')
     ->name('checkout.success');
+Route::get('orders/track/{token}', [CheckoutController::class, 'track'])
+    ->where('token', '[A-Za-z0-9]{64}')
+    ->middleware('throttle:30,1')
+    ->name('orders.track');
 Route::post('orders/{order}/payments/midtrans/retry', [CheckoutController::class, 'retryMidtrans'])
     ->middleware(['signed', 'throttle:10,1'])
     ->name('checkout.midtrans.retry');
@@ -36,10 +40,10 @@ Route::post('payments/midtrans/notification', MidtransNotificationController::cl
     ->name('payments.midtrans.notification');
 
 Route::get('dashboard', AdminDashboardController::class)
-    ->middleware(['auth', 'verified', 'permission:access admin'])
+    ->middleware(['auth', 'verified', 'password.changed', 'permission:access admin'])
     ->name('dashboard');
 
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'permission:access admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'password.changed', 'permission:access admin'])->group(function () {
     Route::get('/', AdminDashboardController::class)->name('dashboard');
     Route::resource('products', AdminProductController::class)
         ->except('show')

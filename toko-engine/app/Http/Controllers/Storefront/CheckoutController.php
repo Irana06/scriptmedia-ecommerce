@@ -121,6 +121,10 @@ class CheckoutController extends Controller
 
     public function success(Order $order): View
     {
+        if (blank($order->public_token)) {
+            $order->forceFill(['public_token' => Str::random(64)])->save();
+        }
+
         $order->load('items');
         $gateway = PaymentGateway::query()->where('code', $order->payment_gateway_code)->first();
 
@@ -136,6 +140,22 @@ class CheckoutController extends Controller
             'midtransRetryUrl' => $gateway?->code === MidtransService::GATEWAY_CODE
                 ? URL::temporarySignedRoute('checkout.midtrans.retry', now()->addDay(), ['order' => $order])
                 : null,
+            'trackingUrl' => route('orders.track', $order->public_token),
+            'whatsappTrackingUrl' => $this->whatsappTrackingUrl($order),
+        ]);
+    }
+
+    public function track(string $token): View
+    {
+        $order = Order::query()->where('public_token', $token)->firstOrFail();
+        $order->load('items');
+        $gateway = PaymentGateway::query()->where('code', $order->payment_gateway_code)->first();
+
+        return view('storefront.orders.track', [
+            'order' => $order,
+            'gateway' => $gateway,
+            'trackingUrl' => route('orders.track', $order->public_token),
+            'whatsappTrackingUrl' => $this->whatsappTrackingUrl($order),
         ]);
     }
 
@@ -167,5 +187,17 @@ class CheckoutController extends Controller
             now()->addDay(),
             ['order' => $order],
         );
+    }
+
+    private function whatsappTrackingUrl(Order $order): string
+    {
+        $phone = preg_replace('/\D+/', '', $order->customer_phone) ?? '';
+        if (str_starts_with($phone, '0')) {
+            $phone = '62'.substr($phone, 1);
+        }
+
+        $message = "Halo {$order->customer_name}, ini link aman untuk memantau order {$order->number}: ".route('orders.track', $order->public_token);
+
+        return 'https://wa.me/'.$phone.'?text='.rawurlencode($message);
     }
 }

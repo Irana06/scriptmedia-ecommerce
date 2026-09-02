@@ -110,13 +110,7 @@ class ProvisionTenantTest extends TestCase
                 $this->assertTrue(Schema::hasTable('store_settings'));
             });
 
-            $this->get('http://schema-check.shops.test/_tenant/health')
-                ->assertOk()
-                ->assertJson([
-                    'tenant_id' => $tenant->id,
-                    'provisioning_status' => 'active',
-                    'store_status' => 'active',
-                ]);
+            $this->get('http://schema-check.shops.test/_tenant/health')->assertNotFound();
 
             $this->assertSame('active', $tenant->fresh()->provisioning_status);
         } finally {

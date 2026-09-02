@@ -19,7 +19,7 @@
                     </span>
                 </a>
 
-                <div class="rounded-card border border-white/20 bg-white p-7 shadow-2xl shadow-navy/30 sm:p-9">
+                <div data-auth-card class="rounded-card border border-white/20 bg-white p-7 text-navy shadow-2xl shadow-navy/30 sm:p-9">
                     {{ $slot }}
                 </div>
 
