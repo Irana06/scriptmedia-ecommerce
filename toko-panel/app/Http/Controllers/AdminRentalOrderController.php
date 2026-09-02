@@ -60,34 +60,8 @@ class AdminRentalOrderController extends Controller
             return $tenant;
         });
 
-        if (app()->isLocal()) {
-            ProvisionTenantJob::dispatchSync($tenant->id);
-        } else {
-            ProvisionTenantJob::dispatch($tenant->id)->afterCommit();
-        }
+        ProvisionTenantJob::dispatch($tenant->id)->afterCommit();
 
         return back()->with('status', 'Provisioning toko dimulai.');
-    }
-
-    public function simulatePayment(RentalOrder $rentalOrder): RedirectResponse
-    {
-        abort_unless(app()->environment(['local', 'testing']), Response::HTTP_NOT_FOUND);
-
-        DB::transaction(function () use ($rentalOrder): void {
-            $locked = RentalOrder::query()->lockForUpdate()->findOrFail($rentalOrder->id);
-            abort_unless(in_array($locked->status, ['awaiting_payment', 'cancelled'], true) && $locked->tenant_id === null, Response::HTTP_UNPROCESSABLE_ENTITY);
-
-            $locked->update([
-                'status' => 'paid',
-                'paid_at' => now(),
-                'payment_reference' => 'LOCAL-'.Str::upper(Str::random(10)),
-                'payment_metadata' => [
-                    'source' => 'local_admin_simulation',
-                    'simulated_at' => now()->toIso8601String(),
-                ],
-            ]);
-        });
-
-        return back()->with('status', 'Pembayaran berhasil disimulasikan untuk pengujian lokal.');
     }
 }

@@ -68,6 +68,14 @@
         @apply bg-offwhite font-sans text-ink antialiased;
     }
 
+    button:not(:disabled),
+    [role='button']:not([aria-disabled='true']),
+    summary,
+    input[type='button']:not(:disabled),
+    input[type='submit']:not(:disabled) {
+        cursor: pointer;
+    }
+
     h1,
     h2,
     h3 {

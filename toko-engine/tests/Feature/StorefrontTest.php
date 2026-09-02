@@ -47,4 +47,12 @@ class StorefrontTest extends TestCase
             ->assertSee('Tas Kanvas')
             ->assertDontSee('Teko Tanah Sore');
     }
+
+    public function test_each_plan_has_a_public_demo_store(): void
+    {
+        $this->get('/starter')->assertOk()->assertSee('Kedai Rona')->assertSee('Paket Starter');
+        $this->get('/standard')->assertOk()->assertSee('Shicomp Store')->assertSee('Paket Standard');
+        $this->get('/pro')->assertOk()->assertSee('Nara Atelier')->assertSee('Paket Pro');
+        $this->get('/enterprise')->assertNotFound();
+    }
 }

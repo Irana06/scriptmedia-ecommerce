@@ -11,7 +11,7 @@
         default => 'bg-orange text-navy hover:bg-orange-light focus-visible:outline-orange',
     };
 
-    $classes = "inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 {$variantClasses}";
+    $classes = "inline-flex cursor-pointer items-center justify-center gap-2 px-5 py-3 text-sm font-semibold transition duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none {$variantClasses}";
 @endphp
 
 @if ($href)
