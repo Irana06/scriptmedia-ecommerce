@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminRentalOrderController;
 use App\Http\Controllers\DashboardRedirectController;
+use App\Http\Controllers\GuideController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MidtransRentalNotificationController;
 use App\Http\Controllers\RentalOrderController;
@@ -14,6 +15,7 @@ use App\Livewire\Admin\Tenants\ManageTenants;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('panduan', GuideController::class)->name('guide');
 Route::post('payments/midtrans/rental-notification', MidtransRentalNotificationController::class)
     ->middleware('throttle:120,1')
     ->name('payments.midtrans.rental-notification');

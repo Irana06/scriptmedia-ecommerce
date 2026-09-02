@@ -8,7 +8,7 @@
                     <p class="text-sm font-semibold tracking-[0.22em] text-orange uppercase">Sewa web e-commerce siap jualan</p>
                     <h1 class="mt-5 max-w-3xl text-4xl leading-tight font-semibold sm:text-6xl">Punya toko online profesional tanpa repot urus teknis.</h1>
                     <p class="mt-6 max-w-2xl text-lg leading-8 text-white/75">Pilih paket, lakukan pembayaran, lalu tim ScriptMedia menyiapkan toko dan kredensial admin untuk bisnismu.</p>
-                    <div class="mt-8 flex flex-wrap gap-3"><x-ui.button href="#paket">Lihat pilihan paket</x-ui.button><a href="#alur" class="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold hover:bg-white/10">Cara kerjanya</a></div>
+                    <div class="mt-8 flex flex-wrap gap-3"><x-ui.button href="#paket">Lihat pilihan paket</x-ui.button><a href="{{ route('guide') }}" class="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold hover:bg-white/10">Panduan lengkap</a></div>
                 </div>
                 <div class="rounded-card border border-white/15 bg-white/10 p-7 shadow-2xl backdrop-blur sm:p-9">
                     <p class="text-sm text-white/65">Termasuk di semua paket</p>

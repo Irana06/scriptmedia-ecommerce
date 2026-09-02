@@ -11,6 +11,7 @@
                     <span><span class="block text-lg leading-none font-semibold">ScriptMedia</span><span class="mt-1 block text-[10px] tracking-[0.22em] text-tosca uppercase">Sewa Toko Online</span></span>
                 </a>
                 <nav class="ml-auto flex items-center gap-2">
+                    <a href="{{ route('guide') }}" class="hidden rounded-full px-4 py-2 text-sm font-semibold text-navy hover:bg-offwhite sm:inline-flex">Panduan</a>
                     @auth
                         <x-ui.button :href="route('dashboard')" variant="navy">Buka panel</x-ui.button>
                     @else
@@ -26,7 +27,7 @@
         <footer class="border-t border-line bg-white">
             <div class="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-8 text-sm text-ink-soft sm:flex-row sm:items-center sm:justify-between sm:px-8">
                 <p>© {{ now()->year }} ScriptMedia. Solusi toko online untuk bisnis Indonesia.</p>
-                <p>Butuh bantuan? Hubungi tim ScriptMedia.</p>
+                <p><a href="{{ route('guide') }}" class="font-semibold text-tosca hover:underline">Panduan layanan</a><span class="mx-2">·</span>Butuh bantuan? Hubungi tim ScriptMedia.</p>
             </div>
         </footer>
         @fluxScripts

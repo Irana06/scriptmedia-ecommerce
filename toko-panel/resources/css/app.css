@@ -144,3 +144,18 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+@media print {
+    header,
+    footer {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+    }
+
+    main section {
+        break-inside: avoid;
+    }
+}

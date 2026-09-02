@@ -26,6 +26,23 @@ class RentalOrderFlowTest extends TestCase
             ->assertSee('Pro');
     }
 
+    public function test_public_guide_explains_the_business_flow_and_live_plans(): void
+    {
+        Plan::factory()->create();
+        Plan::factory()->standard()->create();
+        Plan::factory()->pro()->create();
+
+        $this->get(route('guide'))
+            ->assertOk()
+            ->assertSee('Alur bisnis')
+            ->assertSee('Toko Panel')
+            ->assertSee('Toko Engine')
+            ->assertSee('Starter')
+            ->assertSee('Standard')
+            ->assertSee('Pro')
+            ->assertSee('Cetak / simpan PDF');
+    }
+
     public function test_owner_can_create_monthly_rental_order(): void
     {
         $owner = User::factory()->owner()->create();
