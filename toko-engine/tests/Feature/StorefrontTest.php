@@ -50,9 +50,18 @@ class StorefrontTest extends TestCase
 
     public function test_each_plan_has_a_public_demo_store(): void
     {
-        $this->get('/starter')->assertOk()->assertSee('Kedai Rona')->assertSee('Paket Starter');
-        $this->get('/standard')->assertOk()->assertSee('Shicomp Store')->assertSee('Paket Standard');
-        $this->get('/pro')->assertOk()->assertSee('Nara Atelier')->assertSee('Paket Pro');
+        $this->get('/starter')->assertOk()->assertSee('Kedai Rona')->assertSee('Paket Starter')->assertSee('Paling laku');
+        $this->get('/standard')
+            ->assertOk()
+            ->assertSee('Shicomp Store')
+            ->assertSee('Paket Standard')
+            ->assertSee('Paling laku')
+            ->assertSee('/images/demo/shicomp-standard-hero.png');
+        $this->get('/pro')
+            ->assertOk()
+            ->assertSee('Nara Atelier')
+            ->assertSee('Paket Pro')
+            ->assertSee('/images/demo/nara-pro-hero.png');
         $this->get('/enterprise')->assertNotFound();
     }
 }

@@ -38,6 +38,7 @@ return [
         'payment' => 'QRIS + transfer bank otomatis',
         'capacity' => 'Maksimal 150 produk',
         'domain' => 'Mendukung custom domain',
+        'hero_banner' => '/images/demo/shicomp-standard-hero.png',
         'products' => [
             ['name' => 'Mechanical Keyboard K87', 'category' => 'Keyboard', 'price' => 629000, 'icon' => '⌨️', 'color' => '#dfe8f4'],
             ['name' => 'Wireless Mouse M2', 'category' => 'Mouse', 'price' => 289000, 'icon' => '🖱️', 'color' => '#e5ecef'],
@@ -61,6 +62,7 @@ return [
         'payment' => 'Multi payment gateway',
         'capacity' => 'Produk unlimited',
         'domain' => 'Custom domain & desain penuh',
+        'hero_banner' => '/images/demo/nara-pro-hero.png',
         'products' => [
             ['name' => 'Lumi Lounge Chair', 'category' => 'Furniture', 'price' => 4850000, 'icon' => '🪑', 'color' => '#eaded4'],
             ['name' => 'Sora Pendant Lamp', 'category' => 'Lighting', 'price' => 2290000, 'icon' => '🏮', 'color' => '#f1e4c8'],

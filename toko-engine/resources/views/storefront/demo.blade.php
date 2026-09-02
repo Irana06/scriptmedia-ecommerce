@@ -9,6 +9,7 @@
             .demo-accent-soft { background-color: var(--demo-accent-soft); }
         </style>
     </head>
+    @php($bestSeller = $store['products'][0])
     <body class="min-h-screen bg-offwhite text-navy">
         <div id="demo-store" data-store="{{ $slug }}">
             <div class="bg-navy px-5 py-2.5 text-center text-xs text-white sm:text-sm">
@@ -38,6 +39,10 @@
 
             <main>
                 <section id="beranda" class="relative overflow-hidden bg-linear-to-br from-navy via-navy-mid to-navy py-20 text-white sm:py-28">
+                    @if (isset($store['hero_banner']))
+                        <div class="absolute inset-0 bg-cover bg-center opacity-60" style="background-image: url('{{ asset($store['hero_banner']) }}')"></div>
+                        <div class="absolute inset-0 bg-linear-to-r from-navy via-navy/85 to-navy/55"></div>
+                    @endif
                     <div class="demo-accent-bg absolute -top-28 left-[8%] size-80 rounded-full opacity-20 blur-3xl"></div>
                     <div class="absolute -right-20 -bottom-28 size-96 rounded-full bg-white/10 blur-3xl"></div>
                     <div class="relative mx-auto grid max-w-7xl items-center gap-12 px-5 lg:grid-cols-[1.1fr_.9fr] sm:px-8">
@@ -50,14 +55,13 @@
                                 <a href="#fitur" class="inline-flex cursor-pointer items-center justify-center rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-white/10">Lihat fitur paket</a>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            @foreach (array_slice($store['products'], 0, 4) as $index => $product)
-                                <div class="rounded-card border border-white/10 bg-white/10 p-4 backdrop-blur-sm {{ $index % 2 ? 'translate-y-6' : '' }}">
-                                    <div class="flex aspect-square items-center justify-center rounded-xl text-5xl" style="background: {{ $product['color'] }}">{{ $product['icon'] }}</div>
-                                    <p class="mt-3 text-sm font-semibold text-white">{{ $product['name'] }}</p>
-                                    <p class="mt-1 text-xs text-white/60">Rp{{ number_format($product['price'], 0, ',', '.') }}</p>
-                                </div>
-                            @endforeach
+                        <div class="relative mx-auto w-full max-w-xl overflow-hidden rounded-[1.75rem] border border-white/15 bg-white/10 p-4 shadow-2xl backdrop-blur-sm">
+                            <div class="flex aspect-[4/3] items-center justify-center rounded-2xl text-9xl" style="background: {{ $bestSeller['color'] }}">{{ $bestSeller['icon'] }}</div>
+                            <div class="absolute inset-x-4 bottom-4 h-2/3 rounded-b-2xl bg-linear-to-t from-navy via-navy/35 to-transparent"></div>
+                            <div class="absolute right-8 bottom-8 left-8 flex items-end justify-between gap-4">
+                                <div><span class="demo-accent-bg inline-flex rounded-full px-3 py-1.5 text-[10px] font-semibold tracking-wide text-white uppercase">Paling laku</span><p class="mt-3 text-lg font-semibold text-white">{{ $bestSeller['name'] }}</p><p class="mt-1 text-sm text-white/70">Rp{{ number_format($bestSeller['price'], 0, ',', '.') }}</p></div>
+                                <button type="button" data-add-product="{{ $bestSeller['name'] }}" aria-label="Tambahkan {{ $bestSeller['name'] }} ke keranjang" class="demo-accent-bg flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-full text-2xl font-semibold text-white shadow-lg transition duration-200 hover:-translate-y-1 hover:brightness-110">+</button>
+                            </div>
                         </div>
                     </div>
                 </section>
