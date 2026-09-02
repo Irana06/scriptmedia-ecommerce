@@ -30,6 +30,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('dashboard', AdminDashboardController::class)->name('dashboard');
         Route::get('rental-orders', [AdminRentalOrderController::class, 'index'])->name('rental-orders.index');
+        if (app()->environment(['local', 'testing'])) {
+            Route::post('rental-orders/{rentalOrder}/simulate-payment', [AdminRentalOrderController::class, 'simulatePayment'])->name('rental-orders.simulate-payment');
+        }
         Route::post('rental-orders/{rentalOrder}/provision', [AdminRentalOrderController::class, 'provision'])->name('rental-orders.provision');
         Route::livewire('billing', ManageBilling::class)->name('billing.index');
         Route::livewire('content-requests', ManageContentRequests::class)->name('content-requests.index');

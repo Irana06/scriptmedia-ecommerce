@@ -7,6 +7,7 @@ use App\Models\RentalOrder;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class RentalOrderFlowTest extends TestCase
@@ -189,5 +190,36 @@ class RentalOrderFlowTest extends TestCase
         ]);
 
         $this->actingAs($otherOwner)->get(route('portal.orders.show', $order))->assertForbidden();
+    }
+
+    public function test_admin_can_simulate_a_rental_payment_only_in_a_safe_environment(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole(Role::findOrCreate('admin'));
+        $owner = User::factory()->owner()->create();
+        $plan = Plan::factory()->standard()->create();
+        $order = RentalOrder::create([
+            'number' => 'RENT-LOCAL-STANDARD',
+            'user_id' => $owner->id,
+            'plan_id' => $plan->id,
+            'billing_cycle' => 'monthly',
+            'business_name' => 'Toko Standard Lokal',
+            'desired_subdomain' => 'standard-local',
+            'whatsapp' => '628123456785',
+            'status' => 'awaiting_payment',
+            'amount' => 500000,
+            'payment_gateway' => 'midtrans',
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.rental-orders.simulate-payment', $order))
+            ->assertRedirect()
+            ->assertSessionHas('status');
+
+        $order->refresh();
+        $this->assertSame('paid', $order->status);
+        $this->assertNotNull($order->paid_at);
+        $this->assertStringStartsWith('LOCAL-', (string) $order->payment_reference);
+        $this->assertSame('local_admin_simulation', $order->payment_metadata['source']);
     }
 }
