@@ -28,7 +28,7 @@
 
             <div class="mt-7 flex flex-col gap-3 sm:flex-row">
                 <a href="{{ $whatsappTrackingUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-full bg-tosca px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90">Simpan lewat WhatsApp</a>
-                <x-ui.button :href="route('products.index')" variant="navy">Kembali belanja</x-ui.button>
+                <x-ui.button :href="\App\Support\StorefrontContext::route('products.index')" variant="navy">Kembali belanja</x-ui.button>
             </div>
             <p class="mt-5 text-xs leading-5 text-ink-soft">Jangan bagikan link ini kepada orang lain karena link berfungsi sebagai akses pribadi ke status order.</p>
         </x-ui.card>

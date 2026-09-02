@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\PaymentGateway;
 use App\Models\Product;
+use App\Support\StorefrontContext;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -74,6 +75,15 @@ class StoreLimitService
     {
         if ($this->limits !== null) {
             return $this->limits;
+        }
+
+        $demoStore = StorefrontContext::store();
+        if ($demoStore !== null) {
+            return $this->limits = [
+                'plan_slug' => StorefrontContext::slug(),
+                'max_products' => $this->normalizeLimit($demoStore['max_products'] ?? null),
+                'max_payment_gateways' => $this->normalizeLimit($demoStore['max_payment_gateways'] ?? null),
+            ];
         }
 
         $fallback = $this->fallbackLimits();

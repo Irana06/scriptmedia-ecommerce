@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Storefront;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Services\CartService;
+use App\Support\StorefrontContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,7 +22,8 @@ class CartController extends Controller
 
     public function store(Request $request, Product $product, CartService $cart): RedirectResponse
     {
-        abort_unless($product->is_active, 404);
+        $demoSlug = StorefrontContext::slug();
+        abort_unless($product->is_active && ($demoSlug === null || str_starts_with($product->slug, $demoSlug.'-')), 404);
         $validated = $request->validate(['quantity' => ['nullable', 'integer', 'min:1']]);
 
         if ($product->stock < 1) {
@@ -35,6 +37,8 @@ class CartController extends Controller
 
     public function update(Request $request, Product $product, CartService $cart): RedirectResponse
     {
+        $demoSlug = StorefrontContext::slug();
+        abort_unless($demoSlug === null || str_starts_with($product->slug, $demoSlug.'-'), 404);
         $validated = $request->validate([
             'quantity' => ['required', 'integer', 'min:0', 'max:'.$product->stock],
         ]);
@@ -45,6 +49,8 @@ class CartController extends Controller
 
     public function destroy(Product $product, CartService $cart): RedirectResponse
     {
+        $demoSlug = StorefrontContext::slug();
+        abort_unless($demoSlug === null || str_starts_with($product->slug, $demoSlug.'-'), 404);
         $cart->remove($product);
 
         return back()->with('success', 'Produk dihapus dari keranjang.');

@@ -14,6 +14,8 @@ return [
         'category' => 'Kopi & camilan',
         'payment' => 'QRIS otomatis',
         'capacity' => 'Maksimal 50 produk',
+        'max_products' => 50,
+        'max_payment_gateways' => 1,
         'domain' => 'Subdomain ScriptMedia',
         'products' => [
             ['name' => 'Kopi Susu Rona', 'category' => 'Minuman', 'price' => 22000, 'icon' => '☕', 'color' => '#dcefeb'],
@@ -37,6 +39,8 @@ return [
         'category' => 'Teknologi & aksesori',
         'payment' => 'QRIS + transfer bank otomatis',
         'capacity' => 'Maksimal 150 produk',
+        'max_products' => 150,
+        'max_payment_gateways' => 2,
         'domain' => 'Mendukung custom domain',
         'hero_banner' => '/images/demo/shicomp-standard-hero.png',
         'products' => [
@@ -61,6 +65,8 @@ return [
         'category' => 'Interior premium',
         'payment' => 'Multi payment gateway',
         'capacity' => 'Produk unlimited',
+        'max_products' => null,
+        'max_payment_gateways' => null,
         'domain' => 'Custom domain & desain penuh',
         'hero_banner' => '/images/demo/nara-pro-hero.png',
         'products' => [

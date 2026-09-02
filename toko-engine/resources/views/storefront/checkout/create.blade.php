@@ -4,7 +4,7 @@
         <h1 class="mt-4 text-4xl text-navy sm:text-5xl">Lengkapi pesanan</h1>
         <p class="mt-3 max-w-2xl text-ink-soft">Pastikan data penerima dan metode pembayaran sudah sesuai sebelum membuat order.</p>
 
-        <form method="POST" action="{{ route('checkout.store') }}" class="mt-8 grid gap-8 lg:grid-cols-[1fr_22rem]">
+        <form method="POST" action="{{ \App\Support\StorefrontContext::route('checkout.store') }}" class="mt-8 grid gap-8 lg:grid-cols-[1fr_22rem]">
             @csrf
             <div class="space-y-6">
                 <x-ui.card>

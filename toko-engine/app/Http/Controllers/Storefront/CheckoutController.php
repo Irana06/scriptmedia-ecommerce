@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Services\CartService;
 use App\Services\MidtransService;
 use App\Services\StoreLimitService;
+use App\Support\StorefrontContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class CheckoutController extends Controller
     public function create(CartService $cart, StoreLimitService $storeLimits): View|RedirectResponse
     {
         if ($cart->items()->isEmpty()) {
-            return redirect()->route('cart.index')->withErrors(['cart' => 'Keranjang masih kosong.']);
+            return redirect(StorefrontContext::route('cart.index'))->withErrors(['cart' => 'Keranjang masih kosong.']);
         }
 
         $gateways = PaymentGateway::query()->where('is_active', true)->orderBy('name')->get();
@@ -54,7 +55,7 @@ class CheckoutController extends Controller
         $cartItems = $cart->items();
 
         if ($cartItems->isEmpty()) {
-            return redirect()->route('cart.index')->withErrors(['cart' => 'Keranjang masih kosong.']);
+            return redirect(StorefrontContext::route('cart.index'))->withErrors(['cart' => 'Keranjang masih kosong.']);
         }
 
         $order = DB::transaction(function () use ($validated, $gateway, $cartItems): Order {
@@ -138,9 +139,9 @@ class CheckoutController extends Controller
                 ? config('services.midtrans.snap_js_url')
                 : null,
             'midtransRetryUrl' => $gateway?->code === MidtransService::GATEWAY_CODE
-                ? URL::temporarySignedRoute('checkout.midtrans.retry', now()->addDay(), ['order' => $order])
+                ? URL::temporarySignedRoute(StorefrontContext::routeName('checkout.midtrans.retry'), now()->addDay(), StorefrontContext::routeParameters(['order' => $order]))
                 : null,
-            'trackingUrl' => route('orders.track', $order->public_token),
+            'trackingUrl' => StorefrontContext::route('orders.track', ['token' => $order->public_token]),
             'whatsappTrackingUrl' => $this->whatsappTrackingUrl($order),
         ]);
     }
@@ -154,7 +155,7 @@ class CheckoutController extends Controller
         return view('storefront.orders.track', [
             'order' => $order,
             'gateway' => $gateway,
-            'trackingUrl' => route('orders.track', $order->public_token),
+            'trackingUrl' => StorefrontContext::route('orders.track', ['token' => $order->public_token]),
             'whatsappTrackingUrl' => $this->whatsappTrackingUrl($order),
         ]);
     }
@@ -183,9 +184,9 @@ class CheckoutController extends Controller
     private function successUrl(Order $order): string
     {
         return URL::temporarySignedRoute(
-            'checkout.success',
+            StorefrontContext::routeName('checkout.success'),
             now()->addDay(),
-            ['order' => $order],
+            StorefrontContext::routeParameters(['order' => $order]),
         );
     }
 
@@ -196,7 +197,7 @@ class CheckoutController extends Controller
             $phone = '62'.substr($phone, 1);
         }
 
-        $message = "Halo {$order->customer_name}, ini link aman untuk memantau order {$order->number}: ".route('orders.track', $order->public_token);
+        $message = "Halo {$order->customer_name}, ini link aman untuk memantau order {$order->number}: ".StorefrontContext::route('orders.track', ['token' => $order->public_token]);
 
         return 'https://wa.me/'.$phone.'?text='.rawurlencode($message);
     }

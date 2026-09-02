@@ -3,17 +3,21 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Support\StorefrontContext;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Session;
 
 class CartService
 {
-    private const SESSION_KEY = 'storefront_cart';
+    private function sessionKey(): string
+    {
+        return 'storefront_cart'.(StorefrontContext::slug() ? '_'.StorefrontContext::slug() : '');
+    }
 
     /** @return array<int, int> */
     public function raw(): array
     {
-        $cart = Session::get(self::SESSION_KEY, []);
+        $cart = Session::get($this->sessionKey(), []);
 
         if (! is_array($cart)) {
             return [];
@@ -33,7 +37,7 @@ class CartService
     {
         $cart = $this->raw();
         $cart[$product->id] = min(($cart[$product->id] ?? 0) + $quantity, $product->stock);
-        Session::put(self::SESSION_KEY, $cart);
+        Session::put($this->sessionKey(), $cart);
     }
 
     public function update(Product $product, int $quantity): void
@@ -46,19 +50,19 @@ class CartService
 
         $cart = $this->raw();
         $cart[$product->id] = min($quantity, $product->stock);
-        Session::put(self::SESSION_KEY, $cart);
+        Session::put($this->sessionKey(), $cart);
     }
 
     public function remove(Product $product): void
     {
         $cart = $this->raw();
         unset($cart[$product->id]);
-        Session::put(self::SESSION_KEY, $cart);
+        Session::put($this->sessionKey(), $cart);
     }
 
     public function clear(): void
     {
-        Session::forget(self::SESSION_KEY);
+        Session::forget($this->sessionKey());
     }
 
     public function count(): int
@@ -70,7 +74,7 @@ class CartService
     public function items(): Collection
     {
         $cart = $this->raw();
-        $products = Product::query()
+        $products = StorefrontContext::scopeProducts(Product::query())
             ->available()
             ->with(['category', 'media'])
             ->whereIn('id', array_keys($cart))

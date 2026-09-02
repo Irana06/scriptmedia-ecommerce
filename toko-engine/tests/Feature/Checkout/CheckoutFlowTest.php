@@ -8,6 +8,7 @@ use App\Models\PaymentGateway;
 use App\Models\Product;
 use App\Models\StoreSetting;
 use App\Models\User;
+use Database\Seeders\DemoStoreSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -83,5 +84,39 @@ class CheckoutFlowTest extends TestCase
             ->patch(route('admin.orders.update', $order), ['status' => 'processing', 'payment_status' => 'paid'])
             ->assertSessionHasNoErrors();
         $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'processing', 'payment_status' => 'paid']);
+    }
+
+    public function test_demo_store_uses_the_real_cart_checkout_and_tracking_flow(): void
+    {
+        $this->seed(DemoStoreSeeder::class);
+        PaymentGateway::query()->create([
+            'code' => 'demo-transfer',
+            'name' => 'Transfer Demo',
+            'instructions' => 'Khusus pengujian.',
+            'is_active' => true,
+        ]);
+
+        $this->post('/standard/cart/standard-mechanical-keyboard-k87', ['quantity' => 1])
+            ->assertSessionHasNoErrors();
+        $this->get('/standard/checkout')
+            ->assertOk()
+            ->assertSee('Transfer Demo');
+
+        $response = $this->post('/standard/checkout', [
+            'customer_name' => 'Pelanggan Demo',
+            'customer_email' => 'demo@example.com',
+            'customer_phone' => '08123456789',
+            'shipping_address' => 'Alamat pengujian',
+            'payment_gateway_code' => 'demo-transfer',
+        ]);
+
+        $order = Order::query()->latest('id')->firstOrFail();
+        $response->assertRedirectContains('/standard/orders/'.$order->id.'/success');
+        $this->get($response->headers->get('Location'))
+            ->assertOk()
+            ->assertSee('/standard/orders/track/'.$order->public_token);
+        $this->get('/standard/orders/track/'.$order->public_token)
+            ->assertOk()
+            ->assertSee('Pelanggan Demo');
     }
 }

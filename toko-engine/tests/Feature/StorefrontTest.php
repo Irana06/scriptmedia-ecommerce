@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\StoreSetting;
+use Database\Seeders\DemoStoreSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -50,6 +51,8 @@ class StorefrontTest extends TestCase
 
     public function test_each_plan_has_a_public_demo_store(): void
     {
+        $this->seed(DemoStoreSeeder::class);
+
         $this->get('/starter')->assertOk()->assertSee('Kedai Rona')->assertSee('Paket Starter')->assertSee('Paling laku');
         $this->get('/standard')
             ->assertOk()
@@ -62,6 +65,21 @@ class StorefrontTest extends TestCase
             ->assertSee('Nara Atelier')
             ->assertSee('Paket Pro')
             ->assertSee('/images/demo/nara-pro-hero.png');
+
+        $this->get('/standard/products')
+            ->assertOk()
+            ->assertSee('Mechanical Keyboard K87')
+            ->assertDontSee('Kopi Susu Rona');
+        $this->get('/standard/products/standard-mechanical-keyboard-k87')
+            ->assertOk()
+            ->assertSee('Tambah ke keranjang');
+        $this->post('/standard/cart/standard-mechanical-keyboard-k87', ['quantity' => 1])
+            ->assertRedirect();
+        $this->get('/standard/cart')
+            ->assertOk()
+            ->assertSee('Mechanical Keyboard K87')
+            ->assertSee('/standard/checkout');
+
         $this->get('/enterprise')->assertNotFound();
     }
 }

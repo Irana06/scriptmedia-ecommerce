@@ -38,7 +38,7 @@
                 </div>
             </div>
 
-            <div class="mt-8"><x-ui.button :href="route('products.index')" variant="navy">Lanjut belanja</x-ui.button></div>
+            <div class="mt-8"><x-ui.button :href="\App\Support\StorefrontContext::route('products.index')" variant="navy">Lanjut belanja</x-ui.button></div>
         </x-ui.card>
     </section>
 

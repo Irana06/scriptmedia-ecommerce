@@ -5,9 +5,9 @@
 
     <section class="mx-auto max-w-7xl px-5 py-12 sm:px-8">
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('products.index') }}" class="rounded-full px-4 py-2 text-sm font-semibold {{ $categorySlug === '' ? 'bg-navy text-white' : 'border border-line bg-white text-ink-soft hover:text-navy' }}">Semua</a>
+            <a href="{{ \App\Support\StorefrontContext::route('products.index') }}" class="rounded-full px-4 py-2 text-sm font-semibold {{ $categorySlug === '' ? 'bg-navy text-white' : 'border border-line bg-white text-ink-soft hover:text-navy' }}">Semua</a>
             @foreach ($categories as $category)
-                <a href="{{ route('products.index', ['category' => $category->slug]) }}" class="rounded-full px-4 py-2 text-sm font-semibold {{ $categorySlug === $category->slug ? 'bg-navy text-white' : 'border border-line bg-white text-ink-soft hover:text-navy' }}">{{ $category->name }}</a>
+                <a href="{{ \App\Support\StorefrontContext::route('products.index', ['category' => $category->slug]) }}" class="rounded-full px-4 py-2 text-sm font-semibold {{ $categorySlug === $category->slug ? 'bg-navy text-white' : 'border border-line bg-white text-ink-soft hover:text-navy' }}">{{ $category->name }}</a>
             @endforeach
         </div>
 
@@ -16,7 +16,7 @@
                 class="mt-10"
                 title="{{ $categorySlug === '' ? 'Katalog sedang disiapkan' : 'Belum ada produk di kategori ini' }}"
                 description="{{ $categorySlug === '' ? 'Koleksi produk akan segera tersedia. Kunjungi kembali etalase ini nanti.' : 'Coba jelajahi kategori lain untuk menemukan produk yang kamu cari.' }}"
-                :action-href="$categorySlug === '' ? route('home') : route('products.index')"
+                :action-href="$categorySlug === '' ? \App\Support\StorefrontContext::route('home') : \App\Support\StorefrontContext::route('products.index')"
                 :action-label="$categorySlug === '' ? 'Kembali ke beranda' : 'Lihat semua produk'"
             />
         @else
