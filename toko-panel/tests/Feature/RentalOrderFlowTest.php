@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Plan;
 use App\Models\RentalOrder;
 use App\Models\User;
+use Database\Seeders\PlanSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -12,6 +13,23 @@ use Tests\TestCase;
 class RentalOrderFlowTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_plan_seeder_safely_synchronizes_the_canonical_packages(): void
+    {
+        Plan::factory()->create([
+            'slug' => 'starter',
+            'price_platform' => 1000000,
+            'price_care_monthly' => 750000,
+            'is_active' => false,
+        ]);
+
+        $this->seed(PlanSeeder::class);
+
+        $this->assertDatabaseCount('plans', 3);
+        $this->assertDatabaseHas('plans', ['slug' => 'starter', 'price_platform' => 150000, 'price_care_monthly' => 150000, 'is_active' => true]);
+        $this->assertDatabaseHas('plans', ['slug' => 'standard', 'price_platform' => 150000, 'price_care_monthly' => 350000, 'is_active' => true]);
+        $this->assertDatabaseHas('plans', ['slug' => 'pro', 'price_platform' => 150000, 'price_care_monthly' => 550000, 'is_active' => true]);
+    }
 
     public function test_public_home_displays_active_plans(): void
     {
