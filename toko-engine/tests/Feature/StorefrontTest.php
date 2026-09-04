@@ -53,17 +53,18 @@ class StorefrontTest extends TestCase
     {
         $this->seed(DemoStoreSeeder::class);
 
-        $this->get('/starter')->assertOk()->assertSee('Kedai Rona')->assertSee('Paket Starter')->assertSee('Paling laku');
+        $this->get('/starter')->assertOk()->assertSee('Kedai Rona')->assertSee('Paket Starter')->assertSee('Kopi enak, tanpa ribet');
         $this->get('/standard')
             ->assertOk()
             ->assertSee('Shicomp Store')
             ->assertSee('Paket Standard')
-            ->assertSee('Paling laku')
+            ->assertSee('Pencarian katalog')
             ->assertSee('/images/demo/shicomp-standard-hero.png');
         $this->get('/pro')
             ->assertOk()
             ->assertSee('Nara Atelier')
             ->assertSee('Paket Pro')
+            ->assertSee('Curated collection')
             ->assertSee('/images/demo/nara-pro-hero.png');
 
         $this->get('/standard/products')
@@ -79,6 +80,26 @@ class StorefrontTest extends TestCase
             ->assertOk()
             ->assertSee('Mechanical Keyboard K87')
             ->assertSee('/standard/checkout');
+
+        $this->get('/starter/products')
+            ->assertOk()
+            ->assertDontSee('catalog-search');
+        $this->get('/starter/products/starter-kopi-susu-rona')
+            ->assertOk()
+            ->assertDontSee('Kopi Gula Aren');
+
+        $this->get('/standard/products?q=mouse')
+            ->assertOk()
+            ->assertSee('Wireless Mouse M2')
+            ->assertDontSee('Mechanical Keyboard K87');
+
+        $this->get('/pro/products?sort=price-high')
+            ->assertOk()
+            ->assertSeeInOrder(['Lumi Lounge Chair', 'Nami Woven Rug', 'Sora Pendant Lamp']);
+        $this->get('/pro/products/pro-lumi-lounge-chair')
+            ->assertOk()
+            ->assertSee('Bagikan koleksi')
+            ->assertSee('Arka Side Table');
 
         $this->get('/enterprise')->assertNotFound();
     }

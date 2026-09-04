@@ -1,8 +1,17 @@
+@php($demoStore = \App\Support\StorefrontContext::store())
+
 <x-layouts::storefront title="Checkout">
     <section class="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-18">
         <x-ui.badge variant="orange">Checkout</x-ui.badge>
         <h1 class="mt-4 text-4xl text-navy sm:text-5xl">Lengkapi pesanan</h1>
         <p class="mt-3 max-w-2xl text-ink-soft">Pastikan data penerima dan metode pembayaran sudah sesuai sebelum membuat order.</p>
+        @if ($demoStore)
+            <div class="mt-6 grid gap-3 rounded-card border border-line {{ ($demoStore['layout'] ?? null) === 'editorial' ? 'bg-[#211a17] text-white' : 'bg-white' }} p-5 sm:grid-cols-3">
+                <div><p class="text-xs uppercase opacity-60">Paket toko</p><p class="mt-1 font-semibold">{{ $demoStore['plan'] }}</p></div>
+                <div><p class="text-xs uppercase opacity-60">Pembayaran</p><p class="mt-1 font-semibold">{{ $demoStore['payment'] }}</p></div>
+                <div><p class="text-xs uppercase opacity-60">Pengiriman</p><p class="mt-1 font-semibold">{{ $demoStore['shipping'] }}</p></div>
+            </div>
+        @endif
 
         <form method="POST" action="{{ \App\Support\StorefrontContext::route('checkout.store') }}" class="mt-8 grid gap-8 lg:grid-cols-[1fr_22rem]">
             @csrf

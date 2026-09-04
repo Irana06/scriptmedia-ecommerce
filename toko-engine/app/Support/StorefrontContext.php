@@ -23,6 +23,13 @@ class StorefrontContext
         return $slug === null ? null : config("demo-stores.{$slug}");
     }
 
+    public static function allows(string $feature): bool
+    {
+        $store = self::store();
+
+        return $store === null || ($store[$feature] ?? false) === true;
+    }
+
     public static function routeName(string $name): string
     {
         return self::slug() === null ? $name : 'demo.'.$name;

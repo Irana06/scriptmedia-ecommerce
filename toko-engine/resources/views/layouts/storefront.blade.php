@@ -7,6 +7,7 @@
     $storeTagline = $demoStore['tagline'] ?? $storeSetting?->tagline ?? 'Pilihan lokal';
     $logoUrl = $demoStore ? null : $storeSetting?->getFirstMediaUrl('logo');
     $cartCount = app(\App\Services\CartService::class)->count();
+    $demoLayout = $demoStore['layout'] ?? 'default';
 @endphp
 
 <!DOCTYPE html>
@@ -14,7 +15,7 @@
     <head>
         @include('partials.head', ['title' => $title])
     </head>
-    <body class="min-h-screen bg-offwhite">
+    <body class="storefront storefront-plan-{{ $demoLayout }} min-h-screen bg-offwhite">
         @if ($demoStore)
             <div class="bg-navy px-5 py-2.5 text-center text-xs text-white sm:text-sm"><span class="font-semibold">Demo paket {{ $demoStore['plan'] }}</span><span class="text-white/65"> · Pilih paket lain:</span>@foreach (config('demo-stores') as $storeSlug => $option)<a href="{{ route('demo.home', $storeSlug) }}" class="ml-2 rounded-full px-2.5 py-1 transition hover:bg-white/15 {{ $storeSlug === \App\Support\StorefrontContext::slug() ? 'bg-white/15 text-white' : 'text-white/75' }}">{{ $option['plan'] }}</a>@endforeach</div>
         @endif
@@ -33,8 +34,8 @@
                 </a>
 
                 <nav class="hidden items-center gap-7 text-sm text-ink-soft md:flex" aria-label="Navigasi utama">
-                    <a href="{{ \App\Support\StorefrontContext::route('home') }}" class="transition hover:text-navy">Beranda</a>
-                    <a href="{{ \App\Support\StorefrontContext::route('products.index') }}" class="transition hover:text-navy">Produk</a>
+                    <a href="{{ \App\Support\StorefrontContext::route('home') }}" class="transition hover:text-navy">{{ $demoLayout === 'editorial' ? 'Atelier' : 'Beranda' }}</a>
+                    <a href="{{ \App\Support\StorefrontContext::route('products.index') }}" class="transition hover:text-navy">{{ $demoLayout === 'simple' ? 'Menu' : ($demoLayout === 'editorial' ? 'Collection' : 'Produk') }}</a>
                     <a href="{{ \App\Support\StorefrontContext::route('cart.index') }}" class="transition hover:text-navy">Keranjang ({{ $cartCount }})</a>
                 </nav>
 

@@ -88,6 +88,45 @@
     }
 }
 
+.storefront-plan-simple {
+    --color-navy: #3b2a22;
+    --color-navy-mid: #62483a;
+    --color-tosca: #398b7d;
+    --color-tosca-tint: #e8f3ed;
+    --color-orange: #e9a458;
+    --color-offwhite: #fffaf1;
+    --color-ink: #3b2a22;
+    --color-ink-soft: #735f52;
+    --color-line: rgb(59 42 34 / 14%);
+    --shadow-card: 0 14px 35px rgb(59 42 34 / 8%);
+}
+
+.storefront-plan-business {
+    --shadow-card: 0 16px 40px rgb(11 37 69 / 10%);
+}
+
+.storefront-plan-editorial {
+    --color-navy: #211a17;
+    --color-navy-mid: #49372f;
+    --color-tosca: #c66a4a;
+    --color-tosca-tint: #f3e6df;
+    --color-orange: #d8b49d;
+    --color-orange-light: #ead0c0;
+    --color-offwhite: #f7f2ee;
+    --color-ink: #211a17;
+    --color-ink-soft: #74635b;
+    --color-line: rgb(33 26 23 / 15%);
+    --radius-card: 0.35rem;
+    --shadow-card: 0 20px 55px rgb(33 26 23 / 10%);
+}
+
+.storefront-plan-editorial h1,
+.storefront-plan-editorial h2,
+.storefront-plan-editorial h3 {
+    letter-spacing: -0.035em;
+    font-weight: 500;
+}
+
 [data-flux-field]:not(ui-radio, ui-checkbox) {
     @apply grid gap-2;
 }

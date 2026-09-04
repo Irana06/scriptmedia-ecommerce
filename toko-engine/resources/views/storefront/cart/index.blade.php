@@ -1,3 +1,5 @@
+@php($demoStore = \App\Support\StorefrontContext::store())
+
 <x-layouts::storefront title="Keranjang">
     <section class="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-18">
         <x-ui.badge variant="orange">Keranjang</x-ui.badge><h1 class="mt-4 text-4xl text-navy sm:text-5xl">Pesananmu</h1>
@@ -16,7 +18,7 @@
                         </x-ui.card>
                     @endforeach
                 </div>
-                <x-ui.card class="h-fit lg:sticky lg:top-24"><h2 class="text-xl text-navy">Ringkasan</h2><div class="mt-5 flex justify-between border-t border-line pt-5 text-sm text-ink-soft"><span>Subtotal</span><span class="font-semibold text-navy">Rp{{ number_format($subtotal, 0, ',', '.') }}</span></div><p class="mt-3 text-xs leading-5 text-ink-soft">Biaya pengiriman akan dikonfirmasi oleh toko sesuai alamat tujuan.</p><div class="mt-6"><x-ui.button :href="\App\Support\StorefrontContext::route('checkout.create')" class="w-full">Lanjut checkout</x-ui.button></div></x-ui.card>
+                <x-ui.card class="h-fit lg:sticky lg:top-24"><h2 class="text-xl text-navy">Ringkasan</h2><div class="mt-5 flex justify-between border-t border-line pt-5 text-sm text-ink-soft"><span>Subtotal</span><span class="font-semibold text-navy">Rp{{ number_format($subtotal, 0, ',', '.') }}</span></div><p class="mt-3 text-xs leading-5 text-ink-soft">{{ $demoStore['shipping'] ?? 'Biaya pengiriman akan dikonfirmasi oleh toko sesuai alamat tujuan.' }}</p><div class="mt-6"><x-ui.button :href="\App\Support\StorefrontContext::route('checkout.create')" class="w-full">{{ ($demoStore['layout'] ?? null) === 'simple' ? 'Isi data pesanan' : (($demoStore['layout'] ?? null) === 'editorial' ? 'Proceed to checkout' : 'Lanjut checkout') }}</x-ui.button></div></x-ui.card>
             </div>
         @endif
     </section>
