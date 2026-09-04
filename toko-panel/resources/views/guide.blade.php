@@ -163,12 +163,29 @@
                         <tr><th class="px-6 py-4 font-semibold text-navy">Biaya bulanan</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-lg font-semibold text-navy">Rp{{ number_format($plan->monthlyTotal(), 0, ',', '.') }}</td>@endforeach</tr>
                         <tr class="bg-offwhite"><th class="px-6 py-4 font-semibold text-navy">Biaya tahunan</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-navy">Rp{{ number_format($plan->annualTotal(), 0, ',', '.') }}</td>@endforeach</tr>
                         <tr><th class="px-6 py-4 font-semibold text-navy">Kapasitas produk</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">{{ $plan->max_products ? 'Hingga '.$plan->max_products : 'Tidak dibatasi' }}</td>@endforeach</tr>
-                        <tr class="bg-offwhite"><th class="px-6 py-4 font-semibold text-navy">Payment gateway</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">{{ $plan->max_payment_gateways ?? 'Multi gateway' }}</td>@endforeach</tr>
+                        <tr class="bg-offwhite"><th class="px-6 py-4 font-semibold text-navy">Payment gateway</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">{{ match ($plan->slug) {
+                            'starter' => $plan->max_payment_gateways.' gateway otomatis (QRIS otomatis)',
+                            'standard' => $plan->max_payment_gateways.' gateway otomatis (QRIS + transfer bank otomatis)',
+                            'pro' => 'Multi gateway otomatis (QRIS, transfer bank, kartu kredit, dan e-wallet)',
+                            default => $plan->max_payment_gateways ?? 'Multi gateway',
+                        } }}</td>@endforeach</tr>
                         <tr><th class="px-6 py-4 font-semibold text-navy">Alamat website</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">{{ $plan->custom_domain_allowed ? 'Custom domain atau subdomain' : 'Subdomain ScriptMedia' }}</td>@endforeach</tr>
-                        <tr class="bg-offwhite"><th class="px-6 py-4 font-semibold text-navy">Perubahan konten</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">{{ $plan->content_request_quota }} permintaan/periode</td>@endforeach</tr>
-                        <tr><th class="px-6 py-4 font-semibold text-navy">Respons dukungan</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">Maks. {{ $plan->support_sla_hours }} jam</td>@endforeach</tr>
-                        <tr class="bg-offwhite"><th class="px-6 py-4 font-semibold text-navy">Ongkir real-time</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">{{ $plan->allow_realtime_shipping ? 'Tersedia' : 'Belum termasuk' }}</td>@endforeach</tr>
-                        <tr><th class="px-6 py-4 font-semibold text-navy">Kustomisasi desain penuh</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">{{ $plan->allow_full_design_customization ? 'Tersedia sesuai kesepakatan' : 'Menggunakan template' }}</td>@endforeach</tr>
+                        <tr class="bg-offwhite"><th class="px-6 py-4 font-semibold text-navy">Backup &amp; pemeliharaan</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">{{ match ($plan->slug) {
+                            'starter' => 'Backup mingguan, update keamanan dasar, dan monitoring uptime',
+                            'standard' => 'Backup mingguan + restore atas permintaan serta monitoring keamanan dan uptime',
+                            'pro' => 'Backup mingguan dengan retensi 14 hari serta monitoring keamanan dan uptime',
+                            default => 'Menyesuaikan paket',
+                        } }}</td>@endforeach</tr>
+                        <tr><th class="px-6 py-4 font-semibold text-navy">Perubahan konten</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">{{ $plan->content_request_quota }} permintaan/bulan</td>@endforeach</tr>
+                        <tr class="bg-offwhite"><th class="px-6 py-4 font-semibold text-navy">Respons dukungan</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">Maks. {{ $plan->support_sla_hours }} jam{{ $plan->slug === 'starter' ? ' pada hari kerja' : ($plan->slug === 'pro' ? ', termasuk akhir pekan' : '') }}</td>@endforeach</tr>
+                        <tr><th class="px-6 py-4 font-semibold text-navy">Ongkir real-time</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">{{ $plan->allow_realtime_shipping ? 'Tersedia' : 'Belum termasuk' }}</td>@endforeach</tr>
+                        <tr class="bg-offwhite"><th class="px-6 py-4 font-semibold text-navy">Kustomisasi desain penuh</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">{{ $plan->allow_full_design_customization ? 'Tersedia sesuai kesepakatan' : 'Menggunakan template' }}</td>@endforeach</tr>
+                        <tr><th class="px-6 py-4 font-semibold text-navy">Laporan &amp; konsultasi</th>@foreach ($plans as $plan)<td class="px-6 py-4 text-ink-soft">{{ match ($plan->slug) {
+                            'starter' => 'Belum termasuk',
+                            'standard' => 'Laporan bulanan traffic dan aktivitas toko',
+                            'pro' => 'Laporan bulanan detail + konsultasi bulanan 30 menit',
+                            default => 'Menyesuaikan paket',
+                        } }}</td>@endforeach</tr>
                     </tbody>
                 </table>
             </div>

@@ -23,7 +23,12 @@ class RentalOrderFlowTest extends TestCase
             ->assertOk()
             ->assertSee('Starter')
             ->assertSee('Standard')
-            ->assertSee('Pro');
+            ->assertSee('Pro')
+            ->assertSee('QRIS otomatis')
+            ->assertSee('QRIS + transfer bank')
+            ->assertSee('Ongkir otomatis real-time dan kustomisasi desain penuh')
+            ->assertSee('retensi 14 hari')
+            ->assertSee('Apa saja yang termasuk?');
     }
 
     public function test_public_guide_explains_the_business_flow_and_live_plans(): void
@@ -46,6 +51,11 @@ class RentalOrderFlowTest extends TestCase
             ->assertSee('Starter')
             ->assertSee('Standard')
             ->assertSee('Pro')
+            ->assertSee('QRIS otomatis')
+            ->assertSee('QRIS + transfer bank otomatis')
+            ->assertSee('Backup mingguan')
+            ->assertSee('retensi 14 hari')
+            ->assertSee('Laporan bulanan detail + konsultasi bulanan 30 menit')
             ->assertSee('Cetak / simpan PDF');
     }
 

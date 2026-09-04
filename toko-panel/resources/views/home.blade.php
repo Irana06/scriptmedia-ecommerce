@@ -39,20 +39,61 @@
                         @php
                             $isStandard = $plan->name === 'standard';
                             $startUrl = auth()->check() ? route('onboarding.create', $plan) : route('register', ['plan' => $plan->slug]);
+                            $highlights = match ($plan->slug) {
+                                'starter' => [
+                                    'Template siap pakai, hingga '.$plan->max_products.' produk',
+                                    $plan->max_payment_gateways.' payment gateway otomatis (QRIS otomatis)',
+                                    'Backup mingguan dan update keamanan dasar',
+                                    $plan->content_request_quota.'× request ubah konten kecil / bulan',
+                                ],
+                                'standard' => [
+                                    'Hingga '.$plan->max_products.' produk, mendukung custom domain',
+                                    $plan->max_payment_gateways.' payment gateway otomatis (QRIS + transfer bank)',
+                                    'Dukungan maks. '.$plan->support_sla_hours.' jam dan laporan bulanan',
+                                    $plan->content_request_quota.'× request ubah konten / bulan',
+                                ],
+                                'pro' => [
+                                    'Produk unlimited dan multi payment gateway',
+                                    'Ongkir otomatis real-time dan kustomisasi desain penuh',
+                                    'Dukungan maks. '.$plan->support_sla_hours.' jam, termasuk akhir pekan',
+                                    $plan->content_request_quota.'× request ubah konten / bulan',
+                                ],
+                                default => [],
+                            };
+                            $platformDetails = match ($plan->slug) {
+                                'starter' => ['1 pilihan desain template toko', 'Hingga '.$plan->max_products.' produk', 'QRIS otomatis'],
+                                'standard' => ['Semua fitur Starter', 'Hingga '.$plan->max_products.' produk', 'QRIS dan transfer bank otomatis', 'Penyimpanan gambar produk lebih besar'],
+                                'pro' => ['Semua fitur Standard', 'Kapasitas produk unlimited', 'QRIS, transfer bank, kartu kredit, dan e-wallet', 'Integrasi ongkir otomatis real-time'],
+                                default => [],
+                            };
+                            $careDetails = match ($plan->slug) {
+                                'starter' => ['Subdomain ScriptMedia dan SSL otomatis', 'Backup data mingguan', 'Update keamanan dasar dan monitoring uptime', 'Dukungan WhatsApp pada hari kerja'],
+                                'standard' => ['Subdomain atau custom domain', 'Backup mingguan + restore atas permintaan', 'Monitoring keamanan dan uptime', 'Laporan bulanan traffic dan aktivitas toko'],
+                                'pro' => ['Subdomain atau custom domain + kustomisasi desain penuh', 'Backup mingguan dengan retensi 14 hari', 'Dukungan prioritas termasuk akhir pekan', 'Laporan detail + konsultasi bulanan 30 menit'],
+                                default => [],
+                            };
                         @endphp
                         <article class="relative flex rounded-card border {{ $isStandard ? 'border-orange ring-2 ring-orange/20' : 'border-line' }} bg-offwhite p-7 shadow-card">
                             @if ($isStandard)<span class="absolute -top-3 left-6 rounded-full bg-orange px-4 py-1 text-xs font-semibold text-navy">Paling populer</span>@endif
                             <div class="flex w-full flex-col">
                                 <p class="text-xs font-semibold tracking-[0.2em] text-tosca uppercase">{{ $plan->name }}</p>
                                 <p class="mt-4 text-4xl font-semibold">Rp{{ number_format($plan->monthlyTotal(), 0, ',', '.') }}<span class="text-sm font-normal text-ink-soft"> / bulan</span></p>
-                                <p class="mt-2 text-sm text-ink-soft">Tanpa biaya aktivasi</p>
+                                <div class="mt-4 space-y-2 rounded-xl border border-line bg-white p-4 text-sm text-ink-soft">
+                                    <div class="flex justify-between gap-4"><span>Sewa Platform</span><strong class="text-navy">Rp{{ number_format((float) $plan->price_platform, 0, ',', '.') }}</strong></div>
+                                    <div class="flex justify-between gap-4"><span>Web Care Plan</span><strong class="text-navy">Rp{{ number_format((float) $plan->price_care_monthly, 0, ',', '.') }}</strong></div>
+                                </div>
+                                <p class="mt-3 text-sm font-semibold text-navy">Tanpa biaya aktivasi</p>
+                                <p class="mt-1 text-xs leading-5 text-ink-soft">Tahunan Rp{{ number_format($plan->annualTotal(), 0, ',', '.') }} · hemat setara 2 bulan</p>
                                 <ul class="mt-6 space-y-3 text-sm leading-6 text-ink-soft">
-                                    <li>✓ {{ $plan->max_products ? 'Hingga '.$plan->max_products.' produk' : 'Produk unlimited' }}</li>
-                                    <li>✓ {{ $plan->max_payment_gateways ?? 'Multi' }} payment gateway</li>
-                                    <li>✓ {{ $plan->custom_domain_allowed ? 'Mendukung custom domain' : 'Subdomain ScriptMedia' }}</li>
-                                    <li>✓ {{ $plan->content_request_quota }}× request perubahan konten</li>
-                                    <li>✓ Respons dukungan maks. {{ $plan->support_sla_hours }} jam</li>
+                                    @foreach ($highlights as $highlight)<li>✓ {{ $highlight }}</li>@endforeach
                                 </ul>
+                                <details class="mt-6 border-t border-line pt-5 text-sm text-ink-soft">
+                                    <summary class="cursor-pointer font-semibold text-navy">Apa saja yang termasuk?</summary>
+                                    <div class="mt-4 space-y-4 leading-6">
+                                        <div><p class="font-semibold text-tosca">Sewa Platform mencakup</p><ul class="mt-2 space-y-1">@foreach ($platformDetails as $detail)<li>• {{ $detail }}</li>@endforeach</ul></div>
+                                        <div><p class="font-semibold text-tosca">Web Care Plan mencakup</p><ul class="mt-2 space-y-1">@foreach ($careDetails as $detail)<li>• {{ $detail }}</li>@endforeach</ul></div>
+                                    </div>
+                                </details>
                                 <x-ui.button :href="$startUrl" :variant="$isStandard ? 'orange' : 'navy'" class="mt-8 w-full">Pilih {{ str($plan->name)->title() }}</x-ui.button>
                             </div>
                         </article>
