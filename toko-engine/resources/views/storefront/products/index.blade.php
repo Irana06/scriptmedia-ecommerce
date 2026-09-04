@@ -52,13 +52,21 @@
                     </div>
                 @endif
                 <x-ui.button type="submit" variant="navy">{{ \App\Support\StorefrontContext::allows('catalog_sort') ? 'Terapkan' : 'Cari produk' }}</x-ui.button>
+                @if (\App\Support\StorefrontContext::allows('advanced_filters'))
+                    <div class="grid gap-3 border-t border-line pt-4 sm:col-span-3 sm:grid-cols-[1fr_1fr_auto_auto] sm:items-end">
+                        <label class="grid gap-2 text-xs font-semibold tracking-wide text-ink-soft uppercase">Harga minimum<input type="number" min="0" step="1000" name="min_price" value="{{ $minPrice }}" placeholder="Rp0" class="rounded-xl border border-line px-4 py-2.5 text-sm font-normal text-navy"></label>
+                        <label class="grid gap-2 text-xs font-semibold tracking-wide text-ink-soft uppercase">Harga maksimum<input type="number" min="0" step="1000" name="max_price" value="{{ $maxPrice }}" placeholder="Tanpa batas" class="rounded-xl border border-line px-4 py-2.5 text-sm font-normal text-navy"></label>
+                        <label class="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-line px-4 text-sm text-navy"><input type="checkbox" name="in_stock" value="1" @checked($inStock) class="accent-tosca"> Stok tersedia</label>
+                        @if ($search !== '' || $minPrice !== null || $maxPrice !== null || $inStock)<a href="{{ \App\Support\StorefrontContext::route('products.index') }}" class="inline-flex min-h-11 items-center justify-center px-3 text-sm font-semibold text-tosca">Reset filter</a>@endif
+                    </div>
+                @endif
             </form>
         @endif
 
         <div class="flex flex-wrap gap-2">
-            <a href="{{ \App\Support\StorefrontContext::route('products.index') }}" class="rounded-full px-4 py-2 text-sm font-semibold {{ $categorySlug === '' ? 'bg-navy text-white' : 'border border-line bg-white text-ink-soft hover:text-navy' }}">Semua</a>
+            <a href="{{ \App\Support\StorefrontContext::route('products.index', request()->except(['category', 'page'])) }}" class="rounded-full px-4 py-2 text-sm font-semibold {{ $categorySlug === '' ? 'bg-navy text-white' : 'border border-line bg-white text-ink-soft hover:text-navy' }}">Semua</a>
             @foreach ($categories as $category)
-                <a href="{{ \App\Support\StorefrontContext::route('products.index', ['category' => $category->slug]) }}" class="rounded-full px-4 py-2 text-sm font-semibold {{ $categorySlug === $category->slug ? 'bg-navy text-white' : 'border border-line bg-white text-ink-soft hover:text-navy' }}">{{ $category->name }}</a>
+                <a href="{{ \App\Support\StorefrontContext::route('products.index', [...request()->except('page'), 'category' => $category->slug]) }}" class="rounded-full px-4 py-2 text-sm font-semibold {{ $categorySlug === $category->slug ? 'bg-navy text-white' : 'border border-line bg-white text-ink-soft hover:text-navy' }}">{{ $category->name }}</a>
             @endforeach
         </div>
 

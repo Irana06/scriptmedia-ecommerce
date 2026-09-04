@@ -32,6 +32,10 @@
                         <x-ui.loading-button loading-label="Menambahkan...">Tambah ke keranjang</x-ui.loading-button>
                     </form>
                 @endif
+                @if ($demoLayout === 'editorial')
+                    @php($isWishlisted = app(\App\Services\WishlistService::class)->contains($product))
+                    <form method="POST" action="{{ \App\Support\StorefrontContext::route($isWishlisted ? 'wishlist.destroy' : 'wishlist.store', ['product' => $product]) }}" class="mt-3">@csrf @if($isWishlisted) @method('DELETE') @endif<button type="submit" class="border-b border-current py-2 text-sm font-semibold text-navy">{{ $isWishlisted ? '♥ Hapus dari wishlist' : '♡ Simpan ke wishlist' }}</button></form>
+                @endif
             </div>
         </div>
     </section>

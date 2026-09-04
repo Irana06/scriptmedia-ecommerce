@@ -3,9 +3,14 @@
 @php
     $imageUrl = $product->getFirstMediaUrl('product-images', 'thumb');
     $demoLayout = \App\Support\StorefrontContext::store()['layout'] ?? 'default';
+    $isProDemo = \App\Support\StorefrontContext::slug() === 'pro';
+    $isWishlisted = $isProDemo && app(\App\Services\WishlistService::class)->contains($product);
 @endphp
 
-<x-ui.card :padding="false" {{ $attributes->class('group overflow-hidden transition hover:-translate-y-1 hover:shadow-xl '.$demoLayout.'-product-card') }}>
+<x-ui.card :padding="false" {{ $attributes->class('group relative overflow-hidden transition hover:-translate-y-1 hover:shadow-xl '.$demoLayout.'-product-card') }}>
+    @if ($isProDemo)
+        <form method="POST" action="{{ \App\Support\StorefrontContext::route($isWishlisted ? 'wishlist.destroy' : 'wishlist.store', ['product' => $product]) }}" class="absolute top-4 right-4 z-10">@csrf @if($isWishlisted) @method('DELETE') @endif<button type="submit" class="flex size-10 items-center justify-center rounded-full border border-white/70 bg-white/90 text-lg text-navy shadow-card backdrop-blur transition hover:scale-105" aria-label="{{ $isWishlisted ? 'Hapus dari' : 'Simpan ke' }} wishlist">{{ $isWishlisted ? '♥' : '♡' }}</button></form>
+    @endif
     <a href="{{ \App\Support\StorefrontContext::route('products.show', ['product' => $product]) }}" class="block">
         @if ($imageUrl)
             <img src="{{ $imageUrl }}" alt="{{ $product->name }}" class="{{ $demoLayout === 'editorial' ? 'aspect-[5/3]' : 'aspect-[4/3]' }} w-full object-cover transition duration-500 group-hover:scale-[1.02]">

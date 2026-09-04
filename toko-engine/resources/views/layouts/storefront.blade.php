@@ -8,6 +8,7 @@
     $logoUrl = $demoStore ? null : $storeSetting?->getFirstMediaUrl('logo');
     $cartCount = app(\App\Services\CartService::class)->count();
     $demoLayout = $demoStore['layout'] ?? 'default';
+    $wishlistCount = $demoLayout === 'editorial' ? app(\App\Services\WishlistService::class)->count() : 0;
 @endphp
 
 <!DOCTYPE html>
@@ -36,11 +37,12 @@
                 <nav class="hidden items-center gap-7 text-sm text-ink-soft md:flex" aria-label="Navigasi utama">
                     <a href="{{ \App\Support\StorefrontContext::route('home') }}" class="transition hover:text-navy">{{ $demoLayout === 'editorial' ? 'Atelier' : 'Beranda' }}</a>
                     <a href="{{ \App\Support\StorefrontContext::route('products.index') }}" class="transition hover:text-navy">{{ $demoLayout === 'simple' ? 'Menu' : ($demoLayout === 'editorial' ? 'Collection' : 'Produk') }}</a>
+                    @if($demoLayout === 'editorial')<a href="{{ \App\Support\StorefrontContext::route('wishlist.index') }}" class="transition hover:text-navy">Wishlist ({{ $wishlistCount }})</a>@endif
                     <a href="{{ \App\Support\StorefrontContext::route('cart.index') }}" class="transition hover:text-navy">Keranjang ({{ $cartCount }})</a>
                 </nav>
 
                 <div class="flex items-center gap-2">
-                    <details class="relative md:hidden"><summary class="cursor-pointer list-none rounded-full border border-line px-3 py-2 text-xs font-semibold text-navy">Menu</summary><nav class="absolute top-12 right-0 grid min-w-44 gap-1 rounded-xl border border-line bg-white p-2 text-sm text-navy shadow-card"><a href="{{ \App\Support\StorefrontContext::route('home') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Beranda</a><a href="{{ \App\Support\StorefrontContext::route('products.index') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Produk</a><a href="{{ \App\Support\StorefrontContext::route('cart.index') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Keranjang ({{ $cartCount }})</a></nav></details>
+                    <details class="relative md:hidden"><summary class="cursor-pointer list-none rounded-full border border-line px-3 py-2 text-xs font-semibold text-navy">Menu</summary><nav class="absolute top-12 right-0 grid min-w-44 gap-1 rounded-xl border border-line bg-white p-2 text-sm text-navy shadow-card"><a href="{{ \App\Support\StorefrontContext::route('home') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Beranda</a><a href="{{ \App\Support\StorefrontContext::route('products.index') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Produk</a>@if($demoLayout === 'editorial')<a href="{{ \App\Support\StorefrontContext::route('wishlist.index') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Wishlist ({{ $wishlistCount }})</a>@endif<a href="{{ \App\Support\StorefrontContext::route('cart.index') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Keranjang ({{ $cartCount }})</a></nav></details>
                     @auth
                         <x-ui.button :href="route('admin.dashboard')" variant="navy" class="px-4 py-2.5">Admin</x-ui.button>
                     @else
@@ -50,15 +52,21 @@
             </div>
         </header>
 
-        @if (session('success'))
-            <div class="mx-auto mt-5 max-w-7xl px-5 sm:px-8">
-                <div class="rounded-xl border border-tosca/30 bg-tosca-tint px-4 py-3 text-sm text-navy">{{ session('success') }}</div>
-            </div>
-        @endif
+        @if (session('success') || $errors->any())
+            <div class="pointer-events-none fixed top-5 right-5 z-[70] flex w-[calc(100%-2.5rem)] max-w-sm flex-col gap-3" aria-live="polite" aria-atomic="true">
+                @if (session('success'))
+                    <x-ui.toast>{{ session('success') }}</x-ui.toast>
+                @endif
 
-        @if ($errors->any())
-            <div class="mx-auto mt-5 max-w-7xl px-5 sm:px-8">
-                <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"><ul class="list-disc space-y-1 pl-5">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+                @if ($errors->any())
+                    <x-ui.toast variant="error" :duration="6500">
+                        <ul class="space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </x-ui.toast>
+                @endif
             </div>
         @endif
 

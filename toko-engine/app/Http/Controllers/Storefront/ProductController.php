@@ -17,6 +17,10 @@ class ProductController extends Controller
         $search = StorefrontContext::allows('catalog_search') ? $request->string('q')->trim()->toString() : '';
         $sort = StorefrontContext::allows('catalog_sort') ? $request->string('sort', 'latest')->toString() : 'latest';
         $sort = in_array($sort, ['latest', 'price-low', 'price-high', 'name'], true) ? $sort : 'latest';
+        $hasAdvancedFilters = StorefrontContext::allows('advanced_filters');
+        $minPrice = $hasAdvancedFilters && $request->filled('min_price') ? max(0, $request->integer('min_price')) : null;
+        $maxPrice = $hasAdvancedFilters && $request->filled('max_price') ? max(0, $request->integer('max_price')) : null;
+        $inStock = $hasAdvancedFilters && $request->boolean('in_stock');
         $categories = StorefrontContext::scopeCategories(Category::query())->where('is_active', true)->orderBy('name')->get();
         $products = StorefrontContext::scopeProducts(Product::query())
             ->available()
@@ -26,6 +30,9 @@ class ProductController extends Controller
                     ->where('name', 'like', '%'.$search.'%')
                     ->orWhere('description', 'like', '%'.$search.'%');
             }))
+            ->when($minPrice !== null, fn ($query) => $query->where('price', '>=', $minPrice))
+            ->when($maxPrice !== null, fn ($query) => $query->where('price', '<=', $maxPrice))
+            ->when($inStock, fn ($query) => $query->where('stock', '>', 0))
             ->when($categorySlug, fn ($query) => $query->whereHas(
                 'category',
                 fn ($categoryQuery) => $categoryQuery->where('slug', $categorySlug),
@@ -37,7 +44,7 @@ class ProductController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        return view('storefront.products.index', compact('categories', 'products', 'categorySlug', 'search', 'sort'));
+        return view('storefront.products.index', compact('categories', 'products', 'categorySlug', 'search', 'sort', 'minPrice', 'maxPrice', 'inStock'));
     }
 
     public function show(Product $product): View
