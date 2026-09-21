@@ -8,8 +8,10 @@ use App\Models\PaymentGateway;
 use App\Models\Product;
 use App\Models\StoreSetting;
 use App\Models\User;
+use App\Services\MidtransService;
 use Database\Seeders\DemoStoreSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -89,9 +91,19 @@ class CheckoutFlowTest extends TestCase
     public function test_demo_store_uses_the_real_cart_checkout_and_tracking_flow(): void
     {
         $this->seed(DemoStoreSeeder::class);
+        config()->set('database.connections.central.database', null);
+        config()->set('services.midtrans.client_key', 'client-test');
+        config()->set('services.midtrans.server_key', 'server-test');
+        config()->set('services.midtrans.snap_url', 'https://app.sandbox.midtrans.com/snap/v1/transactions');
+        Http::fake([
+            'https://app.sandbox.midtrans.com/snap/v1/transactions' => Http::response([
+                'token' => 'demo-snap-token',
+                'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/demo-snap-token',
+            ], 201),
+        ]);
         PaymentGateway::query()->create([
-            'code' => 'demo-transfer',
-            'name' => 'Transfer Demo',
+            'code' => MidtransService::GATEWAY_CODE,
+            'name' => 'Midtrans',
             'instructions' => 'Khusus pengujian.',
             'is_active' => true,
         ]);
@@ -100,14 +112,15 @@ class CheckoutFlowTest extends TestCase
             ->assertSessionHasNoErrors();
         $this->get('/standard/checkout')
             ->assertOk()
-            ->assertSee('Transfer Demo');
+            ->assertSee('Midtrans')
+            ->assertSee('Transfer bank otomatis');
 
         $response = $this->post('/standard/checkout', [
             'customer_name' => 'Pelanggan Demo',
             'customer_email' => 'demo@example.com',
             'customer_phone' => '08123456789',
             'shipping_address' => 'Alamat pengujian',
-            'payment_gateway_code' => 'demo-transfer',
+            'payment_gateway_code' => MidtransService::GATEWAY_CODE,
         ]);
 
         $order = Order::query()->latest('id')->firstOrFail();

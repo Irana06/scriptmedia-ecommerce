@@ -11,6 +11,7 @@ use App\Services\MidtransService;
 use App\Services\StoreLimitService;
 use App\Support\StorefrontContext;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,13 +28,12 @@ class CheckoutController extends Controller
             return redirect(StorefrontContext::route('cart.index'))->withErrors(['cart' => 'Keranjang masih kosong.']);
         }
 
-        $gateways = PaymentGateway::query()->where('is_active', true)->orderBy('name')->get();
-
         return view('storefront.checkout.create', [
             'items' => $cart->items(),
             'subtotal' => $cart->subtotal(),
-            'gateways' => $gateways,
+            'gateways' => $this->availableGateways(),
             'midtransPaymentDescription' => $storeLimits->paymentMethodDescription(),
+            'midtransChannelGroups' => $storeLimits->midtransChannelGroups(),
         ]);
     }
 
@@ -48,10 +48,15 @@ class CheckoutController extends Controller
             'payment_gateway_code' => ['required', 'string', 'exists:payment_gateways,code'],
         ]);
 
-        $gateway = PaymentGateway::query()
-            ->where('code', $validated['payment_gateway_code'])
-            ->where('is_active', true)
-            ->firstOrFail();
+        $gateway = $this->availableGateways()
+            ->firstWhere('code', $validated['payment_gateway_code']);
+
+        if (! $gateway instanceof PaymentGateway) {
+            throw ValidationException::withMessages([
+                'payment_gateway_code' => 'Metode pembayaran tersebut tidak tersedia untuk toko ini.',
+            ]);
+        }
+
         $cartItems = $cart->items();
 
         if ($cartItems->isEmpty()) {
@@ -112,7 +117,7 @@ class CheckoutController extends Controller
                 report($exception);
 
                 return redirect($this->successUrl($order))->withErrors([
-                    'payment' => 'Order sudah tercatat, tetapi sesi Midtrans belum dapat dibuat. Coba lagi dari halaman ini.',
+                    'payment' => 'Pesanan sudah tercatat, tetapi sesi pembayaran belum dapat dibuat. Coba lagi dari halaman ini.',
                 ]);
             }
         }
@@ -171,7 +176,7 @@ class CheckoutController extends Controller
         try {
             $midtrans->createSnapTransaction($order);
 
-            return redirect($this->successUrl($order))->with('success', 'Sesi pembayaran Midtrans berhasil dibuat.');
+            return redirect($this->successUrl($order))->with('success', 'Sesi pembayaran berhasil dibuat.');
         } catch (Throwable $exception) {
             report($exception);
 
@@ -179,6 +184,23 @@ class CheckoutController extends Controller
                 'payment' => 'Midtrans masih belum dapat dihubungi. Silakan coba beberapa saat lagi.',
             ]);
         }
+    }
+
+    /**
+     * Active gateways this storefront offers, in the order shoppers see them.
+     *
+     * @return Collection<int, PaymentGateway>
+     */
+    private function availableGateways(): Collection
+    {
+        $allowedCodes = StorefrontContext::gatewayCodes();
+
+        return PaymentGateway::query()
+            ->where('is_active', true)
+            ->when($allowedCodes !== null, fn ($query) => $query->whereIn('code', $allowedCodes))
+            ->orderByRaw('case when code = ? then 0 else 1 end', [MidtransService::GATEWAY_CODE])
+            ->orderBy('name')
+            ->get();
     }
 
     private function successUrl(Order $order): string

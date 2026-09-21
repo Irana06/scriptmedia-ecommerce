@@ -18,7 +18,15 @@
     </head>
     <body class="storefront storefront-plan-{{ $demoLayout }} min-h-screen bg-offwhite">
         @if ($demoStore)
-            <div class="bg-navy px-5 py-2.5 text-center text-xs text-white sm:text-sm"><span class="font-semibold">Demo paket {{ $demoStore['plan'] }}</span><span class="text-white/65"> · Pilih paket lain:</span>@foreach (config('demo-stores') as $storeSlug => $option)<a href="{{ route('demo.home', $storeSlug) }}" class="ml-2 rounded-full px-2.5 py-1 transition hover:bg-white/15 {{ $storeSlug === \App\Support\StorefrontContext::slug() ? 'bg-white/15 text-white' : 'text-white/75' }}">{{ $option['plan'] }}</a>@endforeach</div>
+            <div class="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 bg-navy px-4 py-2.5 text-center text-xs text-white sm:text-sm">
+                <span class="font-semibold">Demo paket {{ $demoStore['plan'] }}</span>
+                <span class="hidden text-white/65 sm:inline">· Pilih paket lain:</span>
+                <span class="flex items-center gap-1">
+                    @foreach (config('demo-stores') as $storeSlug => $option)
+                        <a href="{{ route('demo.home', $storeSlug) }}" class="rounded-full px-2.5 py-1 transition hover:bg-white/15 {{ $storeSlug === \App\Support\StorefrontContext::slug() ? 'bg-white/15 text-white' : 'text-white/75' }}">{{ $option['plan'] }}</a>
+                    @endforeach
+                </span>
+            </div>
         @endif
         <header class="sticky top-0 z-40 border-b border-line bg-white/90 backdrop-blur-lg">
             <div class="mx-auto flex min-h-18 max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
@@ -26,7 +34,7 @@
                     @if ($logoUrl)
                         <img src="{{ $logoUrl }}" alt="Logo {{ $storeName }}" class="size-10 rounded-xl object-cover">
                     @else
-                        <span class="flex size-10 items-center justify-center rounded-xl bg-navy text-sm font-semibold text-orange">{{ \Illuminate\Support\Str::initials($storeName) }}</span>
+                        <span class="flex size-10 items-center justify-center rounded-xl bg-navy text-sm font-semibold text-orange">{{ $demoStore['initials'] ?? \Illuminate\Support\Str::initials($storeName) }}</span>
                     @endif
                     <span>
                         <span class="block text-lg leading-none font-semibold text-navy">{{ $storeName }}</span>
@@ -35,14 +43,14 @@
                 </a>
 
                 <nav class="hidden items-center gap-7 text-sm text-ink-soft md:flex" aria-label="Navigasi utama">
-                    <a href="{{ \App\Support\StorefrontContext::route('home') }}" class="transition hover:text-navy">{{ $demoLayout === 'editorial' ? 'Atelier' : 'Beranda' }}</a>
-                    <a href="{{ \App\Support\StorefrontContext::route('products.index') }}" class="transition hover:text-navy">{{ $demoLayout === 'simple' ? 'Menu' : ($demoLayout === 'editorial' ? 'Collection' : 'Produk') }}</a>
-                    @if($demoLayout === 'editorial')<a href="{{ \App\Support\StorefrontContext::route('wishlist.index') }}" class="transition hover:text-navy">Wishlist ({{ $wishlistCount }})</a>@endif
+                    <a href="{{ \App\Support\StorefrontContext::route('home') }}" class="transition hover:text-navy">Beranda</a>
+                    <a href="{{ \App\Support\StorefrontContext::route('products.index') }}" class="transition hover:text-navy">{{ $demoLayout === 'simple' ? 'Menu' : 'Produk' }}</a>
+                    @if($demoLayout === 'editorial')<a href="{{ \App\Support\StorefrontContext::route('wishlist.index') }}" class="transition hover:text-navy">Favorit ({{ $wishlistCount }})</a>@endif
                     <a href="{{ \App\Support\StorefrontContext::route('cart.index') }}" class="transition hover:text-navy">Keranjang ({{ $cartCount }})</a>
                 </nav>
 
                 <div class="flex items-center gap-2">
-                    <details class="relative md:hidden"><summary class="cursor-pointer list-none rounded-full border border-line px-3 py-2 text-xs font-semibold text-navy">Menu</summary><nav class="absolute top-12 right-0 grid min-w-44 gap-1 rounded-xl border border-line bg-white p-2 text-sm text-navy shadow-card"><a href="{{ \App\Support\StorefrontContext::route('home') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Beranda</a><a href="{{ \App\Support\StorefrontContext::route('products.index') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Produk</a>@if($demoLayout === 'editorial')<a href="{{ \App\Support\StorefrontContext::route('wishlist.index') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Wishlist ({{ $wishlistCount }})</a>@endif<a href="{{ \App\Support\StorefrontContext::route('cart.index') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Keranjang ({{ $cartCount }})</a></nav></details>
+                    <details class="relative md:hidden"><summary class="cursor-pointer list-none rounded-full border border-line px-3 py-2 text-xs font-semibold text-navy">Menu</summary><nav class="absolute top-12 right-0 grid min-w-44 gap-1 rounded-xl border border-line bg-white p-2 text-sm text-navy shadow-card"><a href="{{ \App\Support\StorefrontContext::route('home') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Beranda</a><a href="{{ \App\Support\StorefrontContext::route('products.index') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Produk</a>@if($demoLayout === 'editorial')<a href="{{ \App\Support\StorefrontContext::route('wishlist.index') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Favorit ({{ $wishlistCount }})</a>@endif<a href="{{ \App\Support\StorefrontContext::route('cart.index') }}" class="rounded-lg px-3 py-2 hover:bg-offwhite">Keranjang ({{ $cartCount }})</a></nav></details>
                     @auth
                         <x-ui.button :href="route('admin.dashboard')" variant="navy" class="px-4 py-2.5">Admin</x-ui.button>
                     @else

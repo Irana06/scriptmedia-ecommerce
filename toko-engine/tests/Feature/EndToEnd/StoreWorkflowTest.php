@@ -50,7 +50,7 @@ class StoreWorkflowTest extends TestCase
 
         $this->get(route('home'))->assertOk()->assertSee('Lampu Senja');
         $this->get(route('products.index'))->assertOk()->assertSee('Lampu Senja');
-        $this->get(route('products.show', $product))->assertOk()->assertSee('Tambah ke keranjang');
+        $this->get(route('products.show', $product))->assertOk()->assertSee('+ Keranjang');
         $this->post(route('cart.store', $product), ['quantity' => 2])->assertSessionHasNoErrors();
         $this->get(route('checkout.create'))->assertOk()->assertSee('Transfer Manual');
 

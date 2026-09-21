@@ -56,32 +56,24 @@ class StorefrontTest extends TestCase
         $this->get('/starter')
             ->assertOk()
             ->assertSee('Kedai Rona')
-            ->assertSee('Paket Starter')
             ->assertSee('Kopi enak, tanpa ribet')
             ->assertSee('Pilih menu')
-            ->assertDontSee('Termasuk kemampuan Standard');
+            ->assertDontSee('Katalog yang enak dijelajahi');
         $this->get('/standard')
             ->assertOk()
             ->assertSee('Shicomp Store')
-            ->assertSee('Paket Standard')
             ->assertSee('Pencarian katalog')
             ->assertSee('Pilih produk')
-            ->assertSee('Termasuk kemampuan Standard')
-            ->assertSee('Fitur Starter')
-            ->assertSee('Fitur Standard')
-            ->assertDontSee('The Nara experience')
+            ->assertSee('Katalog yang enak dijelajahi')
+            ->assertDontSee('Pengalaman Nara')
             ->assertSee('/images/demo/shicomp-standard-hero.png');
         $this->get('/pro')
             ->assertOk()
             ->assertSee('Nara Atelier')
-            ->assertSee('Paket Pro')
-            ->assertSee('Curated collection')
-            ->assertSee('Multi-payment')
-            ->assertSee('Termasuk kemampuan Standard')
-            ->assertSee('Fitur Starter')
-            ->assertSee('Fitur Standard')
-            ->assertSee('Fitur Pro')
-            ->assertSee('The Nara experience')
+            ->assertSee('Koleksi terkurasi')
+            ->assertSee('Banyak pilihan bayar')
+            ->assertSee('Katalog yang enak dijelajahi')
+            ->assertSee('Pengalaman Nara')
             ->assertSee('/images/demo/nara-pro-hero.png');
 
         $this->get('/standard/products')
@@ -90,7 +82,8 @@ class StorefrontTest extends TestCase
             ->assertDontSee('Kopi Susu Rona');
         $this->get('/standard/products/standard-mechanical-keyboard-k87')
             ->assertOk()
-            ->assertSee('Tambah ke keranjang');
+            ->assertSee('+ Keranjang')
+            ->assertSee('Beli sekarang');
         $this->post('/standard/cart/standard-mechanical-keyboard-k87', ['quantity' => 1])
             ->assertRedirect();
         $this->get('/standard/cart')
@@ -119,7 +112,7 @@ class StorefrontTest extends TestCase
             ->assertSeeInOrder(['Lumi Lounge Chair', 'Nami Woven Rug', 'Sora Pendant Lamp']);
         $this->get('/pro/products/pro-lumi-lounge-chair')
             ->assertOk()
-            ->assertSee('Bagikan koleksi')
+            ->assertSee('Bagikan')
             ->assertSee('Arka Side Table');
         $this->post('/pro/wishlist/pro-lumi-lounge-chair')
             ->assertRedirect()
@@ -127,12 +120,12 @@ class StorefrontTest extends TestCase
         $this->get('/pro/wishlist')
             ->assertOk()
             ->assertSee('Lumi Lounge Chair')
-            ->assertSee('Wishlist (1)')
-            ->assertSee('Produk disimpan ke wishlist.')
+            ->assertSee('Favorit (1)')
+            ->assertSee('Produk disimpan ke favorit.')
             ->assertSee('role="status"', false)
             ->assertSee('fixed top-5 right-5', false);
         $this->delete('/pro/wishlist/pro-lumi-lounge-chair')->assertRedirect();
-        $this->get('/pro/wishlist')->assertOk()->assertSee('Wishlist masih kosong');
+        $this->get('/pro/wishlist')->assertOk()->assertSee('Belum ada favorit');
         $this->get('/starter/wishlist')->assertNotFound();
 
         $this->get('/enterprise')->assertNotFound();

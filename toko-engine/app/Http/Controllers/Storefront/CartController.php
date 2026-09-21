@@ -22,17 +22,25 @@ class CartController extends Controller
 
     public function store(Request $request, Product $product, CartService $cart): RedirectResponse
     {
-        $demoSlug = StorefrontContext::slug();
-        abort_unless($product->is_active && ($demoSlug === null || str_starts_with($product->slug, $demoSlug.'-')), 404);
-        $validated = $request->validate(['quantity' => ['nullable', 'integer', 'min:1']]);
+        $validated = $this->addToCart($request, $product, $cart);
 
-        if ($product->stock < 1) {
-            return back()->withErrors(['quantity' => 'Produk sedang habis.']);
+        if ($validated instanceof RedirectResponse) {
+            return $validated;
         }
 
-        $cart->add($product, (int) ($validated['quantity'] ?? 1));
-
         return back()->with('success', 'Produk ditambahkan ke keranjang.');
+    }
+
+    /** Shortcut for shoppers who want to pay straight away instead of browsing on. */
+    public function buyNow(Request $request, Product $product, CartService $cart): RedirectResponse
+    {
+        $validated = $this->addToCart($request, $product, $cart);
+
+        if ($validated instanceof RedirectResponse) {
+            return $validated;
+        }
+
+        return redirect(StorefrontContext::route('checkout.create'));
     }
 
     public function update(Request $request, Product $product, CartService $cart): RedirectResponse
@@ -54,5 +62,21 @@ class CartController extends Controller
         $cart->remove($product);
 
         return back()->with('success', 'Produk dihapus dari keranjang.');
+    }
+
+    /** Returns a redirect when the product cannot be added, otherwise null. */
+    private function addToCart(Request $request, Product $product, CartService $cart): ?RedirectResponse
+    {
+        $demoSlug = StorefrontContext::slug();
+        abort_unless($product->is_active && ($demoSlug === null || str_starts_with($product->slug, $demoSlug.'-')), 404);
+        $validated = $request->validate(['quantity' => ['nullable', 'integer', 'min:1']]);
+
+        if ($product->stock < 1) {
+            return back()->withErrors(['quantity' => 'Produk sedang habis.']);
+        }
+
+        $cart->add($product, (int) ($validated['quantity'] ?? 1));
+
+        return null;
     }
 }

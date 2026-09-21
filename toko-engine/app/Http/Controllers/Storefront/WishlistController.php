@@ -23,7 +23,7 @@ class WishlistController extends Controller
         $this->ensureProProduct($product);
         $wishlist->add($product);
 
-        return back()->with('success', 'Produk disimpan ke wishlist.');
+        return back()->with('success', 'Produk disimpan ke favorit.');
     }
 
     public function destroy(Product $product, WishlistService $wishlist): RedirectResponse
@@ -31,7 +31,7 @@ class WishlistController extends Controller
         $this->ensureProProduct($product);
         $wishlist->remove($product);
 
-        return back()->with('success', 'Produk dihapus dari wishlist.');
+        return back()->with('success', 'Produk dihapus dari favorit.');
     }
 
     private function ensureProDemo(): void

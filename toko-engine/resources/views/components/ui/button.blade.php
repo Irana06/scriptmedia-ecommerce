@@ -8,6 +8,7 @@
 @php
     $variantClasses = match ($variant) {
         'navy' => 'bg-navy text-white hover:bg-navy-mid focus-visible:outline-navy',
+        'outline' => 'border border-navy/25 bg-white text-navy hover:border-navy hover:bg-offwhite focus-visible:outline-navy',
         default => 'bg-orange text-navy hover:bg-orange-light focus-visible:outline-orange',
     };
 

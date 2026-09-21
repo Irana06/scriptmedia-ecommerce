@@ -1,14 +1,14 @@
-<x-layouts::storefront title="Status order">
+<x-layouts::storefront title="Status pesanan">
     <section class="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
         <div class="mb-8">
-            <p class="text-xs font-semibold tracking-[0.2em] text-tosca uppercase">Pelacakan order</p>
+            <p class="text-xs font-semibold tracking-[0.2em] text-tosca uppercase">Pelacakan pesanan</p>
             <h1 class="mt-3 text-3xl font-semibold text-navy sm:text-4xl">{{ $order->number }}</h1>
             <p class="mt-3 text-ink-soft">Halo {{ $order->customer_name }}, simpan halaman ini untuk melihat perkembangan pesananmu.</p>
         </div>
 
         <x-ui.card>
             <div class="grid gap-4 sm:grid-cols-2">
-                <div class="rounded-xl bg-offwhite p-4"><p class="text-xs text-ink-soft uppercase">Status order</p><p class="mt-2 font-semibold text-navy">{{ ucfirst($order->status) }}</p></div>
+                <div class="rounded-xl bg-offwhite p-4"><p class="text-xs text-ink-soft uppercase">Status pesanan</p><p class="mt-2 font-semibold text-navy">{{ ucfirst($order->status) }}</p></div>
                 <div class="rounded-xl bg-offwhite p-4"><p class="text-xs text-ink-soft uppercase">Pembayaran</p><p class="mt-2 font-semibold text-navy">{{ ucfirst($order->payment_status) }}</p></div>
             </div>
 
@@ -30,7 +30,7 @@
                 <a href="{{ $whatsappTrackingUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-full bg-tosca px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90">Simpan lewat WhatsApp</a>
                 <x-ui.button :href="\App\Support\StorefrontContext::route('products.index')" variant="navy">Kembali belanja</x-ui.button>
             </div>
-            <p class="mt-5 text-xs leading-5 text-ink-soft">Jangan bagikan link ini kepada orang lain karena link berfungsi sebagai akses pribadi ke status order.</p>
+            <p class="mt-5 text-xs leading-5 text-ink-soft">Jangan bagikan link ini kepada orang lain karena link berfungsi sebagai akses pribadi ke status pesanan.</p>
         </x-ui.card>
     </section>
 </x-layouts::storefront>

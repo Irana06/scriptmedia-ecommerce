@@ -24,6 +24,7 @@ Route::prefix('{demoStore}')
         Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
         Route::get('cart', [CartController::class, 'index'])->name('cart.index');
         Route::post('cart/{product}', [CartController::class, 'store'])->name('cart.store');
+        Route::post('cart/{product}/buy', [CartController::class, 'buyNow'])->name('cart.buy');
         Route::patch('cart/{product}', [CartController::class, 'update'])->name('cart.update');
         Route::delete('cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
         Route::get('wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
@@ -49,6 +50,7 @@ Route::get('products/{product}', [ProductController::class, 'show'])->name('prod
 
 Route::get('cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('cart/{product}', [CartController::class, 'store'])->name('cart.store');
+Route::post('cart/{product}/buy', [CartController::class, 'buyNow'])->name('cart.buy');
 Route::patch('cart/{product}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
 
