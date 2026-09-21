@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\PaymentGateway;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\CartService;
 use App\Services\MidtransService;
 use App\Services\StoreLimitService;
+use App\Support\CartLine;
 use App\Support\OrderTimeline;
 use App\Support\StorefrontContext;
 use Illuminate\Contracts\View\View;
@@ -72,19 +74,43 @@ class CheckoutController extends Controller
 
         $order = DB::transaction(function () use ($validated, $gateway, $cartItems): Order {
             $subtotal = 0.0;
-            $lockedProducts = [];
+            $lines = [];
 
             foreach ($cartItems as $item) {
-                $product = Product::query()->lockForUpdate()->find($item['product']->id);
+                $product = Product::query()->lockForUpdate()->find($item->product->id);
+                $variant = $item->variant === null
+                    ? null
+                    : ProductVariant::query()->lockForUpdate()->find($item->variant->id);
+                $label = $item->label();
 
-                if (! $product instanceof Product || ! $product->is_active || $product->stock < $item['quantity']) {
+                if (! $product instanceof Product || ! $product->is_active) {
                     throw ValidationException::withMessages([
-                        'cart' => "Stok {$item['product']->name} sudah berubah. Periksa keranjang kembali.",
+                        'cart' => "{$label} sudah tidak tersedia. Periksa keranjang kembali.",
                     ]);
                 }
 
-                $lockedProducts[$product->id] = $product;
-                $subtotal += (float) $product->price * $item['quantity'];
+                if ($item->variant !== null && (! $variant instanceof ProductVariant || ! $variant->is_active)) {
+                    throw ValidationException::withMessages([
+                        'cart' => "Varian {$label} sudah tidak tersedia. Periksa keranjang kembali.",
+                    ]);
+                }
+
+                $stock = $variant === null ? $product->stock : $variant->stock;
+
+                if ($stock < $item->quantity) {
+                    throw ValidationException::withMessages([
+                        'cart' => "Stok {$label} sudah berubah. Periksa keranjang kembali.",
+                    ]);
+                }
+
+                $unitPrice = (float) ($variant === null ? $product->price : $variant->price);
+                $subtotal += $unitPrice * $item->quantity;
+                $lines[] = [
+                    'product' => $product,
+                    'variant' => $variant,
+                    'quantity' => $item->quantity,
+                    'unit_price' => $unitPrice,
+                ];
             }
 
             $order = Order::query()->create([
@@ -98,25 +124,26 @@ class CheckoutController extends Controller
                 'placed_at' => now(),
             ]);
 
-            foreach ($cartItems as $item) {
-                $product = $lockedProducts[$item['product']->id];
-                $lineTotal = (float) $product->price * $item['quantity'];
-
+            foreach ($lines as $line) {
                 $order->items()->create([
-                    'product_id' => $product->id,
-                    'product_name' => $product->name,
-                    'unit_price' => $product->price,
-                    'quantity' => $item['quantity'],
-                    'line_total' => $lineTotal,
+                    'product_id' => $line['product']->id,
+                    'product_variant_id' => $line['variant']?->id,
+                    'product_name' => $line['product']->name,
+                    'variant_name' => $line['variant']?->name,
+                    'unit_price' => $line['unit_price'],
+                    'quantity' => $line['quantity'],
+                    'line_total' => $line['unit_price'] * $line['quantity'],
                 ]);
-                $product->decrement('stock', $item['quantity']);
+
+                // Stock lives on the variant when there is one.
+                ($line['variant'] ?? $line['product'])->decrement('stock', $line['quantity']);
             }
 
             return $order;
         });
 
         // Only the ordered lines leave the cart; anything left unticked stays.
-        $cart->forget($cartItems->pluck('product.id')->all());
+        $cart->forget($cartItems->map(fn (CartLine $line): string => $line->key)->all());
 
         if ($gateway->code === MidtransService::GATEWAY_CODE) {
             try {

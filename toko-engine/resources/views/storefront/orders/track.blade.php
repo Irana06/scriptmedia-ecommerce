@@ -51,7 +51,7 @@
                 <h2 class="text-xl font-semibold text-navy">Rincian belanja</h2>
                 <div class="mt-4 divide-y divide-line">
                     @foreach ($order->items as $item)
-                        <div class="flex justify-between gap-5 py-4 text-sm"><div><p class="font-semibold text-navy">{{ $item->product_name }}</p><p class="mt-1 text-ink-soft">{{ $item->quantity }} × Rp{{ number_format((float) $item->unit_price, 0, ',', '.') }}</p></div><p class="font-semibold text-navy">Rp{{ number_format((float) $item->line_total, 0, ',', '.') }}</p></div>
+                        <div class="flex justify-between gap-5 py-4 text-sm"><div><p class="font-semibold text-navy">{{ $item->label() }}</p><p class="mt-1 text-ink-soft">{{ $item->quantity }} × Rp{{ number_format((float) $item->unit_price, 0, ',', '.') }}</p></div><p class="font-semibold text-navy">Rp{{ number_format((float) $item->line_total, 0, ',', '.') }}</p></div>
                     @endforeach
                 </div>
                 <div class="flex justify-between border-t border-line pt-4"><span class="font-semibold text-navy">Total</span><span class="text-lg font-semibold text-navy">Rp{{ number_format((float) $order->total, 0, ',', '.') }}</span></div>

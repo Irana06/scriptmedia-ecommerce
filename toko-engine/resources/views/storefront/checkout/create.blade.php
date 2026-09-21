@@ -78,7 +78,7 @@
                 <p class="mt-1 text-xs text-ink-soft">{{ $items->count() }} produk dari keranjang.</p>
                 <div class="mt-5 space-y-3">
                     @foreach ($items as $item)
-                        <div class="flex justify-between gap-3 text-sm"><span class="text-ink-soft">{{ $item['product']->name }} &times; {{ $item['quantity'] }}</span><span class="font-semibold text-navy">Rp{{ number_format($item['line_total'], 0, ',', '.') }}</span></div>
+                        <div class="flex justify-between gap-3 text-sm"><span class="text-ink-soft">{{ $item->label() }} &times; {{ $item->quantity }}</span><span class="font-semibold text-navy">Rp{{ number_format($item->lineTotal(), 0, ',', '.') }}</span></div>
                     @endforeach
                 </div>
                 <div class="mt-5 flex justify-between border-t border-line pt-5"><span>Total</span><span class="text-lg font-semibold text-navy">Rp{{ number_format($subtotal, 0, ',', '.') }}</span></div>

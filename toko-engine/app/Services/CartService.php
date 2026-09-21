@@ -3,10 +3,18 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Support\CartLine;
 use App\Support\StorefrontContext;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Session;
 
+/**
+ * The cart is keyed by product *and* variant, because the same product in two
+ * sizes is two different things to buy.
+ *
+ * @phpstan-type StoredLine array{key: string, product_id: int, variant_id: int|null, quantity: int}
+ */
 class CartService
 {
     private function sessionKey(): string
@@ -19,7 +27,14 @@ class CartService
         return $this->sessionKey().'_selected';
     }
 
-    /** @return array<int, int> */
+    public static function lineKey(Product $product, ?ProductVariant $variant = null): string
+    {
+        return $variant === null ? 'p'.$product->id : 'p'.$product->id.'-v'.$variant->id;
+    }
+
+    /**
+     * @return array<string, StoredLine>
+     */
     public function raw(): array
     {
         $cart = Session::get($this->sessionKey(), []);
@@ -28,43 +43,87 @@ class CartService
             return [];
         }
 
-        $normalized = [];
-        foreach ($cart as $productId => $quantity) {
-            if (is_numeric($productId) && is_numeric($quantity) && (int) $quantity > 0) {
-                $normalized[(int) $productId] = (int) $quantity;
+        $normalised = [];
+
+        foreach ($cart as $key => $line) {
+            // Carts saved before variants existed were a plain [productId => quantity] map.
+            if (is_numeric($key) && is_numeric($line)) {
+                $quantity = (int) $line;
+
+                if ($quantity > 0) {
+                    $normalised['p'.(int) $key] = [
+                        'key' => 'p'.(int) $key,
+                        'product_id' => (int) $key,
+                        'variant_id' => null,
+                        'quantity' => $quantity,
+                    ];
+                }
+
+                continue;
             }
+
+            if (! is_string($key) || ! is_array($line) || ! is_numeric($line['product_id'] ?? null)) {
+                continue;
+            }
+
+            $quantity = is_numeric($line['quantity'] ?? null) ? (int) $line['quantity'] : 0;
+
+            if ($quantity < 1) {
+                continue;
+            }
+
+            $variantId = is_numeric($line['variant_id'] ?? null) ? (int) $line['variant_id'] : null;
+
+            $normalised[$key] = [
+                'key' => $key,
+                'product_id' => (int) $line['product_id'],
+                'variant_id' => $variantId,
+                'quantity' => $quantity,
+            ];
         }
 
-        return $normalized;
+        return $normalised;
     }
 
-    public function add(Product $product, int $quantity = 1): void
+    public function add(Product $product, int $quantity = 1, ?ProductVariant $variant = null): void
     {
+        $key = self::lineKey($product, $variant);
         $cart = $this->raw();
-        $cart[$product->id] = min(($cart[$product->id] ?? 0) + $quantity, $product->stock);
+        $ceiling = $variant === null ? $product->stock : $variant->stock;
+
+        $cart[$key] = [
+            'key' => $key,
+            'product_id' => $product->id,
+            'variant_id' => $variant?->id,
+            'quantity' => min(($cart[$key]['quantity'] ?? 0) + $quantity, $ceiling),
+        ];
+
         Session::put($this->sessionKey(), $cart);
-        $this->select([...$this->selectedIds(), $product->id]);
+        $this->select([...$this->selectedKeys(), $key]);
     }
 
-    public function update(Product $product, int $quantity): void
+    public function update(Product $product, int $quantity, ?ProductVariant $variant = null): void
     {
         if ($quantity <= 0) {
-            $this->remove($product);
+            $this->remove($product, $variant);
 
             return;
         }
 
+        $key = self::lineKey($product, $variant);
         $cart = $this->raw();
-        $cart[$product->id] = min($quantity, $product->stock);
+
+        if (! array_key_exists($key, $cart)) {
+            return;
+        }
+
+        $cart[$key]['quantity'] = min($quantity, $variant === null ? $product->stock : $variant->stock);
         Session::put($this->sessionKey(), $cart);
     }
 
-    public function remove(Product $product): void
+    public function remove(Product $product, ?ProductVariant $variant = null): void
     {
-        $cart = $this->raw();
-        unset($cart[$product->id]);
-        Session::put($this->sessionKey(), $cart);
-        $this->select(array_diff($this->selectedIds(), [$product->id]));
+        $this->forget([self::lineKey($product, $variant)]);
     }
 
     public function clear(): void
@@ -74,18 +133,18 @@ class CartService
     }
 
     /**
-     * Drop only the given products, leaving the rest of the cart untouched.
+     * Drop only the given lines, leaving the rest of the cart untouched.
      *
-     * @param  iterable<int>  $productIds
+     * @param  iterable<string>  $keys
      */
-    public function forget(iterable $productIds): void
+    public function forget(iterable $keys): void
     {
         $cart = $this->raw();
-        $selected = $this->selectedIds();
+        $selected = $this->selectedKeys();
 
-        foreach ($productIds as $productId) {
-            unset($cart[(int) $productId]);
-            $selected = array_diff($selected, [(int) $productId]);
+        foreach ($keys as $key) {
+            unset($cart[(string) $key]);
+            $selected = array_diff($selected, [(string) $key]);
         }
 
         Session::put($this->sessionKey(), $cart);
@@ -94,116 +153,148 @@ class CartService
 
     public function count(): int
     {
-        return array_sum($this->raw());
+        return array_sum(array_column($this->raw(), 'quantity'));
     }
 
     /**
-     * Product ids the shopper has ticked for checkout.
+     * Cart keys the shopper has ticked for checkout.
      *
-     * @return list<int>
+     * @return list<string>
      */
-    public function selectedIds(): array
+    public function selectedKeys(): array
     {
         $selected = Session::get($this->selectionKey());
+        $inCart = array_keys($this->raw());
 
         // Carts created before selection existed have every line ready to order.
         if (! is_array($selected)) {
-            return array_keys($this->raw());
+            return $inCart;
         }
 
-        $inCart = array_keys($this->raw());
-
         return array_values(array_intersect(
-            array_unique(array_map('intval', array_filter($selected, 'is_numeric'))),
+            array_unique(array_map('strval', array_filter($selected, 'is_scalar'))),
             $inCart,
         ));
     }
 
-    /** @param iterable<int> $productIds */
-    public function select(iterable $productIds): void
+    /** @param iterable<string> $keys */
+    public function select(iterable $keys): void
     {
         $inCart = array_keys($this->raw());
-        $ids = [];
+        $selected = [];
 
-        foreach ($productIds as $productId) {
-            if (in_array((int) $productId, $inCart, true)) {
-                $ids[] = (int) $productId;
+        foreach ($keys as $key) {
+            if (in_array((string) $key, $inCart, true)) {
+                $selected[] = (string) $key;
             }
         }
 
-        Session::put($this->selectionKey(), array_values(array_unique($ids)));
+        Session::put($this->selectionKey(), array_values(array_unique($selected)));
     }
 
-    /** Restrict the selection to a single product, as buy-now does. */
-    public function selectOnly(Product $product): void
+    /** Restrict the selection to a single line, as buy-now does. */
+    public function selectOnly(Product $product, ?ProductVariant $variant = null): void
     {
-        $this->select([$product->id]);
-    }
-
-    public function isSelected(Product $product): bool
-    {
-        return in_array($product->id, $this->selectedIds(), true);
+        $this->select([self::lineKey($product, $variant)]);
     }
 
     public function selectedCount(): int
     {
-        return count($this->selectedIds());
+        return count($this->selectedKeys());
     }
 
     /**
      * Every line in the cart.
      *
-     * @return Collection<int, array{product: Product, quantity: int, line_total: float, selected: bool}>
+     * @return Collection<int, CartLine>
      */
     public function items(): Collection
     {
         $cart = $this->raw();
-        $selected = $this->selectedIds();
+
+        if ($cart === []) {
+            return new Collection;
+        }
+
+        $selected = $this->selectedKeys();
         $products = StorefrontContext::scopeProducts(Product::query())
             ->available()
-            ->with(['category', 'media'])
-            ->whereIn('id', array_keys($cart))
+            ->with(['category', 'media', 'variants'])
+            ->whereIn('id', array_column($cart, 'product_id'))
             ->get()
             ->keyBy('id');
 
-        return collect($cart)
-            ->map(function (int $quantity, int $productId) use ($products, $selected): ?array {
-                $product = $products->get($productId);
+        $items = [];
 
-                if (! $product instanceof Product) {
-                    return null;
+        foreach ($cart as $line) {
+            $product = $products->get($line['product_id']);
+
+            if (! $product instanceof Product) {
+                continue;
+            }
+
+            $variant = null;
+
+            if ($line['variant_id'] !== null) {
+                $variant = $product->activeVariants()->firstWhere('id', $line['variant_id']);
+
+                // The variant was removed or switched off while it sat in the cart.
+                if (! $variant instanceof ProductVariant) {
+                    continue;
                 }
+            }
 
-                $quantity = min($quantity, $product->stock);
+            // A product that grew variants cannot be ordered without picking one.
+            if ($variant === null && $product->hasVariants()) {
+                continue;
+            }
 
-                return [
-                    'product' => $product,
-                    'quantity' => $quantity,
-                    'line_total' => (float) $product->price * $quantity,
-                    'selected' => in_array($productId, $selected, true),
-                ];
-            })
-            ->filter()
-            ->values();
+            $stock = $variant === null ? $product->stock : $variant->stock;
+            $quantity = min($line['quantity'], $stock);
+
+            if ($quantity < 1) {
+                continue;
+            }
+
+            $items[] = new CartLine(
+                key: $line['key'],
+                product: $product,
+                variant: $variant,
+                unitPrice: (float) ($variant === null ? $product->price : $variant->price),
+                quantity: $quantity,
+                stock: $stock,
+                selected: in_array($line['key'], $selected, true),
+            );
+        }
+
+        return new Collection($items);
     }
 
     /**
      * The lines that checkout will turn into an order.
      *
-     * @return Collection<int, array{product: Product, quantity: int, line_total: float, selected: bool}>
+     * @return Collection<int, CartLine>
      */
     public function selectedItems(): Collection
     {
-        return $this->items()->where('selected', true)->values();
+        $selected = [];
+
+        foreach ($this->items() as $item) {
+            if ($item->selected) {
+                $selected[] = $item;
+            }
+        }
+
+        return new Collection($selected);
     }
 
     public function subtotal(): float
     {
-        return $this->items()->sum('line_total');
+        return $this->items()->sum(fn (CartLine $line): float => $line->lineTotal());
     }
 
     public function selectedSubtotal(): float
     {
-        return $this->selectedItems()->sum('line_total');
+        return $this->selectedItems()->sum(fn (CartLine $line): float => $line->lineTotal());
     }
 }

@@ -13,10 +13,10 @@
                 action="{{ \App\Support\StorefrontContext::route('cart.select') }}"
                 class="mt-8 grid gap-8 lg:grid-cols-[1fr_22rem]"
                 x-data="{
-                    selected: @js($items->where('selected', true)->pluck('product.id')->map(fn ($id) => (string) $id)->values()),
-                    lines: @js($items->mapWithKeys(fn ($item) => [(string) $item['product']->id => $item['line_total']])),
+                    selected: @js($items->where('selected', true)->pluck('key')->values()),
+                    lines: @js($items->mapWithKeys(fn ($item) => [$item->key => $item->lineTotal()])),
                     get allChecked() { return this.selected.length === Object.keys(this.lines).length },
-                    get total() { return this.selected.reduce((sum, id) => sum + (this.lines[id] ?? 0), 0) },
+                    get total() { return this.selected.reduce((sum, key) => sum + (this.lines[key] ?? 0), 0) },
                     toggleAll(checked) { this.selected = checked ? Object.keys(this.lines) : [] },
                     format(value) { return 'Rp' + Math.round(value).toLocaleString('id-ID') },
                 }"
@@ -31,17 +31,23 @@
                     </label>
 
                     @foreach ($items as $item)
+                        @php($visual = \App\Support\StorefrontContext::productVisual($item->product))
                         <x-ui.card class="flex flex-col gap-5 sm:flex-row sm:items-center">
-                            <input type="checkbox" name="product_ids[]" value="{{ $item['product']->id }}" x-model="selected" class="size-4 shrink-0 accent-tosca" aria-label="Pilih {{ $item['product']->name }}">
-                            @php($visual = \App\Support\StorefrontContext::productVisual($item['product']))
-                            <div class="flex size-20 shrink-0 items-center justify-center rounded-xl text-2xl text-navy/40" style="background-color: {{ $visual['color'] ?? '#e3f4f3' }}">{{ $visual['icon'] ?? \Illuminate\Support\Str::substr($item['product']->name, 0, 1) }}</div>
-                            <div class="min-w-0 flex-1"><a href="{{ \App\Support\StorefrontContext::route('products.show', ['product' => $item['product']]) }}" class="text-lg font-semibold text-navy">{{ $item['product']->name }}</a><p class="mt-1 text-sm text-ink-soft">Rp{{ number_format((float) $item['product']->price, 0, ',', '.') }} / item</p></div>
-                            <div class="flex items-center gap-2">
-                                <input type="number" form="cart-line-{{ $item['product']->id }}" name="quantity" value="{{ $item['quantity'] }}" min="0" max="{{ $item['product']->stock }}" class="w-20 rounded-xl border border-line px-3 py-2">
-                                <x-ui.loading-button form="cart-line-{{ $item['product']->id }}" loading-label="Memperbarui..." variant="outline" class="cursor-pointer !px-4 !py-2 !text-xs">Ubah</x-ui.loading-button>
+                            <input type="checkbox" name="keys[]" value="{{ $item->key }}" x-model="selected" class="size-4 shrink-0 accent-tosca" aria-label="Pilih {{ $item->label() }}">
+                            <div class="flex size-20 shrink-0 items-center justify-center rounded-xl text-2xl text-navy/40" style="background-color: {{ $visual['color'] ?? '#e3f4f3' }}">{{ $visual['icon'] ?? \Illuminate\Support\Str::substr($item->product->name, 0, 1) }}</div>
+                            <div class="min-w-0 flex-1">
+                                <a href="{{ \App\Support\StorefrontContext::route('products.show', ['product' => $item->product]) }}" class="text-lg font-semibold text-navy">{{ $item->product->name }}</a>
+                                @if ($item->variant)
+                                    <p class="mt-1 text-sm text-tosca">{{ $item->variant->name }}</p>
+                                @endif
+                                <p class="mt-1 text-sm text-ink-soft">Rp{{ number_format($item->unitPrice, 0, ',', '.') }} / item</p>
                             </div>
-                            <div class="font-semibold text-navy">Rp{{ number_format($item['line_total'], 0, ',', '.') }}</div>
-                            <button type="submit" form="cart-remove-{{ $item['product']->id }}" class="cursor-pointer text-sm text-red-600">Hapus</button>
+                            <div class="flex items-center gap-2">
+                                <input type="number" form="cart-line-{{ $item->key }}" name="quantity" value="{{ $item->quantity }}" min="0" max="{{ $item->stock }}" class="w-20 rounded-xl border border-line px-3 py-2">
+                                <x-ui.loading-button form="cart-line-{{ $item->key }}" loading-label="Memperbarui..." variant="outline" class="cursor-pointer !px-4 !py-2 !text-xs">Ubah</x-ui.loading-button>
+                            </div>
+                            <div class="font-semibold text-navy">Rp{{ number_format($item->lineTotal(), 0, ',', '.') }}</div>
+                            <button type="submit" form="cart-remove-{{ $item->key }}" class="cursor-pointer text-sm text-red-600">Hapus</button>
                         </x-ui.card>
                     @endforeach
                 </div>
@@ -65,8 +71,8 @@
 
             {{-- Kept outside the selection form so nested forms stay valid HTML. --}}
             @foreach ($items as $item)
-                <form id="cart-line-{{ $item['product']->id }}" method="POST" action="{{ \App\Support\StorefrontContext::route('cart.update', ['product' => $item['product']]) }}" class="hidden">@csrf @method('PATCH')</form>
-                <form id="cart-remove-{{ $item['product']->id }}" method="POST" action="{{ \App\Support\StorefrontContext::route('cart.destroy', ['product' => $item['product']]) }}" class="hidden">@csrf @method('DELETE')</form>
+                <form id="cart-line-{{ $item->key }}" method="POST" action="{{ \App\Support\StorefrontContext::route('cart.update', ['product' => $item->product]) }}" class="hidden">@csrf @method('PATCH')@if($item->variant)<input type="hidden" name="variant_id" value="{{ $item->variant->id }}">@endif</form>
+                <form id="cart-remove-{{ $item->key }}" method="POST" action="{{ \App\Support\StorefrontContext::route('cart.destroy', ['product' => $item->product]) }}" class="hidden">@csrf @method('DELETE')@if($item->variant)<input type="hidden" name="variant_id" value="{{ $item->variant->id }}">@endif</form>
             @endforeach
         @endif
     </section>

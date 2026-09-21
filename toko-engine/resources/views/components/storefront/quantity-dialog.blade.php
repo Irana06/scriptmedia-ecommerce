@@ -7,7 +7,7 @@
     x-data="{
         open: false,
         intent: 'cart',
-        product: { name: '', price: 0, stock: 1, icon: '', color: '#e3f4f3', cartUrl: '', buyUrl: '' },
+        product: { name: '', price: 0, stock: 1, icon: '', color: '#e3f4f3', cartUrl: '', buyUrl: '', variantId: null },
         quantity: 1,
         show(detail) {
             this.product = detail.product
@@ -62,6 +62,7 @@
             <form method="POST" x-bind:action="intent === 'buy' ? product.buyUrl : product.cartUrl" class="mt-6">
                 @csrf
                 <input type="hidden" name="quantity" x-bind:value="quantity">
+                <template x-if="product.variantId"><input type="hidden" name="variant_id" x-bind:value="product.variantId"></template>
                 <x-ui.loading-button loading-label="Memproses..." variant="navy" class="w-full cursor-pointer">
                     <span x-text="intent === 'buy' ? 'Beli sekarang' : 'Masukkan ke keranjang'"></span>
                 </x-ui.loading-button>

@@ -78,7 +78,15 @@ return [
             ['name' => 'Monitor Light Bar', 'category' => 'Workspace', 'price' => 419000, 'icon' => '💡', 'color' => '#fff0c9'],
             ['name' => 'USB-C Hub 7-in-1', 'category' => 'Konektivitas', 'price' => 379000, 'icon' => '🔌', 'color' => '#e6e4f3'],
             ['name' => 'Laptop Stand Pro', 'category' => 'Workspace', 'price' => 339000, 'icon' => '💻', 'color' => '#dcefeb'],
-            ['name' => 'Desk Mat Midnight', 'category' => 'Aksesori', 'price' => 179000, 'icon' => '🖥️', 'color' => '#dde3eb'],
+            ['name' => 'Desk Mat Midnight', 'category' => 'Aksesori', 'price' => 179000, 'icon' => '🖥️', 'color' => '#dde3eb', 'variants' => [
+                'groups' => ['Ukuran', 'Warna'],
+                'rows' => [
+                    ['values' => ['S', 'Hitam'], 'price' => 179000, 'stock' => 8],
+                    ['values' => ['S', 'Abu'], 'price' => 179000, 'stock' => 5],
+                    ['values' => ['L', 'Hitam'], 'price' => 229000, 'stock' => 4],
+                    ['values' => ['L', 'Abu'], 'price' => 229000, 'stock' => 0],
+                ],
+            ]],
             ['name' => 'Webcam Focus C2', 'category' => 'Konektivitas', 'price' => 549000, 'icon' => '📷', 'color' => '#e2e9f1'],
             ['name' => 'Headset Studio H5', 'category' => 'Audio', 'price' => 759000, 'icon' => '🎧', 'color' => '#e5e1eb'],
             ['name' => 'Portable SSD 1TB', 'category' => 'Penyimpanan', 'price' => 1299000, 'icon' => '💾', 'color' => '#dce4eb'],
@@ -126,7 +134,14 @@ return [
             ['name' => 'Halo Floor Lamp', 'category' => 'Lighting', 'price' => 3790000, 'icon' => '💡', 'color' => '#eee2cb'],
             ['name' => 'Kita Modular Shelf', 'category' => 'Furniture', 'price' => 5890000, 'icon' => '🗄️', 'color' => '#e1d9cd'],
             ['name' => 'Mori Glass Vase', 'category' => 'Decor', 'price' => 1190000, 'icon' => '🏺', 'color' => '#dfe7e5'],
-            ['name' => 'Sabi Boucle Cushion', 'category' => 'Textile', 'price' => 650000, 'icon' => '🛋️', 'color' => '#ece4dc'],
+            ['name' => 'Sabi Boucle Cushion', 'category' => 'Textile', 'price' => 650000, 'icon' => '🛋️', 'color' => '#ece4dc', 'variants' => [
+                'groups' => ['Warna'],
+                'rows' => [
+                    ['values' => ['Sand'], 'price' => 650000, 'stock' => 7],
+                    ['values' => ['Clay'], 'price' => 650000, 'stock' => 3],
+                    ['values' => ['Moss'], 'price' => 690000, 'stock' => 2],
+                ],
+            ]],
             ['name' => 'Dawn Textured Canvas', 'category' => 'Art', 'price' => 1950000, 'icon' => '🖼️', 'color' => '#eadbd2'],
         ],
     ],

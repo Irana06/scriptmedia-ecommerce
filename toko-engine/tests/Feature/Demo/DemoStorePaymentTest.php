@@ -145,7 +145,7 @@ class DemoStorePaymentTest extends TestCase
 
         $this->post(route('demo.cart.store', ['demoStore' => 'standard', 'product' => $first]), ['quantity' => 1]);
         $this->post(route('demo.cart.store', ['demoStore' => 'standard', 'product' => $second]), ['quantity' => 1]);
-        $this->post(route('demo.cart.select', ['demoStore' => 'standard']), ['product_ids' => [$second->id]]);
+        $this->post(route('demo.cart.select', ['demoStore' => 'standard']), ['keys' => ['p'.$second->id]]);
 
         $this->post(route('demo.checkout.store', ['demoStore' => 'standard']), $this->customerPayload());
 
@@ -164,7 +164,7 @@ class DemoStorePaymentTest extends TestCase
         $product = $this->demoProduct('standard');
 
         $this->post(route('demo.cart.store', ['demoStore' => 'standard', 'product' => $product]), ['quantity' => 1]);
-        $this->post(route('demo.cart.select', ['demoStore' => 'standard']), ['product_ids' => []]);
+        $this->post(route('demo.cart.select', ['demoStore' => 'standard']), ['keys' => []]);
 
         $this->get(route('demo.checkout.create', ['demoStore' => 'standard']))
             ->assertRedirect(route('demo.cart.index', ['demoStore' => 'standard']))

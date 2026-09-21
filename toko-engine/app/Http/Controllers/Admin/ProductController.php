@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\StoreLimitService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -19,7 +20,7 @@ class ProductController extends Controller
     {
         $search = $request->string('search')->toString();
         $products = Product::query()
-            ->with(['category', 'media'])
+            ->with(['category', 'media', 'variants'])
             ->when($search, fn ($query) => $query->where('name', 'like', "%{$search}%"))
             ->latest()
             ->paginate(15)
@@ -62,6 +63,8 @@ class ProductController extends Controller
             $product->addMediaFromRequest('image')->toMediaCollection('product-images');
         }
 
+        $this->syncVariants($request, $product);
+
         return redirect()->route('admin.products.index')->with('success', 'Produk berhasil dibuat.');
     }
 
@@ -89,6 +92,8 @@ class ProductController extends Controller
             $product->addMediaFromRequest('image')->toMediaCollection('product-images');
         }
 
+        $this->syncVariants($request, $product);
+
         return redirect()->route('admin.products.index')->with('success', 'Produk berhasil diperbarui.');
     }
 
@@ -110,6 +115,79 @@ class ProductController extends Controller
             'stock' => ['required', 'integer', 'min:0'],
             'image' => ['nullable', 'image', 'max:4096'],
         ]);
+    }
+
+    /**
+     * Rewrite a product's variants from the submitted rows.
+     *
+     * Rows are matched on the option values they carry, so editing a price keeps
+     * the same variant row instead of replacing it.
+     */
+    private function syncVariants(Request $request, Product $product): void
+    {
+        $validated = $request->validate([
+            'option_names' => ['nullable', 'array', 'max:2'],
+            'option_names.*' => ['nullable', 'string', 'max:50'],
+            'variants' => ['nullable', 'array', 'max:100'],
+            'variants.*.id' => ['nullable', 'integer'],
+            'variants.*.values' => ['nullable', 'array', 'max:2'],
+            'variants.*.values.*' => ['nullable', 'string', 'max:50'],
+            'variants.*.price' => ['nullable', 'numeric', 'min:0'],
+            'variants.*.stock' => ['nullable', 'integer', 'min:0'],
+        ]);
+
+        $groups = array_values(array_filter(
+            array_map(fn (mixed $name): string => is_string($name) ? trim($name) : '', $validated['option_names'] ?? []),
+            fn (string $name): bool => $name !== '',
+        ));
+
+        $keptIds = [];
+        $position = 0;
+
+        if ($groups !== []) {
+            foreach ($validated['variants'] ?? [] as $index => $row) {
+                $values = array_map(
+                    fn (mixed $value): string => is_string($value) ? trim($value) : '',
+                    array_values($row['values'] ?? []),
+                );
+                $options = [];
+
+                foreach ($groups as $groupIndex => $group) {
+                    $value = $values[$groupIndex] ?? '';
+
+                    if ($value === '') {
+                        continue 2; // A row missing one of its option values is not a variant.
+                    }
+
+                    $options[$group] = $value;
+                }
+
+                $variant = $product->variants()->firstOrNew(['name' => implode(' / ', array_values($options))]);
+                $variant->fill([
+                    'options' => ProductVariant::encodeOptions($options),
+                    'price' => $row['price'] ?? $product->price,
+                    'stock' => $row['stock'] ?? 0,
+                    'is_active' => $request->boolean("variants.{$index}.is_active"),
+                    'position' => $position++,
+                ]);
+                $product->variants()->save($variant);
+                $keptIds[] = $variant->id;
+            }
+        }
+
+        // Variants that already carry order history are retired, not deleted, so
+        // past orders keep pointing at what was actually bought.
+        foreach ($product->variants()->whereNotIn('id', $keptIds ?: [0])->get() as $stale) {
+            if ($stale->orderItems()->exists()) {
+                $stale->forceFill(['is_active' => false])->save();
+
+                continue;
+            }
+
+            $stale->delete();
+        }
+
+        $product->unsetRelation('variants');
     }
 
     private function uniqueSlug(string $name, ?Product $ignoredProduct = null): string

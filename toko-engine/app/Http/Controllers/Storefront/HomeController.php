@@ -14,14 +14,14 @@ class HomeController extends Controller
         $featuredProducts = StorefrontContext::scopeProducts(Product::query())
             ->available()
             ->where('is_featured', true)
-            ->with(['category', 'media'])
+            ->with(['category', 'media', 'variants'])
             ->latest()
             ->limit(6)
             ->get();
 
         $bestSeller = StorefrontContext::scopeProducts(Product::query())
             ->available()
-            ->with(['category', 'media'])
+            ->with(['category', 'media', 'variants'])
             ->withSum('orderItems as units_sold', 'quantity')
             ->orderByDesc('units_sold')
             ->orderByDesc('is_featured')

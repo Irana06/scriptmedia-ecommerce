@@ -9,7 +9,7 @@
         <div class="space-y-6">
             <x-ui.card>
                 <h2 class="text-xl text-navy">Item order</h2>
-                <div class="mt-5 divide-y divide-line">@foreach ($order->items as $item)<div class="flex justify-between gap-4 py-4"><div><p class="font-semibold text-navy">{{ $item->product_name }}</p><p class="mt-1 text-sm text-ink-soft">{{ $item->quantity }} &times; Rp{{ number_format((float) $item->unit_price, 0, ',', '.') }}</p></div><p class="font-semibold text-navy">Rp{{ number_format((float) $item->line_total, 0, ',', '.') }}</p></div>@endforeach</div>
+                <div class="mt-5 divide-y divide-line">@foreach ($order->items as $item)<div class="flex justify-between gap-4 py-4"><div><p class="font-semibold text-navy">{{ $item->label() }}</p><p class="mt-1 text-sm text-ink-soft">{{ $item->quantity }} &times; Rp{{ number_format((float) $item->unit_price, 0, ',', '.') }}</p></div><p class="font-semibold text-navy">Rp{{ number_format((float) $item->line_total, 0, ',', '.') }}</p></div>@endforeach</div>
             </x-ui.card>
 
             <x-ui.card>

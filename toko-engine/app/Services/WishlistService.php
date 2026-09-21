@@ -48,7 +48,7 @@ class WishlistService
     {
         return StorefrontContext::scopeProducts(Product::query())
             ->available()
-            ->with(['category', 'media'])
+            ->with(['category', 'media', 'variants'])
             ->whereIn('id', $this->productIds())
             ->get();
     }

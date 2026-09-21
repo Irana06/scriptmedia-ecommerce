@@ -35,10 +35,10 @@ class MidtransService
                 'gross_amount' => (int) round((float) $order->total),
             ],
             'item_details' => $order->items->map(fn ($item): array => [
-                'id' => (string) ($item->product_id ?? $item->id),
+                'id' => (string) ($item->product_variant_id ?? $item->product_id ?? $item->id),
                 'price' => (int) round((float) $item->unit_price),
                 'quantity' => $item->quantity,
-                'name' => Str::limit($item->product_name, 50, ''),
+                'name' => Str::limit($item->label(), 50, ''),
             ])->all(),
             'customer_details' => [
                 'first_name' => $order->customer_name,

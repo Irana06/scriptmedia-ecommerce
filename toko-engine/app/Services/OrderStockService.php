@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 
 class OrderStockService
@@ -25,6 +26,13 @@ class OrderStockService
             }
 
             foreach ($locked->items()->get() as $item) {
+                // Stock was taken from the variant when the order carried one.
+                if ($item->product_variant_id !== null) {
+                    ProductVariant::query()->whereKey($item->product_variant_id)->increment('stock', $item->quantity);
+
+                    continue;
+                }
+
                 if ($item->product_id === null) {
                     continue;
                 }

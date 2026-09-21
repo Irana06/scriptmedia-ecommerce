@@ -1,7 +1,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-@php($siteName = \App\Support\StorefrontContext::store()['store_name'] ?? config('app.name', 'Toko Engine'))
+@php($siteName = \App\Support\StorefrontContext::store()['store_name']
+    ?? \App\Models\StoreSetting::query()->value('store_name')
+    ?? config('app.name', 'Toko Engine'))
 
 <title>
     {{ filled($title ?? null) ? $title.' - '.$siteName : $siteName }}

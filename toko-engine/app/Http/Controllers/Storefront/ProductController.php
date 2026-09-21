@@ -24,7 +24,7 @@ class ProductController extends Controller
         $categories = StorefrontContext::scopeCategories(Category::query())->where('is_active', true)->orderBy('name')->get();
         $products = StorefrontContext::scopeProducts(Product::query())
             ->available()
-            ->with(['category', 'media'])
+            ->with(['category', 'media', 'variants'])
             ->when($search, fn ($query) => $query->where(function ($searchQuery) use ($search): void {
                 $searchQuery
                     ->where('name', 'like', '%'.$search.'%')
@@ -51,13 +51,13 @@ class ProductController extends Controller
     {
         $demoSlug = StorefrontContext::slug();
         abort_unless($product->is_active && ($demoSlug === null || str_starts_with($product->slug, $demoSlug.'-')), 404);
-        $product->load(['category', 'media']);
+        $product->load(['category', 'media', 'variants']);
 
         $relatedProducts = StorefrontContext::scopeProducts(Product::query())
             ->available()
             ->where('category_id', $product->category_id)
             ->whereKeyNot($product->id)
-            ->with(['category', 'media'])
+            ->with(['category', 'media', 'variants'])
             ->when(! StorefrontContext::allows('related_products'), fn ($query) => $query->whereRaw('1 = 0'))
             ->limit(StorefrontContext::slug() === 'pro' ? 4 : 3)
             ->get();
