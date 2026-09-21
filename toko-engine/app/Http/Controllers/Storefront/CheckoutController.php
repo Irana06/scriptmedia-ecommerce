@@ -24,13 +24,16 @@ class CheckoutController extends Controller
 {
     public function create(CartService $cart, StoreLimitService $storeLimits): View|RedirectResponse
     {
-        if ($cart->items()->isEmpty()) {
-            return redirect(StorefrontContext::route('cart.index'))->withErrors(['cart' => 'Keranjang masih kosong.']);
+        if ($cart->selectedItems()->isEmpty()) {
+            return redirect(StorefrontContext::route('cart.index'))
+                ->withErrors(['cart' => $cart->items()->isEmpty()
+                    ? 'Keranjang masih kosong.'
+                    : 'Pilih dulu produk yang mau dipesan.']);
         }
 
         return view('storefront.checkout.create', [
-            'items' => $cart->items(),
-            'subtotal' => $cart->subtotal(),
+            'items' => $cart->selectedItems(),
+            'subtotal' => $cart->selectedSubtotal(),
             'gateways' => $this->availableGateways(),
             'midtransPaymentDescription' => $storeLimits->paymentMethodDescription(),
             'midtransChannelGroups' => $storeLimits->midtransChannelGroups(),
@@ -57,10 +60,13 @@ class CheckoutController extends Controller
             ]);
         }
 
-        $cartItems = $cart->items();
+        $cartItems = $cart->selectedItems();
 
         if ($cartItems->isEmpty()) {
-            return redirect(StorefrontContext::route('cart.index'))->withErrors(['cart' => 'Keranjang masih kosong.']);
+            return redirect(StorefrontContext::route('cart.index'))
+                ->withErrors(['cart' => $cart->items()->isEmpty()
+                    ? 'Keranjang masih kosong.'
+                    : 'Pilih dulu produk yang mau dipesan.']);
         }
 
         $order = DB::transaction(function () use ($validated, $gateway, $cartItems): Order {
@@ -108,7 +114,8 @@ class CheckoutController extends Controller
             return $order;
         });
 
-        $cart->clear();
+        // Only the ordered lines leave the cart; anything left unticked stays.
+        $cart->forget($cartItems->pluck('product.id')->all());
 
         if ($gateway->code === MidtransService::GATEWAY_CODE) {
             try {

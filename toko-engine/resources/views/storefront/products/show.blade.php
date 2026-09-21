@@ -28,20 +28,19 @@
                 @endif
                 <div class="mt-8 rounded-xl bg-white p-4 text-sm text-ink-soft ring-1 ring-line">{{ $product->stock > 0 ? 'Tersedia '.$product->stock.' item' : 'Stok habis' }}</div>
                 @if ($product->stock > 0)
-                    <div class="mt-6" x-data="{ quantity: 1 }">
-                        <label class="grid w-24 gap-2 text-sm font-semibold text-navy">Jumlah<input type="number" x-model.number="quantity" value="1" min="1" max="{{ $product->stock }}" class="rounded-xl border border-line bg-white px-4 py-3"></label>
-                        <div class="mt-4 flex flex-wrap gap-3">
-                            <form method="POST" action="{{ \App\Support\StorefrontContext::route('cart.store', ['product' => $product]) }}">
-                                @csrf
-                                <input type="hidden" name="quantity" x-bind:value="quantity">
-                                <x-ui.loading-button loading-label="Menambahkan..." variant="outline">+ Keranjang</x-ui.loading-button>
-                            </form>
-                            <form method="POST" action="{{ \App\Support\StorefrontContext::route('cart.buy', ['product' => $product]) }}">
-                                @csrf
-                                <input type="hidden" name="quantity" x-bind:value="quantity">
-                                <x-ui.loading-button loading-label="Menyiapkan..." variant="navy">Beli sekarang</x-ui.loading-button>
-                            </form>
-                        </div>
+                    @php($detailVisual = \App\Support\StorefrontContext::productVisual($product))
+                    @php($dialogPayload = [
+                        'name' => $product->name,
+                        'price' => (float) $product->price,
+                        'stock' => $product->stock,
+                        'icon' => $detailVisual['icon'] ?? mb_substr($product->name, 0, 1),
+                        'color' => $detailVisual['color'] ?? '#e3f4f3',
+                        'cartUrl' => \App\Support\StorefrontContext::route('cart.store', ['product' => $product]),
+                        'buyUrl' => \App\Support\StorefrontContext::route('cart.buy', ['product' => $product]),
+                    ])
+                    <div class="mt-6 flex flex-wrap gap-3" x-data data-product="{{ json_encode($dialogPayload) }}">
+                        <x-ui.button type="button" variant="outline" class="cursor-pointer" x-on:click="$dispatch('open-quantity-dialog', { intent: 'cart', product: JSON.parse($root.dataset.product) })">+ Keranjang</x-ui.button>
+                        <x-ui.button type="button" variant="navy" class="cursor-pointer" x-on:click="$dispatch('open-quantity-dialog', { intent: 'buy', product: JSON.parse($root.dataset.product) })">Beli sekarang</x-ui.button>
                     </div>
                 @endif
                 @if ($demoLayout === 'editorial')

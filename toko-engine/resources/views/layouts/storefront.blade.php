@@ -80,6 +80,8 @@
 
         <main>{{ $slot }}</main>
 
+        <x-storefront.quantity-dialog />
+
         <footer class="border-t border-line bg-white">
             <div class="mx-auto grid max-w-7xl gap-6 px-5 py-10 text-sm text-ink-soft sm:grid-cols-2 sm:px-8">
                 <div><p class="text-lg font-semibold text-navy">{{ $storeName }}</p><p class="mt-2 max-w-md">{{ $storeTagline }}</p></div>

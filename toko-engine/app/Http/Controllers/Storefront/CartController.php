@@ -17,7 +17,31 @@ class CartController extends Controller
         return view('storefront.cart.index', [
             'items' => $cart->items(),
             'subtotal' => $cart->subtotal(),
+            'selectedSubtotal' => $cart->selectedSubtotal(),
+            'selectedCount' => $cart->selectedCount(),
         ]);
+    }
+
+    /** Replaces the whole selection with whatever the shopper ticked. */
+    public function select(Request $request, CartService $cart): RedirectResponse
+    {
+        $validated = $request->validate([
+            'product_ids' => ['nullable', 'array'],
+            'product_ids.*' => ['integer'],
+            'continue' => ['nullable', 'in:checkout'],
+        ]);
+        $cart->select($validated['product_ids'] ?? []);
+
+        if (($validated['continue'] ?? null) !== 'checkout') {
+            return back();
+        }
+
+        if ($cart->selectedCount() === 0) {
+            return redirect(StorefrontContext::route('cart.index'))
+                ->withErrors(['cart' => 'Pilih dulu produk yang mau dipesan.']);
+        }
+
+        return redirect(StorefrontContext::route('checkout.create'));
     }
 
     public function store(Request $request, Product $product, CartService $cart): RedirectResponse
@@ -31,7 +55,10 @@ class CartController extends Controller
         return back()->with('success', 'Produk ditambahkan ke keranjang.');
     }
 
-    /** Shortcut for shoppers who want to pay straight away instead of browsing on. */
+    /**
+     * Shortcut for shoppers who want to pay straight away. Only this product is
+     * ordered; anything already in the cart stays there, just unticked.
+     */
     public function buyNow(Request $request, Product $product, CartService $cart): RedirectResponse
     {
         $validated = $this->addToCart($request, $product, $cart);
@@ -39,6 +66,8 @@ class CartController extends Controller
         if ($validated instanceof RedirectResponse) {
             return $validated;
         }
+
+        $cart->selectOnly($product);
 
         return redirect(StorefrontContext::route('checkout.create'));
     }

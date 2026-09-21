@@ -71,7 +71,11 @@
             </div>
 
             <x-ui.card class="h-fit lg:sticky lg:top-24">
-                <h2 class="text-xl text-navy">Ringkasan pesanan</h2>
+                <div class="flex items-baseline justify-between gap-3">
+                    <h2 class="text-xl text-navy">Produk yang dipesan</h2>
+                    <a href="{{ \App\Support\StorefrontContext::route('cart.index') }}" class="text-xs font-semibold text-tosca">Ubah</a>
+                </div>
+                <p class="mt-1 text-xs text-ink-soft">{{ $items->count() }} produk dari keranjang.</p>
                 <div class="mt-5 space-y-3">
                     @foreach ($items as $item)
                         <div class="flex justify-between gap-3 text-sm"><span class="text-ink-soft">{{ $item['product']->name }} &times; {{ $item['quantity'] }}</span><span class="font-semibold text-navy">Rp{{ number_format($item['line_total'], 0, ',', '.') }}</span></div>

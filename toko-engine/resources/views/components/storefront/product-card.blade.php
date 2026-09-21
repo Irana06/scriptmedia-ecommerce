@@ -28,9 +28,23 @@
         <div class="mt-6">
             <span class="block font-semibold text-navy">Rp{{ number_format((float) $product->price, 0, ',', '.') }}</span>
             @if ($product->stock > 0)
-                <div class="mt-3 grid gap-2 sm:grid-cols-2">
-                    <form method="POST" action="{{ \App\Support\StorefrontContext::route('cart.store', ['product' => $product]) }}">@csrf<input type="hidden" name="quantity" value="1"><x-ui.button type="submit" variant="outline" class="w-full cursor-pointer !px-3 !py-2.5 !text-xs whitespace-nowrap">+ Keranjang</x-ui.button></form>
-                    <form method="POST" action="{{ \App\Support\StorefrontContext::route('cart.buy', ['product' => $product]) }}">@csrf<input type="hidden" name="quantity" value="1"><x-ui.button type="submit" variant="navy" class="w-full cursor-pointer !px-3 !py-2.5 !text-xs whitespace-nowrap">Beli sekarang</x-ui.button></form>
+                @php($dialogPayload = [
+                    'name' => $product->name,
+                    'price' => (float) $product->price,
+                    'stock' => $product->stock,
+                    'icon' => $visual['icon'] ?? mb_substr($product->name, 0, 1),
+                    'color' => $visual['color'] ?? '#e3f4f3',
+                    'cartUrl' => \App\Support\StorefrontContext::route('cart.store', ['product' => $product]),
+                    'buyUrl' => \App\Support\StorefrontContext::route('cart.buy', ['product' => $product]),
+                ])
+                {{--
+                    x-data makes this an Alpine root so the handlers below are initialised,
+                    and the payload rides on a data attribute because Blade does not compile
+                    @js() inside a component's attribute value.
+                --}}
+                <div class="mt-3 grid gap-2 sm:grid-cols-2" x-data data-product="{{ json_encode($dialogPayload) }}">
+                    <x-ui.button type="button" variant="outline" class="w-full cursor-pointer !px-3 !py-2.5 !text-xs whitespace-nowrap" x-on:click="$dispatch('open-quantity-dialog', { intent: 'cart', product: JSON.parse($root.dataset.product) })">+ Keranjang</x-ui.button>
+                    <x-ui.button type="button" variant="navy" class="w-full cursor-pointer !px-3 !py-2.5 !text-xs whitespace-nowrap" x-on:click="$dispatch('open-quantity-dialog', { intent: 'buy', product: JSON.parse($root.dataset.product) })">Beli sekarang</x-ui.button>
                 </div>
             @else
                 <p class="mt-3 text-sm text-ink-soft">Stok habis</p>

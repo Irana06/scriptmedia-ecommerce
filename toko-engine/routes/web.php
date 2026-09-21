@@ -23,6 +23,8 @@ Route::prefix('{demoStore}')
         Route::get('products', [ProductController::class, 'index'])->name('products.index');
         Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
         Route::get('cart', [CartController::class, 'index'])->name('cart.index');
+        // Declared before cart/{product} so "selection" is not read as a product slug.
+        Route::post('cart/selection', [CartController::class, 'select'])->name('cart.select');
         Route::post('cart/{product}', [CartController::class, 'store'])->name('cart.store');
         Route::post('cart/{product}/buy', [CartController::class, 'buyNow'])->name('cart.buy');
         Route::patch('cart/{product}', [CartController::class, 'update'])->name('cart.update');
@@ -49,6 +51,8 @@ Route::get('products', [ProductController::class, 'index'])->name('products.inde
 Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
 
 Route::get('cart', [CartController::class, 'index'])->name('cart.index');
+// Declared before cart/{product} so "selection" is not read as a product slug.
+Route::post('cart/selection', [CartController::class, 'select'])->name('cart.select');
 Route::post('cart/{product}', [CartController::class, 'store'])->name('cart.store');
 Route::post('cart/{product}/buy', [CartController::class, 'buyNow'])->name('cart.buy');
 Route::patch('cart/{product}', [CartController::class, 'update'])->name('cart.update');

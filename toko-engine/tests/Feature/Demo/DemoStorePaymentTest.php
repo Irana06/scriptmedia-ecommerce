@@ -112,6 +112,70 @@ class DemoStorePaymentTest extends TestCase
             ->assertSee('&times; 2', false);
     }
 
+    public function test_buy_now_orders_only_that_product_and_leaves_the_cart_alone(): void
+    {
+        $this->prepareDemo();
+        $inCart = $this->demoProduct('standard');
+        $wanted = Product::query()->where('slug', 'like', 'standard-%')->whereKeyNot($inCart->id)->firstOrFail();
+
+        $this->post(route('demo.cart.store', ['demoStore' => 'standard', 'product' => $inCart]), ['quantity' => 3]);
+        $this->post(route('demo.cart.buy', ['demoStore' => 'standard', 'product' => $wanted]), ['quantity' => 1]);
+
+        $this->get(route('demo.checkout.create', ['demoStore' => 'standard']))
+            ->assertOk()
+            ->assertSee($wanted->name)
+            ->assertDontSee($inCart->name);
+
+        $this->post(route('demo.checkout.store', ['demoStore' => 'standard']), $this->customerPayload());
+
+        $order = Order::query()->latest('id')->firstOrFail();
+        $this->assertSame([$wanted->name], $order->items()->pluck('product_name')->all());
+
+        // The untouched line is still waiting in the cart afterwards.
+        $this->get(route('demo.cart.index', ['demoStore' => 'standard']))
+            ->assertOk()
+            ->assertSee($inCart->name);
+    }
+
+    public function test_checkout_covers_only_the_ticked_cart_lines(): void
+    {
+        $this->prepareDemo();
+        $first = $this->demoProduct('standard');
+        $second = Product::query()->where('slug', 'like', 'standard-%')->whereKeyNot($first->id)->firstOrFail();
+
+        $this->post(route('demo.cart.store', ['demoStore' => 'standard', 'product' => $first]), ['quantity' => 1]);
+        $this->post(route('demo.cart.store', ['demoStore' => 'standard', 'product' => $second]), ['quantity' => 1]);
+        $this->post(route('demo.cart.select', ['demoStore' => 'standard']), ['product_ids' => [$second->id]]);
+
+        $this->post(route('demo.checkout.store', ['demoStore' => 'standard']), $this->customerPayload());
+
+        $order = Order::query()->latest('id')->firstOrFail();
+        $this->assertSame([$second->name], $order->items()->pluck('product_name')->all());
+
+        $this->get(route('demo.cart.index', ['demoStore' => 'standard']))
+            ->assertOk()
+            ->assertSee($first->name)
+            ->assertDontSee($second->name);
+    }
+
+    public function test_checkout_is_refused_when_nothing_is_ticked(): void
+    {
+        $this->prepareDemo();
+        $product = $this->demoProduct('standard');
+
+        $this->post(route('demo.cart.store', ['demoStore' => 'standard', 'product' => $product]), ['quantity' => 1]);
+        $this->post(route('demo.cart.select', ['demoStore' => 'standard']), ['product_ids' => []]);
+
+        $this->get(route('demo.checkout.create', ['demoStore' => 'standard']))
+            ->assertRedirect(route('demo.cart.index', ['demoStore' => 'standard']))
+            ->assertSessionHasErrors('cart');
+
+        $this->post(route('demo.checkout.store', ['demoStore' => 'standard']), $this->customerPayload())
+            ->assertSessionHasErrors('cart');
+
+        $this->assertDatabaseCount('orders', 0);
+    }
+
     public function test_a_gateway_outside_the_plan_is_rejected_on_a_demo_store(): void
     {
         $this->prepareDemo();

@@ -89,7 +89,8 @@ class StorefrontTest extends TestCase
         $this->get('/standard/cart')
             ->assertOk()
             ->assertSee('Mechanical Keyboard K87')
-            ->assertSee('/standard/checkout');
+            ->assertSee('/standard/cart/selection')
+            ->assertSee('Pilih semua produk');
 
         $this->get('/starter/products')
             ->assertOk()
