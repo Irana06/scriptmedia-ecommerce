@@ -7,7 +7,7 @@
                 <p class="mt-2 text-ink-soft">{{ $tenant->custom_domain ?? $tenant->subdomain.'.'.config('tenancy.base_domain') }}</p>
             </div>
             <x-ui.badge :variant="$tenant->store_status === 'active' ? 'tosca' : 'orange'">
-                {{ str($tenant->store_status)->replace('_', ' ')->title() }}
+                {{ \App\Support\StatusLabel::for($tenant->store_status) }}
             </x-ui.badge>
         </div>
 
@@ -83,7 +83,7 @@
                                     <td class="px-6 py-4 text-navy">{{ $invoice->invoice_number }}</td>
                                     <td class="px-6 py-4 text-ink-soft">{{ $invoice->due_date->format('d M Y') }}</td>
                                     <td class="px-6 py-4 text-navy">Rp{{ number_format((float) $invoice->total, 0, ',', '.') }}</td>
-                                    <td class="px-6 py-4"><x-ui.badge variant="navy">{{ str($invoice->status)->title() }}</x-ui.badge></td>
+                                    <td class="px-6 py-4"><x-ui.badge variant="navy">{{ \App\Support\StatusLabel::for($invoice->status) }}</x-ui.badge></td>
                                 </tr>
                             @empty
                                 <tr>

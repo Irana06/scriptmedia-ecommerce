@@ -58,7 +58,7 @@
                     <div class="flex items-center justify-between gap-3">
                         <time class="text-xs text-ink-soft">{{ $contentRequest->created_at->format('d M Y H:i') }}</time>
                         <x-ui.badge :variant="match ($contentRequest->status) { 'done' => 'tosca', 'rejected' => 'danger', 'in_progress' => 'navy', default => 'orange' }">
-                            {{ str($contentRequest->status)->replace('_', ' ')->title() }}
+                            {{ \App\Support\StatusLabel::for($contentRequest->status) }}
                         </x-ui.badge>
                     </div>
                     <p class="mt-3 text-sm leading-6 text-ink">{{ $contentRequest->description }}</p>

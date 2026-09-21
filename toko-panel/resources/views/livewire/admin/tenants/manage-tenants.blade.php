@@ -75,7 +75,7 @@
                         <th class="px-6 py-3 font-normal">Owner</th>
                         <th class="px-6 py-3 font-normal">Plan aktif</th>
                         <th class="px-6 py-3 font-normal">Subscription</th>
-                        <th class="px-6 py-3 font-normal">Provisioning</th>
+                        <th class="px-6 py-3 font-normal">Pembuatan database</th>
                         <th class="px-6 py-3 font-normal">Status toko</th>
                         <th class="px-6 py-3 text-right font-normal">Aksi</th>
                     </tr>
@@ -96,12 +96,12 @@
                             </td>
                             <td class="px-6 py-4">
                                 <x-ui.badge :variant="$tenant->provisioning_status === 'failed' ? 'orange' : 'navy'">
-                                    {{ str($tenant->provisioning_status)->title() }}
+                                    {{ \App\Support\StatusLabel::for($tenant->provisioning_status) }}
                                 </x-ui.badge>
                             </td>
                             <td class="px-6 py-4">
                                 <x-ui.badge :variant="$tenant->store_status === 'active' ? 'tosca' : 'orange'">
-                                    {{ str($tenant->store_status)->replace('_', ' ')->title() }}
+                                    {{ \App\Support\StatusLabel::for($tenant->store_status) }}
                                 </x-ui.badge>
                             </td>
                             <td class="px-6 py-4 text-right">

@@ -60,7 +60,7 @@
                             <td class="px-6 py-4 font-semibold text-navy">Rp{{ number_format((float) $invoice->total, 0, ',', '.') }}</td>
                             <td class="px-6 py-4">
                                 <x-ui.badge :variant="$invoice->status === 'paid' ? 'tosca' : ($invoice->status === 'overdue' ? 'orange' : 'navy')">
-                                    {{ str($invoice->status)->title() }}
+                                    {{ \App\Support\StatusLabel::for($invoice->status) }}
                                 </x-ui.badge>
                             </td>
                             <td class="px-6 py-4 text-right">
@@ -117,7 +117,7 @@
                             <td class="px-6 py-4 text-navy">{{ $payment->invoice->invoice_number }}</td>
                             <td class="px-6 py-4 text-ink-soft">{{ str($payment->gateway)->title() }}</td>
                             <td class="px-6 py-4 font-mono text-xs text-ink-soft">{{ $payment->gateway_reference ?? '—' }}</td>
-                            <td class="px-6 py-4"><x-ui.badge variant="tosca">{{ str($payment->status)->title() }}</x-ui.badge></td>
+                            <td class="px-6 py-4"><x-ui.badge variant="tosca">{{ \App\Support\StatusLabel::for($payment->status) }}</x-ui.badge></td>
                         </tr>
                     @empty
                         <tr>

@@ -209,7 +209,7 @@
             <div class="text-center"><p class="text-xs font-semibold tracking-[0.22em] text-tosca uppercase">Yang perlu dipahami</p><h2 class="mt-3 text-3xl sm:text-4xl">Batas layanan yang dibuat jelas sejak awal</h2></div>
             <div class="mt-10 space-y-4">
                 @foreach ([
-                    ['Apakah Starter bisa menggunakan domain sendiri?', 'Belum. Starter memakai subdomain ScriptMedia, misalnya namatoko.scriptmedia.id. Custom domain tersedia mulai Standard.'],
+                    ['Apakah Starter bisa menggunakan domain sendiri?', 'Belum. Starter memakai subdomain ScriptMedia, misalnya namatoko.'.config('tenancy.base_domain').'. Custom domain tersedia mulai Standard.'],
                     ['Apa arti perubahan konten?', 'Perubahan konten adalah bantuan tim ScriptMedia untuk mengganti teks, gambar, banner, atau penyesuaian kecil sesuai kuota paket. Pengelolaan produk dan order tetap dapat dilakukan pemilik melalui Toko Engine.'],
                     ['Apakah desain Pro benar-benar bebas?', 'Pro mencakup kustomisasi desain penuh berdasarkan kebutuhan dan kesepakatan ruang lingkup. Permintaan besar di luar ruang lingkup awal akan ditinjau terlebih dahulu agar jadwal dan hasil tetap terukur.'],
                     ['Kapan toko mulai dibuat?', 'Tim mulai memproses setelah pembayaran terverifikasi. Status pengerjaan dapat dilihat dari detail order di Toko Panel.'],

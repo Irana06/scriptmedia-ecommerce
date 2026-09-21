@@ -21,10 +21,10 @@
 
             <flux:select wire:model.live="status" label="Status">
                 <flux:select.option value="">Semua status</flux:select.option>
-                <flux:select.option value="pending">Pending</flux:select.option>
-                <flux:select.option value="in_progress">In progress</flux:select.option>
-                <flux:select.option value="done">Done</flux:select.option>
-                <flux:select.option value="rejected">Rejected</flux:select.option>
+                <flux:select.option value="pending">Menunggu</flux:select.option>
+                <flux:select.option value="in_progress">Sedang dikerjakan</flux:select.option>
+                <flux:select.option value="done">Selesai</flux:select.option>
+                <flux:select.option value="rejected">Ditolak</flux:select.option>
             </flux:select>
         </div>
     </x-ui.card>
@@ -52,7 +52,7 @@
                             <td class="max-w-xl px-6 py-4 leading-6 text-ink">{{ $contentRequest->description }}</td>
                             <td class="px-6 py-4">
                                 <x-ui.badge :variant="match ($contentRequest->status) { 'done' => 'tosca', 'rejected' => 'danger', 'in_progress' => 'navy', default => 'orange' }">
-                                    {{ str($contentRequest->status)->replace('_', ' ')->title() }}
+                                    {{ \App\Support\StatusLabel::for($contentRequest->status) }}
                                 </x-ui.badge>
                             </td>
                             <td class="px-6 py-4 text-right">
