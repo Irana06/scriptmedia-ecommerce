@@ -1,57 +1,76 @@
 # Repository Guidelines
 
+Dokumen ini bersifat informatif: menjelaskan bagaimana `toko-engine` disusun hari ini, supaya siapa pun (manusia maupun AI) bisa cepat paham konteksnya. Arahan terbaru dari pemilik project selalu jadi acuan utama.
+
 ## Project Scope & Architecture
 
-`toko-engine` is ScriptMedia's reusable e-commerce application for catalog, cart, checkout, orders, and store administration. It supports two explicit runtime modes. In ScriptMedia-hosted mode (`TENANCY_ENABLED=true`), it serves every public store domain and uses `stancl/tenancy` to select the tenant database by domain. In standalone/self-hosted mode (`TENANCY_ENABLED=false`), tenancy middleware is completely disabled and the application behaves like a conventional single-database Laravel store. Database creation and provisioning orchestration still belong in the sibling `toko-panel` project. Never modify files outside `toko-engine/` unless explicitly requested.
+`toko-engine` adalah aplikasi e-commerce ScriptMedia yang dipakai ulang untuk katalog, keranjang, checkout, order, dan administrasi toko.
 
-Plan limits must be accessed through a small `StoreLimitService`, not scattered conditionals. It may read product or payment-gateway limits from the panel's central database, but standalone installations must fall back to unlimited or local configuration.
+Rencananya aplikasi ini punya dua mode runtime:
+
+- **Hosted** (`TENANCY_ENABLED=true`): melayani seluruh domain toko publik, memilih database tenant lewat `stancl/tenancy` berdasarkan domain.
+- **Standalone** (`TENANCY_ENABLED=false`): satu database biasa, cocok untuk template yang dijual lepas.
+
+Orkestrasi provisioning (membuat database, menjalankan migrasi tenant, mendaftarkan domain) berada di `toko-panel`.
+
+Batasan paket diakses lewat `StoreLimitService` agar terpusat. Service ini bisa membaca limit produk / payment gateway dari central database panel, dan punya fallback ke config lokal atau unlimited untuk instalasi standalone.
+
+## Demo Stores (tahap saat ini)
+
+Tiga demo storefront hidup di `config/demo-stores.php` dan dilayani dari prefix `/starter`, `/standard`, `/pro` melalui middleware `demo.store` + helper `App\Support\StorefrontContext`. Demo ini adalah materi jualan untuk klien; sistem plan enforcement penuh menyusul setelah demo disetujui.
 
 ## Project Structure & Module Organization
 
-Application classes live in `app/`; place class-based Livewire components in `app/Livewire/` and matching templates in `resources/views/livewire/`. HTTP and settings routes are in `routes/`. Keep migrations, factories, and seeders under `database/`. Frontend sources belong in `resources/css/` and `resources/js/`; only publicly served static assets go in `public/`. Tests are split between `tests/Feature/` and `tests/Unit/`.
+Kelas aplikasi ada di `app/`; komponen Livewire berbasis kelas di `app/Livewire/` dengan template di `resources/views/livewire/`. Route HTTP dan settings ada di `routes/`. Migrasi, factory, dan seeder di `database/`. Sumber frontend di `resources/css/` dan `resources/js/`; aset statis yang disajikan publik di `public/`. Test terbagi antara `tests/Feature/` dan `tests/Unit/`.
 
 ## Build, Test, and Development Commands
 
-- `composer setup` installs PHP/Node dependencies, prepares `.env`, migrates, and builds assets.
-- `composer dev` starts Laravel, the queue listener, and Vite concurrently.
-- `composer test` runs Pint checks, PHPStan level 7, and the full test suite.
-- `composer lint` fixes PHP formatting; `composer types:check` runs static analysis.
-- `npm run build` creates production frontend assets.
+- `composer setup` — install dependency PHP/Node, siapkan `.env`, migrate, build aset.
+- `composer dev` — jalankan Laravel, queue listener, dan Vite bersamaan.
+- `composer test` — Pint check, PHPStan level 7, lalu seluruh test suite.
+- `composer lint` — perbaiki format PHP; `composer types:check` untuk analisis statis.
+- `npm run build` — build aset frontend produksi.
 
 ## Coding Style & Naming Conventions
 
-Follow `.editorconfig`: UTF-8, LF, four spaces (two for YAML), and final newlines. Use Laravel Pint's `laravel` preset and PSR-4 namespaces. Name classes in PascalCase, methods/variables in camelCase, database columns in snake_case, and Blade files in kebab-case. Use class-based Livewire components; do not introduce Volt.
+Ikuti `.editorconfig`: UTF-8, LF, indentasi empat spasi (dua untuk YAML), dan newline di akhir file. Gunakan preset `laravel` dari Laravel Pint dan namespace PSR-4. Kelas PascalCase, method/variabel camelCase, kolom database snake_case, file Blade kebab-case. Komponen Livewire ditulis berbasis kelas (bukan Volt) agar konsisten dengan yang sudah ada.
 
 ## Testing Guidelines
 
-Use Pest 5/PHPUnit tests and `RefreshDatabase` for database behavior. Name tests by feature and behavior, for example `tests/Feature/Checkout/PlaceOrderTest.php`. Cover happy paths, validation, authorization, failures, and every bug regression. CI uses PHP 8.3 and Node 22 and runs `composer ci:check`.
+Gunakan Pest 5/PHPUnit dan `RefreshDatabase` untuk perilaku database. Beri nama test sesuai fitur dan perilakunya, misalnya `tests/Feature/Checkout/PlaceOrderTest.php`. Cakup happy path, validasi, otorisasi, kegagalan, dan regresi tiap bug. CI memakai PHP 8.3 dan Node 22 serta menjalankan `composer ci:check`.
 
-## Design, Security & Contributions
+## Design
 
-Follow `sewa-toko-online.html`: Questrial, navy `#0B2545`, tosca `#2CA6A4`, orange `#F4A300`, off-white `#F4FAFA`, 18px cards, thin borders, solid pill badges, and navy gradient heroes. Never commit `.env`, credentials, customer data, or generated databases.
+Acuan visual ada di `docs/references/sewa-toko-online.html`: font Questrial, navy `#0B2545`, tosca `#2CA6A4`, orange `#F4A300`, off-white `#F4FAFA`, kartu radius 18px, border tipis, pill badge solid, dan hero gradient navy.
 
-History currently contains only `init`; use concise imperative commits such as `Add cart quantity validation`. Pull requests should explain scope, migrations/config changes, and verification, link relevant issues, and include screenshots for UI work.
+## Security
 
-## Final Product & Architecture Decisions
+`.env`, kredensial, data pelanggan, dan database hasil generate sebaiknya tetap di luar git. Kredensial Midtrans sandbox dan produksi adalah pasangan key yang berbeda di dashboard Midtrans, dan `MIDTRANS_IS_PRODUCTION` menentukan endpoint Snap yang dipakai — pastikan key di `.env` berasal dari environment yang sama dengan flag tersebut.
 
-These decisions come from project concept documents 14 and 15. They override any older instruction that conflicts with them. Interpret the documents in order: concept 13, correction 14, then correction 15.
+## Contributions
+
+Gunakan pesan commit imperatif yang ringkas, misalnya `Add cart quantity validation`. Pull request sebaiknya menjelaskan scope, perubahan migrasi/config, dan cara verifikasinya, menautkan issue terkait, serta menyertakan screenshot untuk pekerjaan UI.
+
+## Catatan Produk & Arsitektur
+
+Catatan berikut merangkum keputusan yang berlaku saat ini. Kalau ada arahan baru dari pemilik project, arahan itu yang dipakai.
 
 ### Domain Serving & Tenancy
 
-- `toko-engine` is the only application that serves public tenant storefront traffic. Wildcard subdomains such as `*.scriptmedia.id` and all client custom domains must resolve to the `toko-engine` deployment.
-- `toko-panel` has one separate central domain such as `panel.scriptmedia.id`. It must never render storefront pages or receive requests for store domains.
-- `stancl/tenancy` belongs in `toko-engine`, not `toko-panel`. When `TENANCY_ENABLED=true`, `InitializeTenancyByDomain` resolves the domain-to-tenant record from the panel's central database through a read connection, then switches the default connection to that tenant's database.
-- Hosted tenants share the `toko-engine` codebase, but each client has a fully separate database. One client equals one tenant, one store, and one tenant database; a dedicated physical server per client is not required.
-- When `TENANCY_ENABLED=false`, do not initialize tenancy or query tenant domains. Use the normal default database so sold templates can run standalone.
-- `toko-panel` remains responsible for provisioning: creating the database and central records, running `toko-engine` migrations against the new tenant database, registering domains, and creating the tenant owner account. Do not move provisioning orchestration into `toko-engine`.
-- DNS must route wildcard `*.scriptmedia.id` and client custom-domain CNAMEs to `toko-engine`; only the panel domain routes to `toko-panel`. Both apps may share a physical server but must use separate virtual hosts/app entry points.
+- `toko-engine` adalah aplikasi yang melayani trafik storefront publik. Wildcard subdomain `*.scriptmedia.id` dan custom domain klien diarahkan ke deployment `toko-engine`.
+- `toko-panel` berjalan di satu domain central terpisah, misalnya `panel.scriptmedia.id`, untuk billing dan tiket.
+- `stancl/tenancy` ditempatkan di `toko-engine`. Saat `TENANCY_ENABLED=true`, `InitializeTenancyByDomain` memetakan domain ke record tenant lewat read connection ke central database, lalu mengganti default connection ke database tenant tersebut.
+- Tenant hosted berbagi codebase `toko-engine`, tetapi tiap klien punya database sendiri. Satu klien = satu tenant = satu toko = satu database tenant; server fisik terpisah per klien tidak diperlukan.
+- Saat `TENANCY_ENABLED=false`, tenancy dilewati dan aplikasi memakai database default.
+- Provisioning ditangani `toko-panel`: membuat database dan record central, menjalankan migrasi `toko-engine` ke database tenant baru, mendaftarkan domain, dan membuat akun owner tenant.
+- DNS mengarahkan wildcard `*.scriptmedia.id` dan CNAME custom domain klien ke `toko-engine`; domain panel mengarah ke `toko-panel`. Keduanya boleh berbagi server fisik dengan virtual host terpisah.
 
 ### Accounts, Plans & Feature Rules
 
-- The owner intentionally has two separate accounts. The central-DB account signs in to the panel billing/ticket portal; a different user record in the tenant DB signs in to the store administration area. Provisioning creates both using the same email/contact identity. Do not introduce SSO or shared cross-application tokens unless explicitly requested later.
-- Store limits must continue to come from central `plans` records through `StoreLimitService`. Standalone mode may fall back to unlimited or local configuration.
-- Midtrans uses one shared merchant account. Starter must send `enabled_payments=['other_qris']`; Standard permits `other_qris` plus VA channels including `bca_va`, `bni_va`, `bri_va`, and `permata_va`; Pro leaves all active channels available, including credit cards and other e-wallets. Do not change Starter back to `gopay`.
-- Content-change requests are final, not provisional: usage is the number of `content_change_requests` inside the active subscription's `current_period_start` through `current_period_end`, compared with `plans.content_request_quota`. The existing panel behavior is intentional.
-- Do not require separate annual-price columns. Every annual price is calculated dynamically as `(price_platform + price_care_monthly) * 10`, while the subscription remains active for 12 months.
-- Canonical monthly plan values are: Starter `150000 + 150000`, Standard `150000 + 350000`, and Pro `150000 + 550000` rupiah for platform plus care respectively.
-- The business workflow for selling template source code is deliberately deferred. Preserve standalone capability, but do not add licensing, one-time-sale, setup-service, or optional-care-plan models unless explicitly requested.
+- Pemilik toko punya dua akun terpisah secara sengaja: akun di central DB untuk portal billing/tiket panel, dan user record di DB tenant untuk area administrasi toko. Provisioning membuat keduanya dari identitas email/kontak yang sama. SSO atau token lintas aplikasi belum termasuk scope saat ini.
+- Limit toko bersumber dari record `plans` central melalui `StoreLimitService`, dengan fallback config lokal / unlimited untuk mode standalone.
+- Midtrans memakai satu merchant account bersama. Starter mengirim `enabled_payments=['other_qris']`; Standard menambahkan kanal VA (`bca_va`, `bni_va`, `bri_va`, `permata_va`, dan sejenisnya); Pro membiarkan seluruh kanal aktif, termasuk kartu kredit dan e-wallet.
+- Permintaan ubah konten dihitung final: jumlah `content_change_requests` dalam rentang `current_period_start` sampai `current_period_end` subscription aktif, dibandingkan dengan `plans.content_request_quota`.
+- Harga tahunan dihitung dinamis sebagai `(price_platform + price_care_monthly) * 10` dengan masa aktif 12 bulan, sehingga kolom harga tahunan terpisah tidak diperlukan.
+- Nilai paket bulanan kanonis: Starter `150000 + 150000`, Standard `150000 + 350000`, Pro `150000 + 550000` rupiah untuk platform + care.
+- Alur bisnis penjualan source code template ditunda. Kemampuan standalone tetap dipertahankan; model lisensi, one-time-sale, setup service, dan care plan opsional menyusul kalau diminta.
