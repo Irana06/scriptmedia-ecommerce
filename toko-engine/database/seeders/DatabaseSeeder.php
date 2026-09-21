@@ -123,8 +123,13 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Midtrans',
                 'instructions' => 'Bayar aman melalui kartu, virtual account, QRIS, GoPay, dan metode lain yang aktif di Midtrans Snap.',
-                'config' => ['provider' => 'midtrans', 'environment' => 'sandbox'],
-                'is_active' => false,
+                'config' => [
+                    'provider' => 'midtrans',
+                    'environment' => config('services.midtrans.is_production') ? 'production' : 'sandbox',
+                ],
+                // The demo storefronts sell Midtrans as the automatic gateway, so it
+                // ships enabled; the per-plan channel list is applied at Snap time.
+                'is_active' => true,
             ],
         );
 

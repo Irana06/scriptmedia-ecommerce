@@ -48,7 +48,7 @@ class StoreLimitService
     {
         $planSlug = $this->planSlug();
 
-        if (! in_array($planSlug, ['starter', 'standard'], true)) {
+        if ($planSlug === null) {
             return null;
         }
 
@@ -58,14 +58,37 @@ class StoreLimitService
             return null;
         }
 
-        return array_values(array_filter($methods, fn (mixed $method): bool => is_string($method) && $method !== ''));
+        $methods = array_values(array_filter($methods, fn (mixed $method): bool => is_string($method) && $method !== ''));
+
+        return $methods === [] ? null : $methods;
+    }
+
+    /**
+     * Human-readable channel groups for the storefront checkout.
+     *
+     * @return list<array{label: string, detail: string}>
+     */
+    public function midtransChannelGroups(): array
+    {
+        $planSlug = $this->planSlug();
+        $groups = $planSlug === null ? null : config("store-limits.midtrans_channel_groups.{$planSlug}");
+
+        if (! is_array($groups)) {
+            return [];
+        }
+
+        return array_values(array_filter(
+            $groups,
+            fn (mixed $group): bool => is_array($group) && is_string($group['label'] ?? null) && is_string($group['detail'] ?? null),
+        ));
     }
 
     public function paymentMethodDescription(): string
     {
         return match ($this->planSlug()) {
-            'starter' => 'Pembayaran QRIS melalui Midtrans.',
-            'standard' => 'Pembayaran QRIS dan bank transfer/virtual account melalui Midtrans.',
+            'starter' => 'Pembayaran QRIS otomatis melalui Midtrans.',
+            'standard' => 'Pembayaran QRIS dan transfer bank (virtual account) otomatis melalui Midtrans.',
+            'pro' => 'Semua metode Midtrans: QRIS, transfer bank, kartu kredit/debit, dan e-wallet.',
             default => 'Semua metode pembayaran yang aktif di Midtrans Snap.',
         };
     }

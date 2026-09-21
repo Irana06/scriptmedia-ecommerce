@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class StorefrontContext
 {
@@ -28,6 +29,56 @@ class StorefrontContext
         $store = self::store();
 
         return $store === null || ($store[$feature] ?? false) === true;
+    }
+
+    /**
+     * Payment gateway codes this storefront offers.
+     *
+     * @return list<string>|null Null means every active gateway is offered.
+     */
+    public static function gatewayCodes(): ?array
+    {
+        $codes = self::store()['gateways'] ?? null;
+
+        if (! is_array($codes)) {
+            return null;
+        }
+
+        $codes = array_values(array_filter($codes, fn (mixed $code): bool => is_string($code) && $code !== ''));
+
+        return $codes === [] ? null : $codes;
+    }
+
+    /**
+     * Demo artwork (emoji plus background colour) configured for a product.
+     *
+     * @return array{icon: string, color: string}|null
+     */
+    public static function productVisual(Product $product): ?array
+    {
+        $store = self::store();
+        $slug = self::slug();
+
+        if ($store === null || $slug === null || ! is_array($store['products'] ?? null)) {
+            return null;
+        }
+
+        foreach ($store['products'] as $configured) {
+            if (! is_array($configured) || ! is_string($configured['name'] ?? null)) {
+                continue;
+            }
+
+            if ($slug.'-'.Str::slug($configured['name']) !== $product->slug) {
+                continue;
+            }
+
+            $icon = $configured['icon'] ?? null;
+            $color = $configured['color'] ?? null;
+
+            return is_string($icon) && is_string($color) ? ['icon' => $icon, 'color' => $color] : null;
+        }
+
+        return null;
     }
 
     public static function routeName(string $name): string

@@ -16,6 +16,11 @@ return [
         'max_payment_gateways' => env('STORE_MAX_PAYMENT_GATEWAYS'),
     ],
 
+    /*
+    | Midtrans Snap channels allowed per plan. A plan that is absent here (or
+    | mapped to null) leaves every channel active on the merchant account
+    | available, which is how Pro and standalone installations behave.
+    */
     'midtrans_payment_methods' => [
         'starter' => ['other_qris'],
         'standard' => [
@@ -31,6 +36,28 @@ return [
             'seabank_va',
             'saqu_va',
             'other_va',
+        ],
+        'pro' => null,
+    ],
+
+    /*
+    | Human-readable grouping of the channels above, used on the storefront so
+    | shoppers (and clients reviewing a demo) can see exactly what a plan opens
+    | up before they reach the Snap popup.
+    */
+    'midtrans_channel_groups' => [
+        'starter' => [
+            ['label' => 'QRIS', 'detail' => 'GoPay, OVO, DANA, ShopeePay, LinkAja, dan mobile banking apa pun yang mendukung QRIS.'],
+        ],
+        'standard' => [
+            ['label' => 'QRIS', 'detail' => 'GoPay, OVO, DANA, ShopeePay, LinkAja, dan mobile banking apa pun yang mendukung QRIS.'],
+            ['label' => 'Transfer bank otomatis', 'detail' => 'Virtual account BCA, BNI, BRI, Mandiri, Permata, CIMB, dan bank lain yang aktif.'],
+        ],
+        'pro' => [
+            ['label' => 'QRIS', 'detail' => 'GoPay, OVO, DANA, ShopeePay, LinkAja, dan mobile banking apa pun yang mendukung QRIS.'],
+            ['label' => 'Transfer bank otomatis', 'detail' => 'Virtual account BCA, BNI, BRI, Mandiri, Permata, CIMB, dan bank lain yang aktif.'],
+            ['label' => 'Kartu kredit & debit', 'detail' => 'Visa, Mastercard, dan JCB dengan 3D Secure.'],
+            ['label' => 'E-wallet & paylater', 'detail' => 'GoPay, ShopeePay, serta kanal cicilan yang aktif di merchant Midtrans.'],
         ],
     ],
 ];

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Support\StorefrontContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\URL;
@@ -52,10 +53,12 @@ class MidtransService
             ],
             'credit_card' => ['secure' => true],
             'callbacks' => [
+                // Keep shoppers inside the storefront they started from; on a demo
+                // store that is the plan-prefixed route, not the root store.
                 'finish' => URL::temporarySignedRoute(
-                    'checkout.success',
+                    StorefrontContext::routeName('checkout.success'),
                     now()->addDay(),
-                    ['order' => $order],
+                    StorefrontContext::routeParameters(['order' => $order]),
                 ),
             ],
             'expiry' => ['duration' => 24, 'unit' => 'hours'],
@@ -142,8 +145,15 @@ class MidtransService
                 $nextStatus = 'paid';
             }
 
+            $becamePaid = $nextStatus === 'paid' && $currentStatus !== 'paid';
+
             $lockedOrder->update([
                 'payment_status' => $nextStatus ?? $currentStatus,
+                // A freshly paid order is ready to be worked on, so move it out of
+                // the "waiting for payment" bucket in the admin order list.
+                'status' => $becamePaid && $lockedOrder->status === 'pending'
+                    ? 'processing'
+                    : $lockedOrder->status,
                 'payment_reference' => $notification['transaction_id'] ?? $lockedOrder->payment_reference,
                 'payment_metadata' => [
                     'transaction_status' => $notification['transaction_status'] ?? null,
