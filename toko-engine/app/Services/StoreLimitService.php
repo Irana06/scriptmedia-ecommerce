@@ -18,7 +18,8 @@ class StoreLimitService
     {
         $limit = $this->productLimit();
 
-        return $limit === null || Product::query()->count() < $limit;
+        // Only the store's own products count towards its plan allowance.
+        return $limit === null || StorefrontContext::scopeAdminBySlug(Product::query())->count() < $limit;
     }
 
     public function canUseGateway(): bool
@@ -100,10 +101,14 @@ class StoreLimitService
             return $this->limits;
         }
 
-        $demoStore = StorefrontContext::store();
+        // On a demo storefront the plan comes from the URL; inside the admin it
+        // comes from the account, so a per-plan demo owner sees their own limits.
+        $demoStore = StorefrontContext::store() ?? StorefrontContext::adminStore();
+        $demoSlug = StorefrontContext::slug() ?? StorefrontContext::adminSlug();
+
         if ($demoStore !== null) {
             return $this->limits = [
-                'plan_slug' => StorefrontContext::slug(),
+                'plan_slug' => $demoSlug,
                 'max_products' => $this->normalizeLimit($demoStore['max_products'] ?? null),
                 'max_payment_gateways' => $this->normalizeLimit($demoStore['max_payment_gateways'] ?? null),
             ];

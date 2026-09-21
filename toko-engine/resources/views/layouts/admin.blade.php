@@ -2,7 +2,11 @@
 
 @php
     $storeSetting = \App\Models\StoreSetting::query()->first();
-    $storeName = $storeSetting?->store_name ?? 'Toko Senja';
+    // A store-bound demo account administers one demo storefront, not the whole catalogue.
+    $managedStore = \App\Support\StorefrontContext::adminStore();
+    $managedSlug = \App\Support\StorefrontContext::adminSlug();
+    $storeName = $managedStore['store_name'] ?? $storeSetting?->store_name ?? 'Toko Senja';
+    $storeInitials = $managedStore['initials'] ?? \Illuminate\Support\Str::initials($storeName);
 @endphp
 
 <!DOCTYPE html>
@@ -12,9 +16,16 @@
         <div class="min-h-screen lg:grid lg:grid-cols-[17rem_1fr]">
             <aside class="hidden h-screen flex-col bg-linear-to-b from-navy to-navy-mid px-5 py-6 text-white lg:sticky lg:top-0 lg:flex">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-2" wire:navigate>
-                    <span class="flex size-11 items-center justify-center rounded-xl bg-orange font-semibold text-navy">{{ \Illuminate\Support\Str::initials($storeName) }}</span>
-                    <span><span class="block text-lg leading-none font-semibold">{{ $storeName }}</span><span class="mt-1.5 block text-[10px] tracking-[0.18em] text-white/55 uppercase">Admin toko</span></span>
+                    <span class="flex size-11 items-center justify-center rounded-xl bg-orange font-semibold text-navy">{{ $storeInitials }}</span>
+                    <span><span class="block text-lg leading-none font-semibold">{{ $storeName }}</span><span class="mt-1.5 block text-[10px] tracking-[0.18em] text-white/55 uppercase">{{ $managedStore ? 'Paket '.$managedStore['plan'] : 'Admin toko' }}</span></span>
                 </a>
+
+                @if ($managedStore)
+                    <a href="{{ route('demo.home', $managedSlug) }}" target="_blank" rel="noopener" class="mt-5 flex items-center justify-between gap-2 rounded-xl bg-white/10 px-4 py-3 text-xs text-white/75 transition hover:bg-white/15">
+                        Lihat storefront
+                        <span aria-hidden="true">↗</span>
+                    </a>
+                @endif
 
                 <nav class="mt-10 space-y-2 text-sm" aria-label="Navigasi admin">
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 {{ request()->routeIs('admin.dashboard') ? 'bg-white/12 font-semibold text-white' : 'text-white/70 hover:bg-white/8 hover:text-white' }}" wire:navigate><span class="size-2 rounded-full bg-orange"></span>Dashboard</a>

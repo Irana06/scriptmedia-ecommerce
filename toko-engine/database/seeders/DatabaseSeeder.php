@@ -59,6 +59,21 @@ class DatabaseSeeder extends Seeder
         );
         $staff->syncRoles($staffRole);
 
+        // One owner per demo storefront, so the plan's store administration can be
+        // shown as a client would see it: only their own catalogue and their limits.
+        foreach (config('demo-stores') as $storeSlug => $demoStore) {
+            $demoOwner = User::query()->firstOrCreate(
+                ['email' => $storeSlug.'@demo.test'],
+                [
+                    'name' => 'Pemilik '.$demoStore['store_name'],
+                    'email_verified_at' => now(),
+                    'password' => Hash::make('password'),
+                ],
+            );
+            $demoOwner->forceFill(['demo_store' => $storeSlug])->save();
+            $demoOwner->syncRoles($ownerRole);
+        }
+
         $home = Category::query()->updateOrCreate(
             ['slug' => 'rumah'],
             ['name' => 'Rumah', 'is_active' => true],

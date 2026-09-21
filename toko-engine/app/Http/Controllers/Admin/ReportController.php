@@ -18,7 +18,7 @@ class ReportController extends Controller
         ]);
         $from = Carbon::parse($validated['from'] ?? now()->subDays(29)->toDateString())->startOfDay();
         $to = Carbon::parse($validated['to'] ?? now()->toDateString())->endOfDay();
-        $query = Order::query()->whereBetween('placed_at', [$from, $to]);
+        $query = Order::query()->forAdminStore()->whereBetween('placed_at', [$from, $to]);
 
         return view('admin.reports.index', [
             'from' => $from,

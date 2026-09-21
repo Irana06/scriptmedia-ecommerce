@@ -32,6 +32,42 @@ class StorefrontContext
     }
 
     /**
+     * The demo store an admin account is bound to.
+     *
+     * Separate from slug(), which follows the URL: an owner signed in to the
+     * Starter demo should still see the whole root storefront when they visit it.
+     */
+    public static function adminSlug(): ?string
+    {
+        $slug = auth()->user()?->demo_store;
+
+        return is_string($slug) && array_key_exists($slug, config('demo-stores')) ? $slug : null;
+    }
+
+    /** @return array<string, mixed>|null */
+    public static function adminStore(): ?array
+    {
+        $slug = self::adminSlug();
+
+        return $slug === null ? null : config("demo-stores.{$slug}");
+    }
+
+    /**
+     * Restrict an admin query to the store its account is bound to.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  Builder<TModel>  $query
+     * @return Builder<TModel>
+     */
+    public static function scopeAdminBySlug(Builder $query, string $column = 'slug'): Builder
+    {
+        $slug = self::adminSlug();
+
+        return $slug === null ? $query : $query->where($column, 'like', $slug.'-%');
+    }
+
+    /**
      * Payment gateway codes this storefront offers.
      *
      * @return list<string>|null Null means every active gateway is offered.

@@ -7,7 +7,9 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\StoreLimitService;
+use App\Support\StorefrontContext;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -19,7 +21,7 @@ class ProductController extends Controller
     public function index(Request $request): View
     {
         $search = $request->string('search')->toString();
-        $products = Product::query()
+        $products = StorefrontContext::scopeAdminBySlug(Product::query())
             ->with(['category', 'media', 'variants'])
             ->when($search, fn ($query) => $query->where('name', 'like', "%{$search}%"))
             ->latest()
@@ -31,13 +33,14 @@ class ProductController extends Controller
             'search' => $search,
             'canAddProduct' => $this->storeLimits->canAddProduct(),
             'productLimit' => $this->storeLimits->productLimit(),
+            'managedStore' => StorefrontContext::adminStore(),
         ]);
     }
 
     public function create(): View
     {
         return view('admin.products.create', [
-            'categories' => Category::query()->where('is_active', true)->orderBy('name')->get(),
+            'categories' => $this->manageableCategories(),
             'canAddProduct' => $this->storeLimits->canAddProduct(),
             'productLimit' => $this->storeLimits->productLimit(),
         ]);
@@ -70,16 +73,18 @@ class ProductController extends Controller
 
     public function edit(Product $product): View
     {
-        $product->load('media');
+        $this->ensureManageable($product);
+        $product->load(['media', 'variants']);
 
         return view('admin.products.edit', [
             'product' => $product,
-            'categories' => Category::query()->where('is_active', true)->orderBy('name')->get(),
+            'categories' => $this->manageableCategories(),
         ]);
     }
 
     public function update(Request $request, Product $product): RedirectResponse
     {
+        $this->ensureManageable($product);
         $validated = $this->validateProduct($request);
         $product->update([
             ...$validated,
@@ -99,9 +104,26 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
+        $this->ensureManageable($product);
         $product->delete();
 
         return redirect()->route('admin.products.index')->with('success', 'Produk berhasil dihapus.');
+    }
+
+    /** A store-bound account may only touch products belonging to its own store. */
+    private function ensureManageable(Product $product): void
+    {
+        $slug = StorefrontContext::adminSlug();
+        abort_unless($slug === null || str_starts_with($product->slug, $slug.'-'), 404);
+    }
+
+    /** @return Collection<int, Category> */
+    private function manageableCategories(): Collection
+    {
+        return StorefrontContext::scopeAdminBySlug(Category::query())
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
     }
 
     /** @return array<string, mixed> */
@@ -192,7 +214,11 @@ class ProductController extends Controller
 
     private function uniqueSlug(string $name, ?Product $ignoredProduct = null): string
     {
+        // Demo stores are told apart by a slug prefix, so a product created by a
+        // store-bound account has to carry that prefix to belong to the store.
+        $prefix = StorefrontContext::adminSlug();
         $baseSlug = Str::slug($name) ?: 'produk';
+        $baseSlug = $prefix === null ? $baseSlug : $prefix.'-'.$baseSlug;
         $slug = $baseSlug;
         $counter = 2;
 

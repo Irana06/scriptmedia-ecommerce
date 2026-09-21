@@ -116,6 +116,7 @@ class CheckoutController extends Controller
             $order = Order::query()->create([
                 ...$validated,
                 'number' => 'ORD-'.now()->format('Ymd').'-'.Str::upper(Str::random(6)),
+                'demo_store' => StorefrontContext::slug(),
                 'subtotal' => $subtotal,
                 'total' => $subtotal,
                 'status' => 'pending',
