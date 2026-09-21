@@ -25,6 +25,9 @@ class MidtransRentalService
         $order->loadMissing(['user', 'plan']);
         $response = Http::acceptJson()->asJson()
             ->withBasicAuth((string) config('services.midtrans.server_key'), '')
+            // Both apps share one merchant, and the dashboard holds a single
+            // notification URL, so each transaction names the endpoint that owns it.
+            ->withHeaders(['X-Override-Notification' => $this->notificationUrl()])
             ->connectTimeout(5)->timeout(15)
             ->post((string) config('services.midtrans.snap_url'), [
                 'transaction_details' => [
@@ -60,6 +63,16 @@ class MidtransRentalService
         $order->update(['payment_checkout_token' => $token, 'payment_checkout_url' => $redirectUrl]);
 
         return $order->refresh();
+    }
+
+    /** Where Midtrans should post notifications for transactions this app creates. */
+    private function notificationUrl(): string
+    {
+        $configured = config('services.midtrans.notification_url');
+
+        return is_string($configured) && $configured !== ''
+            ? $configured
+            : URL::route('payments.midtrans.rental-notification');
     }
 
     /** @param array<string, mixed> $notification */

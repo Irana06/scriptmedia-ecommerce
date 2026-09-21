@@ -40,6 +40,13 @@ return [
         'client_key' => env('MIDTRANS_CLIENT_KEY'),
         'server_key' => env('MIDTRANS_SERVER_KEY'),
         'is_production' => (bool) env('MIDTRANS_IS_PRODUCTION', false),
+        /*
+        | The storefront and the panel share one Midtrans merchant, which only
+        | holds a single dashboard notification URL. Each app therefore names its
+        | own endpoint per transaction so both receive the payments they created.
+        | Leave empty to fall back to this app's own notification route.
+        */
+        'notification_url' => env('MIDTRANS_NOTIFICATION_URL'),
         'snap_url' => (bool) env('MIDTRANS_IS_PRODUCTION', false)
             ? 'https://app.midtrans.com/snap/v1/transactions'
             : 'https://app.sandbox.midtrans.com/snap/v1/transactions',

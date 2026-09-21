@@ -130,6 +130,37 @@ class MidtransPaymentTest extends TestCase
         $this->assertSame('paid', $order->fresh()->payment_status);
     }
 
+    public function test_snap_is_told_which_endpoint_owns_the_transaction(): void
+    {
+        $this->configureMidtrans();
+        Http::fake([
+            'https://app.sandbox.midtrans.com/snap/v1/transactions' => Http::response([
+                'token' => 'snap-token',
+                'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/snap-token',
+            ], 201),
+        ]);
+
+        app(MidtransService::class)->createSnapTransaction($this->midtransOrder());
+
+        // The panel shares this merchant, so the dashboard URL alone is not enough.
+        Http::assertSent(fn (Request $request): bool => $request->hasHeader('X-Override-Notification', route('payments.midtrans.notification')));
+    }
+
+    public function test_the_dashboard_test_notification_is_acknowledged(): void
+    {
+        $this->configureMidtrans();
+
+        $this->postJson(route('payments.midtrans.notification'), [
+            'order_id' => 'payment_notif_test_G123456789_abcdef',
+            'status_code' => '200',
+            'gross_amount' => '10000.00',
+            'signature_key' => 'not-a-real-signature',
+            'transaction_status' => 'settlement',
+        ])->assertOk();
+
+        $this->assertDatabaseCount('orders', 0);
+    }
+
     public function test_notification_with_invalid_signature_is_rejected(): void
     {
         $this->configureMidtrans();

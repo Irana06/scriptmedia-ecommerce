@@ -25,6 +25,13 @@ class MidtransNotificationController extends Controller
             'payment_type' => ['nullable', 'string', 'max:100'],
         ]);
 
+        // The "Test notification URL" button in the Midtrans dashboard posts a
+        // sample that matches no real order. Acknowledging it changes nothing and
+        // keeps that check green.
+        if (str_starts_with($notification['order_id'], 'payment_notif_test')) {
+            return response()->json(['message' => 'Test notification received.']);
+        }
+
         if (! $midtrans->hasValidSignature($notification) || ! $midtrans->matchesMerchant($notification)) {
             return response()->json(['message' => 'Invalid Midtrans notification signature.'], 403);
         }

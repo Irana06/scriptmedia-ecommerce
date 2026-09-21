@@ -27,6 +27,11 @@
         <env name="DB_DATABASE" value=":memory:"/>
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
+        <!-- Kept empty so the suite never depends on the Midtrans keys in a developer's .env. -->
+        <env name="MIDTRANS_MERCHANT_ID" value=""/>
+        <env name="MIDTRANS_CLIENT_KEY" value=""/>
+        <env name="MIDTRANS_SERVER_KEY" value=""/>
+        <env name="MIDTRANS_NOTIFICATION_URL" value=""/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>

@@ -45,11 +45,13 @@ class PlanSeeder extends Seeder
             ],
         ];
 
-        foreach ($plans as $name => $attributes) {
+        foreach ($plans as $slug => $attributes) {
             Plan::updateOrCreate(
-                ['slug' => $name],
+                ['slug' => $slug],
                 [
-                    'name' => $name,
+                    // plans.name is an enum of starter|standard|pro, so it stays
+                    // lowercase; views title-case it for display.
+                    'name' => $slug,
                     'price_platform' => 150000,
                     'is_active' => true,
                     ...$attributes,

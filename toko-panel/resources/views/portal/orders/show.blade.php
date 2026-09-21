@@ -5,6 +5,9 @@
     @endphp
     <div class="mx-auto max-w-5xl space-y-8">
         <x-ui.section-header eyebrow="Detail order" :title="$order->number" description="Pantau pembayaran dan proses pembuatan toko dari halaman ini." />
+        @if ($errors->any())
+            <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"><ul class="space-y-1">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+        @endif
         <x-ui.card>
             <div class="grid gap-4 sm:grid-cols-4">
                 @foreach ([['Pembayaran','Selesaikan pembayaran'],['Terverifikasi','Pembayaran diterima'],['Pembuatan toko','Tim menyiapkan toko'],['Toko siap','Kredensial tersedia']] as $index => [$title, $description])

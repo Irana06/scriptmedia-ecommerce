@@ -47,16 +47,24 @@ class DatabaseSeeder extends Seeder
             'view reports',
         ]);
 
+        /*
+         * The default owner of a fresh install. A standalone copy of this app has
+         * no demo stores, so this account administers the whole catalogue and is
+         * the one a self-hosted client would sign in with.
+         */
         $owner = User::query()->firstOrCreate(
             ['email' => 'owner@example.com'],
             ['name' => 'Pemilik Toko', 'email_verified_at' => now(), 'password' => Hash::make('password')],
         );
         $owner->syncRoles($ownerRole);
 
+        // A staff member works inside one store, so binding this account to a demo
+        // store is what makes the owner-versus-staff difference visible.
         $staff = User::query()->firstOrCreate(
             ['email' => 'staff@example.com'],
             ['name' => 'Staff Toko', 'email_verified_at' => now(), 'password' => Hash::make('password')],
         );
+        $staff->forceFill(['demo_store' => 'standard'])->save();
         $staff->syncRoles($staffRole);
 
         // One owner per demo storefront, so the plan's store administration can be

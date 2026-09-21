@@ -163,6 +163,48 @@ class RentalOrderFlowTest extends TestCase
         $this->assertNotNull($order->paid_at);
     }
 
+    public function test_snap_is_told_which_endpoint_owns_the_transaction(): void
+    {
+        config([
+            'services.midtrans.client_key' => 'client-key',
+            'services.midtrans.server_key' => 'server-key',
+            'services.midtrans.snap_url' => 'https://app.sandbox.midtrans.com/snap/v1/transactions',
+        ]);
+        Http::fake([
+            'https://app.sandbox.midtrans.com/snap/v1/transactions' => Http::response([
+                'token' => 'rental-token',
+                'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/rental-token',
+            ], 201),
+        ]);
+        $owner = User::factory()->owner()->create();
+        $plan = Plan::factory()->create();
+
+        $this->actingAs($owner)->post(route('onboarding.store', $plan), [
+            'business_name' => 'Toko Notifikasi',
+            'desired_subdomain' => 'toko-notifikasi',
+            'whatsapp' => '628123456783',
+            'billing_cycle' => 'monthly',
+        ])->assertRedirect();
+
+        // toko-engine shares this merchant, so the dashboard URL alone is not enough.
+        Http::assertSent(fn ($request): bool => $request->hasHeader('X-Override-Notification', route('payments.midtrans.rental-notification')));
+    }
+
+    public function test_the_dashboard_test_notification_is_acknowledged(): void
+    {
+        config(['services.midtrans.server_key' => 'server-key']);
+
+        $this->postJson(route('payments.midtrans.rental-notification'), [
+            'order_id' => 'payment_notif_test_G123456789_abcdef',
+            'status_code' => '200',
+            'gross_amount' => '10000.00',
+            'signature_key' => 'not-a-real-signature',
+            'transaction_status' => 'settlement',
+        ])->assertOk();
+
+        $this->assertDatabaseCount('rental_orders', 0);
+    }
+
     public function test_midtrans_notification_rejects_a_different_merchant(): void
     {
         config([

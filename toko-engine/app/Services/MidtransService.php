@@ -72,6 +72,9 @@ class MidtransService
         $response = Http::acceptJson()
             ->asJson()
             ->withBasicAuth((string) config('services.midtrans.server_key'), '')
+            // Both apps share one merchant, and the dashboard holds a single
+            // notification URL, so each transaction names the endpoint that owns it.
+            ->withHeaders(['X-Override-Notification' => $this->notificationUrl()])
             ->connectTimeout(5)
             ->timeout(15)
             ->post((string) config('services.midtrans.snap_url'), $payload);
@@ -90,6 +93,16 @@ class MidtransService
         ]);
 
         return $order->refresh();
+    }
+
+    /** Where Midtrans should post notifications for transactions this app creates. */
+    private function notificationUrl(): string
+    {
+        $configured = config('services.midtrans.notification_url');
+
+        return is_string($configured) && $configured !== ''
+            ? $configured
+            : URL::route('payments.midtrans.notification');
     }
 
     /** @param array<string, mixed> $notification */

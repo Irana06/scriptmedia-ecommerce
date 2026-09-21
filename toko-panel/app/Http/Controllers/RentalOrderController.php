@@ -90,7 +90,19 @@ class RentalOrderController extends Controller
         abort_unless($request->user()?->getKey() === $rentalOrder->user_id, Response::HTTP_FORBIDDEN);
         abort_unless($rentalOrder->status === 'awaiting_payment', Response::HTTP_UNPROCESSABLE_ENTITY);
 
-        $midtrans->createSnapTransaction($rentalOrder);
+        // A client pressing "try again" should never be shown a stack trace.
+        try {
+            $midtrans->createSnapTransaction($rentalOrder);
+        } catch (Throwable $exception) {
+            Log::warning('Gagal membuat ulang transaksi Midtrans untuk rental order.', [
+                'rental_order_id' => $rentalOrder->id,
+                'exception' => $exception,
+            ]);
+
+            return redirect()->route('portal.orders.show', $rentalOrder)->withErrors([
+                'payment' => 'Pembayaran belum dapat disiapkan. Coba lagi beberapa saat lagi atau hubungi tim kami.',
+            ]);
+        }
 
         return redirect()->route('portal.orders.show', $rentalOrder);
     }

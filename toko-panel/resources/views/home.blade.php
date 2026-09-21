@@ -37,7 +37,8 @@
                 <div class="mt-10 grid gap-6 lg:grid-cols-3">
                     @forelse ($plans as $plan)
                         @php
-                            $isStandard = $plan->name === 'standard';
+                            // Keyed on the slug, which is stable; the name is editable in the admin.
+                            $isStandard = $plan->slug === 'standard';
                             $startUrl = auth()->check() ? route('onboarding.create', $plan) : route('register', ['plan' => $plan->slug]);
                             $highlights = match ($plan->slug) {
                                 'starter' => [
@@ -76,7 +77,7 @@
                         <article class="relative flex rounded-card border {{ $isStandard ? 'border-orange ring-2 ring-orange/20' : 'border-line' }} bg-offwhite p-7 shadow-card">
                             @if ($isStandard)<span class="absolute -top-3 left-6 rounded-full bg-orange px-4 py-1 text-xs font-semibold text-navy">Paling populer</span>@endif
                             <div class="flex w-full flex-col">
-                                <p class="text-xs font-semibold tracking-[0.2em] text-tosca uppercase">{{ $plan->name }}</p>
+                                <p class="text-xs font-semibold tracking-[0.2em] text-tosca uppercase">{{ str($plan->name)->title() }}</p>
                                 <p class="mt-4 text-4xl font-semibold">Rp{{ number_format($plan->monthlyTotal(), 0, ',', '.') }}<span class="text-sm font-normal text-ink-soft"> / bulan</span></p>
                                 <div class="mt-4 space-y-2 rounded-xl border border-line bg-white p-4 text-sm text-ink-soft">
                                     <div class="flex justify-between gap-4"><span>Sewa Platform</span><strong class="text-navy">Rp{{ number_format((float) $plan->price_platform, 0, ',', '.') }}</strong></div>
