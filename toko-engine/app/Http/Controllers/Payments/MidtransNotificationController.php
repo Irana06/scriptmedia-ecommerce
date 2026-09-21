@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Payments;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\MidtransService;
+use App\Services\OrderStockService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MidtransNotificationController extends Controller
 {
-    public function __invoke(Request $request, MidtransService $midtrans): JsonResponse
+    public function __invoke(Request $request, MidtransService $midtrans, OrderStockService $stock): JsonResponse
     {
         $notification = $request->validate([
             'order_id' => ['required', 'string', 'max:50'],
@@ -38,7 +39,12 @@ class MidtransNotificationController extends Controller
             return response()->json(['message' => 'Notification does not match the order.'], 422);
         }
 
-        $midtrans->applyNotification($order, $notification);
+        $order = $midtrans->applyNotification($order, $notification);
+
+        // A denied, cancelled or expired payment frees the stock this order held.
+        if ($order->payment_status === 'failed') {
+            $stock->cancel($order);
+        }
 
         return response()->json(['message' => 'OK']);
     }

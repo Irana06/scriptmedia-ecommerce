@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Services\CartService;
 use App\Services\MidtransService;
 use App\Services\StoreLimitService;
+use App\Support\OrderTimeline;
 use App\Support\StorefrontContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
@@ -167,6 +168,9 @@ class CheckoutController extends Controller
         return view('storefront.orders.track', [
             'order' => $order,
             'gateway' => $gateway,
+            'timeline' => OrderTimeline::for($order),
+            'statusLabel' => OrderTimeline::currentLabel($order),
+            'paymentLabel' => OrderTimeline::paymentLabel($order),
             'trackingUrl' => StorefrontContext::route('orders.track', ['token' => $order->public_token]),
             'whatsappTrackingUrl' => $this->whatsappTrackingUrl($order),
         ]);

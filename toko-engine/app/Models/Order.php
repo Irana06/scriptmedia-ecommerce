@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
     'number', 'customer_name', 'customer_email', 'customer_phone', 'shipping_address',
     'notes', 'subtotal', 'total', 'status', 'payment_status', 'payment_gateway_code',
     'payment_reference', 'payment_checkout_token', 'payment_checkout_url', 'payment_metadata',
-    'public_token', 'paid_at', 'placed_at',
+    'public_token', 'paid_at', 'placed_at', 'stock_restored_at',
 ])]
 class Order extends Model
 {
@@ -36,6 +36,7 @@ class Order extends Model
             'payment_metadata' => 'array',
             'paid_at' => 'datetime',
             'placed_at' => 'datetime',
+            'stock_restored_at' => 'datetime',
         ];
     }
 

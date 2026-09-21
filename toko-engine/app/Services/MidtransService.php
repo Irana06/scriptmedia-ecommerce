@@ -61,7 +61,7 @@ class MidtransService
                     StorefrontContext::routeParameters(['order' => $order]),
                 ),
             ],
-            'expiry' => ['duration' => 24, 'unit' => 'hours'],
+            'expiry' => ['duration' => (int) config('store.payment_window_hours', 24), 'unit' => 'hours'],
         ];
         $enabledPayments = $this->storeLimits->midtransPaymentMethods();
 

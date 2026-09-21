@@ -229,6 +229,63 @@ class DemoStorePaymentTest extends TestCase
         ]);
     }
 
+    public function test_a_failed_payment_returns_the_stock_and_the_timeline_says_so(): void
+    {
+        $this->prepareDemo();
+        $product = $this->demoProduct('standard');
+        $stockBefore = $product->stock;
+
+        $this->post(route('demo.cart.store', ['demoStore' => 'standard', 'product' => $product]), ['quantity' => 2]);
+        $this->post(route('demo.checkout.store', ['demoStore' => 'standard']), $this->customerPayload());
+
+        $order = Order::query()->latest('id')->firstOrFail();
+        $this->assertSame($stockBefore - 2, $product->fresh()->stock);
+
+        $grossAmount = number_format((float) $order->total, 2, '.', '');
+        $this->postJson(route('payments.midtrans.notification'), [
+            'order_id' => $order->number,
+            'status_code' => '202',
+            'gross_amount' => $grossAmount,
+            'signature_key' => hash('sha512', $order->number.'202'.$grossAmount.'server-test'),
+            'merchant_id' => 'merchant-test',
+            'transaction_id' => 'midtrans-expired',
+            'transaction_status' => 'expire',
+            'payment_type' => 'other_qris',
+        ])->assertOk();
+
+        $order->refresh();
+        $this->assertSame('failed', $order->payment_status);
+        $this->assertSame('cancelled', $order->status);
+        $this->assertSame($stockBefore, $product->fresh()->stock);
+
+        $this->get(route('demo.orders.track', ['demoStore' => 'standard', 'token' => $order->public_token]))
+            ->assertOk()
+            ->assertSee('Pesanan dibatalkan')
+            ->assertSee('Gagal / kedaluwarsa');
+    }
+
+    public function test_the_tracking_page_walks_through_the_fulfilment_stages(): void
+    {
+        $this->prepareDemo();
+        $product = $this->demoProduct('standard');
+
+        $this->post(route('demo.cart.store', ['demoStore' => 'standard', 'product' => $product]), ['quantity' => 1]);
+        $this->post(route('demo.checkout.store', ['demoStore' => 'standard']), $this->customerPayload());
+        $order = Order::query()->latest('id')->firstOrFail();
+
+        $this->get(route('demo.orders.track', ['demoStore' => 'standard', 'token' => $order->public_token]))
+            ->assertOk()
+            ->assertSeeInOrder(['Pesanan dibuat', 'Pembayaran diterima', 'Pesanan dikirim', 'Pesanan selesai'])
+            ->assertSee('Menunggu pembayaran');
+
+        $order->forceFill(['status' => 'shipped', 'payment_status' => 'paid', 'paid_at' => now()])->save();
+
+        $this->get(route('demo.orders.track', ['demoStore' => 'standard', 'token' => $order->public_token]))
+            ->assertOk()
+            ->assertSee('Lunas')
+            ->assertDontSee('Menunggu pembayaran');
+    }
+
     private function prepareDemo(): void
     {
         config()->set('database.connections.central.database', null);

@@ -8,9 +8,44 @@
 
         <x-ui.card>
             <div class="grid gap-4 sm:grid-cols-2">
-                <div class="rounded-xl bg-offwhite p-4"><p class="text-xs text-ink-soft uppercase">Status pesanan</p><p class="mt-2 font-semibold text-navy">{{ ucfirst($order->status) }}</p></div>
-                <div class="rounded-xl bg-offwhite p-4"><p class="text-xs text-ink-soft uppercase">Pembayaran</p><p class="mt-2 font-semibold text-navy">{{ ucfirst($order->payment_status) }}</p></div>
+                <div class="rounded-xl bg-offwhite p-4"><p class="text-xs text-ink-soft uppercase">Status pesanan</p><p class="mt-2 font-semibold text-navy">{{ $statusLabel }}</p></div>
+                <div class="rounded-xl bg-offwhite p-4"><p class="text-xs text-ink-soft uppercase">Pembayaran</p><p class="mt-2 font-semibold text-navy">{{ $paymentLabel }}</p></div>
             </div>
+
+            <ol class="mt-7 border-t border-line pt-6">
+                @foreach ($timeline as $step)
+                    <li class="flex gap-4 {{ $loop->last ? '' : 'pb-6' }}">
+                        <div class="flex flex-col items-center">
+                            <span @class([
+                                'flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
+                                'bg-tosca text-white' => $step['done'],
+                                'bg-navy text-white ring-4 ring-navy/15' => ! $step['done'] && $step['current'],
+                                'bg-offwhite text-ink-soft ring-1 ring-line' => ! $step['done'] && ! $step['current'],
+                            ])>
+                                @if ($step['done'])
+                                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                @else
+                                    {{ $loop->iteration }}
+                                @endif
+                            </span>
+                            @unless ($loop->last)
+                                <span class="mt-1 w-px flex-1 {{ $step['done'] ? 'bg-tosca/40' : 'bg-line' }}"></span>
+                            @endunless
+                        </div>
+                        <div class="pt-1">
+                            <p class="font-semibold {{ $step['done'] || $step['current'] ? 'text-navy' : 'text-ink-soft' }}">{{ $step['label'] }}</p>
+                            <p class="mt-1 text-sm leading-6 text-ink-soft">{{ $step['description'] }}</p>
+                            @if ($step['at'])
+                                <p class="mt-1 text-xs text-ink-soft">{{ $step['at']->translatedFormat('d M Y, H:i') }}</p>
+                            @endif
+                        </div>
+                    </li>
+                @endforeach
+            </ol>
+
+            @if ($order->status === 'cancelled')
+                <p class="mt-2 rounded-xl border border-orange/30 bg-orange/10 p-4 text-sm leading-6 text-ink-soft">Pesanan ini dibatalkan. Kalau kamu merasa ini keliru, hubungi toko dengan menyebut nomor pesanan di atas.</p>
+            @endif
 
             <div class="mt-7 border-t border-line pt-6">
                 <h2 class="text-xl font-semibold text-navy">Rincian belanja</h2>
